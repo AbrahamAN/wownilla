@@ -1,0 +1,12 @@
+/* The scroll hint would collide with the CTAs on short laptop screens */
+@media (max-height: 820px) {
+  .scroll-hint {
+    display: none !important;
+  }
+}
+
+/* Hero logo artwork */
+.hero-logo {
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.75))
+    drop-shadow(0 0 30px rgba(212, 175, 55, 0.18));
+}

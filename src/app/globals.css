@@ -1,0 +1,397 @@
+@import "tailwindcss";
+/* Tailwind v3 responsive font utilities won over unprefixed line heights. */
+@layer utilities {
+  @media (min-width: 640px) {
+    .sm\:text-5xl {
+      line-height: 1;
+    }
+    .sm\:text-xs {
+      line-height: 1rem;
+    }
+  }
+  @media (min-width: 768px) {
+    .md\:text-xs {
+      line-height: 1rem;
+    }
+    .md\:text-sm {
+      line-height: 1.25rem;
+    }
+    .md\:text-base {
+      line-height: 1.5rem;
+    }
+    .md\:text-lg {
+      line-height: 1.75rem;
+    }
+    .md\:text-xl {
+      line-height: 1.75rem;
+    }
+    .md\:text-2xl {
+      line-height: 2rem;
+    }
+    .md\:text-3xl {
+      line-height: 2.25rem;
+    }
+    .md\:text-5xl,
+    .md\:text-6xl {
+      line-height: 1;
+    }
+  }
+}
+@theme inline {
+  --font-morpheus: var(--font-metamorphous), Georgia, serif;
+  --font-friz: var(--font-marcellus), Georgia, serif;
+  --font-narrow:
+    "Arial Narrow", var(--font-roboto-condensed), Arial, sans-serif;
+  --color-ink: #0b0a08;
+  --color-ink2: #1a120b;
+  --color-leather: #3a2718;
+  --color-bronze: #6b4a25;
+  --color-gold: #b88632;
+  --color-goldhi: #d4af37;
+  --color-parch: #e8d7a8;
+  --color-parch2: #a99a78;
+  --color-alliance: #2455a4;
+  --color-horde: #8b2020;
+}
+
+:root {
+  --ink: #0b0a08;
+  --ink2: #1a120b;
+  --leather: #3a2718;
+  --bronze: #6b4a25;
+  --gold: #b88632;
+  --goldhi: #d4af37;
+  --parch: #e8d7a8;
+  --parch2: #a99a78;
+  --alliance: #2455a4;
+  --horde: #8b2020;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Muted item-quality colors */
+  --legendary: #e07b24;
+  --epic: #9a5cc9;
+  --rare: #3f7bcb;
+  --uncommon: #5fae55;
+
+  /* Low-opacity procedural textures */
+  --tex-stone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .42 0 0 0 0 .28 0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23s)'/%3E%3C/svg%3E");
+  --tex-leather: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='turbulence' baseFrequency='.9 .6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .3 0 0 0 0 .16 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23l)'/%3E%3C/svg%3E");
+  --tex-parch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .7 0 0 0 0 .55 0 0 0 0 .32 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23p)'/%3E%3C/svg%3E");
+  /* Bronze window frame with gold corner studs (drawn via border-image) */
+  --frame: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect x='3.5' y='3.5' width='41' height='41' fill='none' stroke='%236B4A25' stroke-width='1.5'/%3E%3Crect x='6.5' y='6.5' width='35' height='35' fill='none' stroke='%23B88632' stroke-opacity='.4' stroke-width='1'/%3E%3Cg fill='%23D4AF37'%3E%3Cpath d='M4 0l4 4-4 4-4-4z'/%3E%3Cpath d='M44 0l4 4-4 4-4-4z'/%3E%3Cpath d='M4 40l4 4-4 4-4-4z'/%3E%3Cpath d='M44 40l4 4-4 4-4-4z'/%3E%3C/g%3E%3Cg fill='%230B0A08'%3E%3Ccircle cx='4' cy='4' r='1.2'/%3E%3Ccircle cx='44' cy='4' r='1.2'/%3E%3Ccircle cx='4' cy='44' r='1.2'/%3E%3Ccircle cx='44' cy='44' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+html {
+  scroll-behavior: smooth;
+}
+html,
+body {
+  background: var(--ink);
+}
+body {
+  font-family: var(--font-marcellus), Georgia, serif;
+  color: var(--parch);
+  -webkit-font-smoothing: antialiased;
+}
+::selection {
+  background: rgba(212, 175, 55, 0.35);
+  color: #fff;
+}
+section[id] {
+  scroll-margin-top: 88px;
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--goldhi);
+  outline-offset: 3px;
+}
+
+/* ---------- Entrance ---------- */
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.anim-down {
+  animation: fadeDown 0.9s var(--ease-out) 0.05s both;
+}
+.anim-up {
+  animation: fadeUp 1s var(--ease-out) both;
+}
+.d1 {
+  animation-delay: 0.15s;
+}
+.d2 {
+  animation-delay: 0.28s;
+}
+.d3 {
+  animation-delay: 0.42s;
+}
+.d4 {
+  animation-delay: 0.56s;
+}
+.d5 {
+  animation-delay: 0.7s;
+}
+
+/* ---------- Surfaces ---------- */
+.bg-stone {
+  background-color: var(--ink);
+  background-image:
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(107, 74, 37, 0.16),
+      transparent 60%
+    ),
+    var(--tex-stone);
+}
+.bg-leather {
+  background-color: var(--leather);
+  background-image:
+    radial-gradient(
+      ellipse at 50% 50%,
+      rgba(58, 39, 24, 0.55),
+      transparent 75%
+    ),
+    var(--tex-leather), var(--tex-stone);
+}
+/* MMO window: dark leather panel inside a bronze frame with gold studs */
+.panel {
+  position: relative;
+  background-color: #14100b;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(58, 39, 24, 0.35),
+      rgba(11, 10, 8, 0.2) 40%,
+      rgba(11, 10, 8, 0.55)
+    ),
+    var(--tex-leather);
+  border: 12px solid transparent;
+  border-image: var(--frame) 12 / 12px stretch;
+  box-shadow:
+    inset 0 0 40px rgba(0, 0, 0, 0.65),
+    0 22px 44px -18px rgba(0, 0, 0, 0.85);
+}
+/* Smaller inset tile */
+.tile {
+  background: linear-gradient(
+    180deg,
+    rgba(26, 18, 11, 0.95),
+    rgba(11, 10, 8, 0.95)
+  );
+  border: 1px solid var(--leather);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 175, 55, 0.08),
+    inset 0 0 14px rgba(0, 0, 0, 0.6);
+}
+.tile-hover {
+  transition:
+    border-color 0.3s,
+    transform 0.3s var(--ease-out),
+    box-shadow 0.3s;
+}
+.tile-hover:hover {
+  border-color: var(--bronze);
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 175, 55, 0.15),
+    inset 0 0 14px rgba(0, 0, 0, 0.6),
+    0 0 18px -6px rgba(212, 175, 55, 0.35);
+}
+/* Title plate that sits on a panel's top edge */
+.plate {
+  display: inline-block;
+  padding: 0.4rem 1.25rem;
+  background: linear-gradient(180deg, #3a2718, #1a120b);
+  border: 1px solid var(--bronze);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 175, 55, 0.3),
+    0 4px 10px rgba(0, 0, 0, 0.6);
+  font-family: var(--font-marcellus), serif;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 11px;
+  color: var(--goldhi);
+}
+
+/* ---------- Type ---------- */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  font-family: var(--font-marcellus), serif;
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 12px;
+  color: var(--gold);
+}
+.eyebrow::before,
+.eyebrow::after {
+  content: "";
+  height: 1px;
+  width: 44px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+.eyebrow::after {
+  transform: scaleX(-1);
+}
+.title-gold {
+  font-family: var(--font-metamorphous), serif;
+  color: var(--goldhi);
+  text-shadow:
+    0 2px 0 #000,
+    0 0 22px rgba(212, 175, 55, 0.14);
+}
+.wordmark {
+  font-family: var(--font-metamorphous), serif;
+  letter-spacing: 0.02em;
+  background: linear-gradient(
+    180deg,
+    #f6e6a8 0%,
+    #e3c25e 30%,
+    #d4af37 48%,
+    #8e6524 70%,
+    #c99a3e 88%,
+    #ebd48a 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  -webkit-text-stroke: 1px #2a1a0a;
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.85))
+    drop-shadow(0 0 26px rgba(212, 175, 55, 0.28));
+  padding: 0 0.04em 0.06em;
+}
+
+/* Brand lettering in the spirit of the logo: chiselled capitals, molten gold, dark bevel.
+       The logo lettering is custom artwork (not a distributable font), so this approximates it
+       with Cinzel Black. */
+.logo-type {
+  display: inline-block;
+  font-family: var(--font-cinzel), var(--font-marcellus), serif;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  background: linear-gradient(
+    180deg,
+    #fff0a8 0%,
+    #ffd24a 32%,
+    #f2a52a 58%,
+    #c9661c 82%,
+    #f5b84a 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  -webkit-text-stroke: 0.6px #3a1a05;
+  filter: drop-shadow(0 1.5px 0 #2a1405) drop-shadow(0 0 1px rgba(0, 0, 0, 0.9))
+    drop-shadow(0 0 10px rgba(242, 165, 42, 0.25));
+  padding: 0.04em 0.02em;
+}
+.logo-type::first-letter {
+  font-size: 1.22em;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  font-family: var(--font-marcellus), serif;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 3px;
+}
+.btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 240, 190, 0.28),
+    transparent
+  );
+  transform: skewX(-18deg);
+  transition: left 0.9s var(--ease-out);
+}
+.btn:hover::after {
+  left: 125%;
+}
+.btn-gold {
+  background: var(--gold);
+  color: #1a120b;
+  border: 1px solid #e2c46a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 236, 180, 0.5),
+    inset 0 -2px 0 rgba(60, 36, 10, 0.35),
+    0 0 0 1px #3a2718,
+    0 6px 16px rgba(0, 0, 0, 0.55);
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.3s var(--ease-out);
+}
+.btn-gold:hover {
+  background: var(--goldhi);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 236, 180, 0.6),
+    inset 0 -2px 0 rgba(60, 36, 10, 0.3),
+    0 0 0 1px #3a2718,
+    0 8px 20px rgba(0, 0, 0, 0.55),
+    0 0 18px rgba(212, 175, 55, 0.3);
+}
+.btn-dark {
+  background: linear-gradient(180deg, #2a1c10, #140e08);
+  color: var(--parch);
+  border: 1px solid var(--bronze);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 175, 55, 0.14),
+    0 6px 16px rgba(0, 0, 0, 0.5);
+  transition:
+    color 0.3s,
+    border-color 0.3s,
+    box-shadow 0.3s,
+    transform 0.3s var(--ease-out);
+}
+.btn-dark:hover {
+  color: var(--goldhi);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 175, 55, 0.2),
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    0 0 14px rgba(212, 175, 55, 0.18);
+}

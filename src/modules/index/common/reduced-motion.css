@@ -1,0 +1,46 @@
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  #queue.entering #queueScene {
+    transform: none;
+    transition: none;
+  }
+  .flame,
+  .eyes,
+  .clouds,
+  .portal-shimmer,
+  .q-ember,
+  .rays,
+  .fog,
+  .dust {
+    animation: none !important;
+  }
+  .q-ember,
+  .dust {
+    display: none;
+  }
+  .coin,
+  .coin-glow,
+  .hero-media,
+  .cine-top,
+  .cine-bot {
+    animation: none !important;
+  }
+  .cine-top,
+  .cine-bot {
+    display: none;
+  }
+  #mobileMenu {
+    transition: none;
+  }
+  .anim-down,
+  .anim-up {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
+  }
+
+  .bar-fill {
+    transition: none;
+  }
+}

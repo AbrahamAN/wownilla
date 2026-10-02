@@ -1,0 +1,33 @@
+/* ---------- Coin ---------- */
+@keyframes coinTurn {
+  0% {
+    transform: translateY(0) rotateY(-24deg) rotateZ(-3deg);
+  }
+  50% {
+    transform: translateY(-14px) rotateY(24deg) rotateZ(2deg);
+  }
+  100% {
+    transform: translateY(0) rotateY(-24deg) rotateZ(-3deg);
+  }
+}
+@keyframes glowBreath {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.06);
+  }
+}
+.coin-stage {
+  perspective: 1200px;
+}
+.coin {
+  animation: coinTurn 22s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+.coin-glow {
+  animation: glowBreath 9s ease-in-out infinite;
+}

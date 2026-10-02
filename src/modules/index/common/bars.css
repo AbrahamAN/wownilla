@@ -1,0 +1,25 @@
+/* ---------- Bars ---------- */
+.bar-track {
+  background: #0b0a08;
+  border: 1px solid var(--leather);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+.bar-fill {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+#xp {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 calc(5% - 1px),
+      rgba(212, 175, 55, 0.35) calc(5% - 1px) 5%
+    ),
+    #0b0a08;
+  border-top: 1px solid var(--bronze);
+}
+#xp-fill {
+  background: linear-gradient(180deg, #3b6cc0, #2455a4 55%, #173a74);
+  box-shadow: 0 0 8px rgba(36, 85, 164, 0.6);
+  transition: width 0.2s linear;
+}

@@ -1,0 +1,23 @@
+/* ---------- Chat ---------- */
+@keyframes chatIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.chat-line {
+  animation: chatIn 0.5s var(--ease-out) both;
+}
+.c-guild {
+  color: #6dbe5e;
+}
+.c-sys {
+  color: #e3c45a;
+}
+.c-leg {
+  color: var(--legendary);
+}

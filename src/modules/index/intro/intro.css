@@ -1,0 +1,226 @@
+/* ---------- Login queue intro ---------- */
+html.queued,
+html.queued body {
+  overflow: hidden;
+}
+.queued .anim-up,
+.queued .anim-down,
+.queued .hero-media,
+.queued .cine-top,
+.queued .cine-bot {
+  animation-play-state: paused;
+}
+#queue {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #0b0508;
+  overflow: hidden;
+  transition: opacity 0.7s ease;
+}
+#queue.gone {
+  opacity: 0;
+  pointer-events: none;
+}
+#queueScene {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 64%;
+  animation: fadeIn 0.6s ease-out both;
+}
+#queueScene svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+#queue.entering #queueScene {
+  transform: scale(3.6);
+  filter: brightness(1.6);
+  transition:
+    transform 1s cubic-bezier(0.6, 0, 0.9, 0.5),
+    filter 1s ease-in;
+}
+#queueFlash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 60%, #fff3d0, #d4af37 50%, #0b0a08);
+  transition: opacity 0.55s ease-in 0.5s;
+}
+#queue.entering #queueFlash {
+  opacity: 1;
+}
+#queue.entering .q-ui {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+@keyframes flameFlicker {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  25% {
+    transform: scale(0.94, 1.08);
+  }
+  50% {
+    transform: scale(1.05, 0.95);
+  }
+  75% {
+    transform: scale(0.97, 1.05);
+  }
+}
+.flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flameFlicker 0.9s ease-in-out infinite;
+}
+.flame.b {
+  animation-duration: 1.3s;
+  animation-delay: -0.4s;
+}
+@keyframes eyeGlow {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.eyes {
+  animation: eyeGlow 3s ease-in-out infinite;
+}
+@keyframes cloudDrift {
+  from {
+    transform: translateX(-3%);
+  }
+  to {
+    transform: translateX(3%);
+  }
+}
+.clouds {
+  animation: cloudDrift 24s ease-in-out infinite alternate;
+}
+@keyframes portalShimmer {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+.portal-shimmer {
+  animation: portalShimmer 4s ease-in-out infinite;
+}
+@keyframes emberRise {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--dx, 20px), -55vh, 0);
+    opacity: 0;
+  }
+}
+.q-ember {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background: #ffc46e;
+  box-shadow: 0 0 6px 2px rgba(255, 140, 40, 0.7);
+  animation: emberRise linear infinite;
+}
+.q-dialog {
+  background: linear-gradient(180deg, rgba(8, 6, 10, 0.86), rgba(4, 3, 6, 0.9));
+  border: 3px solid #6f6a70;
+  box-shadow:
+    inset 0 0 0 1px #1a1718,
+    inset 0 0 0 3px #9b969c,
+    inset 0 0 22px rgba(0, 0, 0, 0.9),
+    0 0 0 1px #000,
+    0 20px 50px rgba(0, 0, 0, 0.6);
+}
+.q-dialog::before,
+.q-dialog::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, #d8d4da, #5e5a60);
+  top: -6px;
+  box-shadow: 0 0 0 1px #000;
+}
+.q-dialog::before {
+  left: -6px;
+}
+.q-dialog::after {
+  right: -6px;
+}
+.q-text {
+  font-family: var(--font-marcellus), serif;
+  color: #f2c230;
+  text-shadow:
+    0 1px 0 #000,
+    0 0 2px #000,
+    1px 1px 2px #000;
+}
+.q-btn {
+  font-family: var(--font-marcellus), serif;
+  color: #ffe7a6;
+  text-shadow: 0 1px 1px #000;
+  background: linear-gradient(180deg, #b01e14 0%, #7a0c07 55%, #4e0503 100%);
+  border: 2px solid #1a0a08;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 170, 140, 0.45),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px #c9a24a;
+  transition:
+    filter 0.2s,
+    transform 0.2s;
+}
+.q-btn:hover {
+  filter: brightness(1.2);
+}
+.q-btn:active {
+  transform: translateY(1px);
+}
+@keyframes enterPulse {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 170, 140, 0.45),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+      0 0 0 1px #c9a24a,
+      0 0 0 rgba(212, 175, 55, 0);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 170, 140, 0.45),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+      0 0 0 1px #e8c766,
+      0 0 22px rgba(212, 175, 55, 0.55);
+  }
+}
+.q-btn.enter-world {
+  animation: enterPulse 1.6s ease-in-out infinite;
+  font-size: 1.05em;
+}
+@media (max-aspect-ratio: 3/4) {
+  #queueScene .g-left {
+    transform: translate(606px, 810px) scale(0.6);
+  }
+  #queueScene .g-right {
+    transform: translate(994px, 810px) scale(-0.6, 0.6);
+  }
+  #queueScene .brazier {
+    display: none;
+  }
+}

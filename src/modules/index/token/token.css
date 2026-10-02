@@ -1,0 +1,10 @@
+/* Container sizing prevents the long supply figure from crossing tile borders. */
+#token .panel .grid > .tile {
+  container-type: inline-size;
+}
+#token .panel .grid > .tile > .font-friz {
+  font-size: min(1.25rem, 24cqw);
+}
+#token .panel .grid > .tile:nth-child(2) > .font-friz {
+  font-size: min(1.25rem, 12cqw);
+}

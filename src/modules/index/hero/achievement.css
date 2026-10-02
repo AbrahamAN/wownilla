@@ -1,0 +1,28 @@
+/* ---------- Achievement toast ---------- */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes toastOut {
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+.toast {
+  opacity: 0;
+  pointer-events: none;
+}
+.toast.show {
+  animation: toastIn 0.7s var(--ease-out) forwards;
+  pointer-events: auto;
+}
+.toast.hide {
+  animation: toastOut 0.6s ease-in forwards;
+}

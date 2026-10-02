@@ -1,0 +1,142 @@
+/* ---------- Hero media & atmosphere ---------- */
+@keyframes mediaIn {
+  0% {
+    opacity: 0;
+    transform: scale(1.14);
+    filter: blur(12px) brightness(0.3);
+  }
+  60% {
+    opacity: 1;
+    filter: blur(2px) brightness(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: none;
+  }
+}
+.hero-media {
+  animation: mediaIn 2.6s var(--ease-out) both;
+}
+#heroVideo {
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+#heroVideo.ready {
+  opacity: 1;
+}
+.grain {
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+@keyframes barOpenTop {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+@keyframes barOpenBot {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+.cine-top {
+  animation: barOpenTop 1.6s var(--ease-out) 0.3s both;
+}
+.cine-bot {
+  animation: barOpenBot 1.6s var(--ease-out) 0.3s both;
+}
+
+@keyframes raySway {
+  0%,
+  100% {
+    transform: rotate(-3deg) translateX(-2%);
+    opacity: 0.5;
+  }
+  50% {
+    transform: rotate(3deg) translateX(2%);
+    opacity: 0.8;
+  }
+}
+.rays {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  top: -30%;
+  height: 110%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transform-origin: 50% 0%;
+  background: repeating-conic-gradient(
+    from 180deg at 50% 0%,
+    rgba(232, 190, 110, 0.07) 0deg 3deg,
+    transparent 3deg 9deg
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 45% 80% at 50% 0%,
+    #000 20%,
+    transparent 75%
+  );
+  mask-image: radial-gradient(
+    ellipse 45% 80% at 50% 0%,
+    #000 20%,
+    transparent 75%
+  );
+  animation: raySway 18s ease-in-out infinite;
+}
+@keyframes fogDrift {
+  0% {
+    transform: translate3d(-8%, 0, 0);
+  }
+  100% {
+    transform: translate3d(8%, 0, 0);
+  }
+}
+.fog {
+  position: absolute;
+  left: -30%;
+  width: 160%;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(150, 118, 80, 0.22) 0%,
+    rgba(90, 66, 40, 0.12) 40%,
+    transparent 70%
+  );
+  filter: blur(10px);
+  animation: fogDrift 50s ease-in-out infinite alternate;
+}
+@keyframes dustFloat {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: var(--o, 0.6);
+  }
+  80% {
+    opacity: var(--o, 0.6);
+  }
+  100% {
+    transform: translate3d(var(--dx, 30px), var(--dy, -60px), 0);
+    opacity: 0;
+  }
+}
+.dust {
+  position: absolute;
+  border-radius: 9999px;
+  background: #e8d7a8;
+  pointer-events: none;
+  animation: dustFloat linear infinite;
+}
+.dust.magic {
+  background: #f2d27a;
+  box-shadow: 0 0 6px 1px rgba(212, 175, 55, 0.6);
+}

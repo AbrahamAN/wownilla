@@ -1,0 +1,9 @@
+/* Keep guild figures within their three-column tiles on narrow phones. */
+#community .tile {
+  container-type: inline-size;
+}
+@media (max-width: 639px) {
+  #community .tile > .font-friz {
+    font-size: min(1.5rem, 30cqw);
+  }
+}
