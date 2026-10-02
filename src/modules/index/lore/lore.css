@@ -1,30 +1,657 @@
-/* ---------- Lore codex ---------- */
-.codex {
-  background-color: #1c140c;
+/* ---------- Lore roadmap: floating 3D world ---------- */
+/* The section's own top padding already clears the fixed navigation, so the
+   shared scroll margin would only push the map below the fold. */
+#lore {
+  scroll-margin-top: 0;
+}
+.rm-stage {
+  --rm-tilt: 36deg;
+  --rm-pin: 1;
+  position: relative;
+  perspective: 1500px;
+  perspective-origin: 50% 30%;
+  padding: 3% 0 1%;
+  margin-inline: auto;
+}
+/* On landscape screens cap the map by viewport height, so the heading and the
+   whole world are visible together when the section is navigated to. */
+@media (min-width: 1024px) {
+  .rm-stage {
+    max-width: max(560px, calc((100svh - 390px) * 1.7));
+    /* The tilt leaves the top of the layout box empty; reclaim it. */
+    padding: 0;
+    margin-top: -2.5%;
+  }
+}
+.rm-tilt,
+.rm-float,
+.rm-world {
+  transform-style: preserve-3d;
+  /* The far half of the tilted world sits behind these untilted planes, so
+     they must not swallow hits meant for the markers there. */
+  pointer-events: none;
+}
+.rm-float {
+  animation: rm-float 9s ease-in-out infinite alternate;
+}
+.rm-world {
+  position: relative;
+  aspect-ratio: 1000 / 625;
+  transform: rotateX(var(--rm-tilt));
+}
+.rm-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.rm-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Depth stack, lowest first. Grouping effects stay on leaf layers so the
+   preserve-3d chain above them is never flattened. */
+.rm-ground {
+  position: absolute;
+  inset: 8% 4% -6%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(0, 0, 0, 0.75),
+    transparent 68%
+  );
+  transform: translateZ(-150px);
+  pointer-events: none;
+}
+.rm-clouds-back {
+  transform: translateZ(-70px);
+}
+.rm-slab {
+  border-radius: 10px;
+  background: linear-gradient(180deg, #3a2718, #140e08);
+  box-shadow:
+    0 0 0 3px #1a120b,
+    0 0 0 4px rgba(184, 134, 50, 0.45);
+  transform: translateZ(-16px);
+}
+.rm-sea {
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 2px #1a120b,
+    0 0 0 3px rgba(212, 175, 55, 0.5),
+    0 0 60px rgba(212, 175, 55, 0.12);
+}
+.rm-cast {
+  transform: translateZ(4px);
+}
+.rm-shadow {
+  filter: blur(7px);
+  transform: translate(1.4%, 2.6%);
+}
+.rm-land {
+  transform: translateZ(16px);
+  filter: drop-shadow(0 2px 0 #7a5223) drop-shadow(0 5px 0 #3a2718);
+}
+.rm-route {
+  transform: translateZ(19px);
+}
+.rm-glint {
+  stroke-dashoffset: 100;
+  opacity: 0.6;
+  animation: rm-glint 9s linear infinite;
+}
+.rm-peaks {
+  transform: translateZ(30px);
+}
+.rm-relief {
+  filter: drop-shadow(0 4px 2px rgba(0, 0, 0, 0.5));
+}
+/* Parchment grain, a warm key light from the upper left and a vignette. */
+.rm-sheen {
+  border-radius: 8px;
   background-image:
     radial-gradient(
-      ellipse 70% 60% at 50% 45%,
-      rgba(232, 215, 168, 0.07),
+      ellipse 60% 55% at 24% 18%,
+      rgba(255, 236, 180, 0.2),
+      transparent 70%
+    ),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(11, 10, 8, 0.5)),
+    var(--tex-parch);
+  transform: translateZ(31px);
+}
+.rm-clouds-mid {
+  transform: translateZ(44px);
+}
+.rm-clouds-front {
+  transform: translateZ(130px);
+}
+
+/* ---------- Clouds and fog ---------- */
+.rm-cloud {
+  position: absolute;
+  aspect-ratio: 2.6 / 1;
+  opacity: var(--o);
+  background:
+    radial-gradient(
+      ellipse 38% 46% at 30% 58%,
+      rgba(244, 236, 214, 0.95),
       transparent 70%
     ),
     radial-gradient(
-      ellipse at 50% 50%,
-      transparent 55%,
-      rgba(0, 0, 0, 0.55) 100%
+      ellipse 34% 52% at 55% 42%,
+      rgba(255, 250, 235, 0.92),
+      transparent 70%
     ),
-    var(--tex-parch), var(--tex-leather);
-  border: 12px solid transparent;
-  border-image: var(--frame) 12 / 12px stretch;
-  box-shadow:
-    inset 0 0 60px rgba(0, 0, 0, 0.7),
-    0 30px 60px -20px rgba(0, 0, 0, 0.9);
+    radial-gradient(
+      ellipse 36% 42% at 74% 62%,
+      rgba(214, 204, 186, 0.9),
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 60% 30% at 50% 74%,
+      rgba(176, 166, 150, 0.6),
+      transparent 75%
+    );
+  filter: blur(6px);
+  animation: rm-drift 80s ease-in-out infinite alternate;
 }
-.dropcap::first-letter {
-  font-family: var(--font-metamorphous), serif;
-  float: left;
-  font-size: 3.4em;
-  line-height: 0.85;
-  padding: 0.06em 0.12em 0 0;
+.rm-fog {
+  position: absolute;
+  /* Oversized so every haze fades out well inside the box edges. */
+  inset: -25% -20%;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 28% 18% at 22% 72%,
+      rgba(232, 215, 168, 0.1),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 26% 16% at 78% 26%,
+      rgba(232, 215, 168, 0.09),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 40% 14% at 50% 80%,
+      rgba(169, 154, 120, 0.1),
+      transparent 70%
+    );
+  animation: rm-fog 26s ease-in-out infinite alternate;
+}
+
+/* Cloud bank that hides the world until the section is entered. It only
+   exists while the entrance classes are present, so it never blocks the map
+   without JavaScript or under reduced motion. */
+.rm-veil {
+  display: none;
+  position: absolute;
+  inset: -10% -8%;
+  z-index: 3;
+  pointer-events: none;
+}
+.rm-pre .rm-veil,
+.rm-seen .rm-veil {
+  display: block;
+}
+.rm-veil-puff {
+  position: absolute;
+  aspect-ratio: 2.1 / 1;
+  background:
+    radial-gradient(
+      ellipse 40% 48% at 30% 56%,
+      rgba(244, 236, 214, 0.98),
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 38% 54% at 56% 42%,
+      rgba(255, 250, 235, 0.96),
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 38% 46% at 74% 60%,
+      rgba(214, 204, 186, 0.95),
+      transparent 74%
+    ),
+    radial-gradient(
+      ellipse 62% 36% at 50% 72%,
+      rgba(176, 166, 150, 0.8),
+      transparent 76%
+    );
+  filter: blur(9px);
+}
+.rm-seen .rm-veil-puff {
+  animation: rm-part 2.6s cubic-bezier(0.5, 0, 0.2, 1) both;
+}
+
+/* ---------- Markers ---------- */
+.rm-beacon {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 0;
+  height: 0;
+  transform: translateZ(21px);
+  pointer-events: none;
+}
+.rm-beacon i {
+  position: absolute;
+  left: -15px;
+  top: -15px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(169, 154, 120, 0.55);
+  background: radial-gradient(rgba(11, 10, 8, 0.45), transparent 70%);
+}
+.rm-beacon i + i {
+  display: none;
+}
+.rm-beacon[data-status="in-progress"] i {
+  left: -38px;
+  top: -38px;
+  width: 76px;
+  height: 76px;
+  border: 2px solid #f6e6a8;
+  background: radial-gradient(rgba(246, 230, 168, 0.55), transparent 65%);
+  box-shadow: 0 0 22px rgba(212, 175, 55, 0.7);
+  animation: rm-pulse 2.8s ease-out infinite;
+}
+.rm-beacon[data-status="in-progress"] i + i {
+  display: block;
+  animation-delay: 1.4s;
+}
+/* The last waypoint breathes a pale, uncertain light. */
+.rm-beacon[data-final] i {
+  left: -26px;
+  top: -26px;
+  width: 52px;
+  height: 52px;
+  border-style: dashed;
+  background: radial-gradient(rgba(232, 215, 168, 0.35), transparent 68%);
+  animation: rm-breathe 5s ease-in-out infinite alternate;
+}
+
+.rm-marker {
+  --rm-lift: 1;
+  --pin: #7b7364;
+  --pin-light: #b9ad94;
+  --pin-edge: #241c14;
+  --pin-core: #17120d;
+  --pin-glyph: #a99a78;
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 44px;
+  height: 58px;
+  margin: -56px 0 0 -22px;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  transform-origin: 50% 96%;
+  /* Counter-rotating the tilt stands each pin upright on the map plane. */
+  transform: translateZ(22px) rotateX(calc(var(--rm-tilt) * -1))
+    scale(calc(var(--rm-pin) * var(--rm-lift)));
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.6));
+  transition:
+    transform 0.35s var(--ease-out),
+    filter 0.35s;
+  -webkit-tap-highlight-color: transparent;
+}
+.rm-marker[data-status="in-progress"] {
+  --pin: #d4af37;
+  --pin-light: #fff0b4;
+  --pin-edge: #3a2718;
+  --pin-core: #2a1a0a;
+  --pin-glyph: #fff4cf;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 10px rgba(246, 214, 110, 0.75));
+}
+.rm-marker[data-final] {
+  --pin: #8d8672;
+  --pin-glyph: #d9cba3;
+}
+.rm-marker:hover,
+.rm-marker[aria-expanded="true"] {
+  --rm-lift: 1.16;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 12px rgba(232, 215, 168, 0.7)) brightness(1.15);
+}
+.rm-marker[data-status="in-progress"]:hover,
+.rm-marker[data-status="in-progress"][aria-expanded="true"] {
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 18px rgba(255, 226, 130, 0.95)) brightness(1.12);
+}
+.rm-pin {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.rm-pin-body {
+  fill: var(--pin);
+  stroke: var(--pin-edge);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.rm-pin-light {
+  fill: var(--pin-light);
+  opacity: 0.55;
+}
+.rm-pin-core {
+  fill: var(--pin-core);
+  stroke: var(--pin-light);
+  stroke-opacity: 0.6;
+  stroke-width: 1.2;
+}
+.rm-pin-glyph {
+  fill: var(--pin-glyph);
+  color: var(--pin-glyph);
+}
+.rm-marker-tag {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  background: rgba(11, 10, 8, 0.78);
+  border: 1px solid var(--bronze);
+  font-family: var(--font-marcellus), serif;
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.14em;
+  color: var(--parch2);
+  white-space: nowrap;
+}
+.rm-marker[data-status="in-progress"] .rm-marker-tag {
+  border-color: var(--goldhi);
   color: var(--goldhi);
-  text-shadow: 0 2px 0 #000;
+}
+.rm-spark {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #fff4cf;
+  box-shadow: 0 0 6px 1px rgba(246, 214, 110, 0.9);
+  opacity: 0;
+  pointer-events: none;
+  animation: rm-spark 3.5s ease-out infinite;
+}
+
+/* ---------- Tooltip ---------- */
+.rm-panel-anchor {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+}
+.rm-panel-anchor[data-side="above"] {
+  transform: translateY(calc(-100% - 26px));
+}
+.rm-panel-anchor[data-side="below"] {
+  transform: translateY(16px);
+}
+.rm-panel {
+  position: relative;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--gold);
+  border-radius: 3px;
+  background-color: rgba(20, 15, 10, 0.88);
+  background-image:
+    linear-gradient(180deg, rgba(58, 39, 24, 0.4), transparent 45%),
+    var(--tex-parch);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow:
+    inset 0 0 0 3px rgba(11, 10, 8, 0.85),
+    inset 0 0 0 4px rgba(184, 134, 50, 0.35),
+    inset 0 0 30px rgba(0, 0, 0, 0.6),
+    0 20px 40px -14px #000;
+}
+.rm-panel::after {
+  content: "";
+  position: absolute;
+  left: var(--notch);
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  background: #17110b;
+  border: solid var(--gold);
+  transform: rotate(45deg);
+}
+.rm-panel-anchor[data-side="above"] .rm-panel::after {
+  bottom: -7px;
+  border-width: 0 1px 1px 0;
+}
+.rm-panel-anchor[data-side="below"] .rm-panel::after {
+  top: -7px;
+  border-width: 1px 0 0 1px;
+}
+.rm-panel-title {
+  color: var(--parch);
+}
+.rm-panel[data-status="in-progress"] {
+  border-color: var(--goldhi);
+  background-image:
+    linear-gradient(180deg, rgba(212, 175, 55, 0.22), transparent 50%),
+    var(--tex-parch);
+  box-shadow:
+    inset 0 0 0 3px rgba(11, 10, 8, 0.85),
+    inset 0 0 0 4px rgba(212, 175, 55, 0.6),
+    inset 0 0 30px rgba(0, 0, 0, 0.55),
+    0 20px 40px -14px #000,
+    0 0 34px -4px rgba(212, 175, 55, 0.55);
+}
+.rm-panel[data-status="in-progress"]::after {
+  border-color: var(--goldhi);
+}
+.rm-panel[data-status="in-progress"] .rm-panel-title {
+  color: var(--goldhi);
+}
+
+/* Status badge, shared by the tooltip and the ledger. */
+.rm-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-marcellus), serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--parch2);
+}
+.rm-status[data-status="in-progress"] {
+  padding: 2px 8px;
+  border: 1px solid var(--goldhi);
+  background: rgba(212, 175, 55, 0.14);
+  color: #f6e6a8;
+}
+.rm-status-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--goldhi);
+  box-shadow: 0 0 8px var(--goldhi);
+  transform: rotate(45deg);
+  animation: rm-blink 1.6s ease-in-out infinite alternate;
+}
+
+/* ---------- Entrance ---------- */
+.rm-pre .rm-marker,
+.rm-pre .rm-beacon,
+.rm-pre .rm-route {
+  opacity: 0;
+}
+.rm-seen .rm-world {
+  animation: rm-rise 2.4s var(--ease-out) 0.3s backwards;
+}
+.rm-seen .rm-route {
+  animation: fadeIn 1.2s ease-out 1.5s backwards;
+}
+.rm-seen .rm-marker {
+  animation: rm-drop 0.7s var(--ease-out) backwards;
+  animation-delay: calc(var(--i) * 0.2s + 1.8s);
+}
+.rm-seen .rm-beacon {
+  animation: fadeIn 0.8s ease-out backwards;
+  animation-delay: calc(var(--i) * 0.2s + 2s);
+}
+
+/* Rest offscreen, and hold the world still while a tooltip is anchored. */
+.rm-idle *,
+.rm-open .rm-float {
+  animation-play-state: paused !important;
+}
+
+@keyframes rm-float {
+  from {
+    transform: translateY(6px) rotateZ(-0.3deg);
+  }
+  to {
+    transform: translateY(-8px) rotateZ(0.3deg);
+  }
+}
+@keyframes rm-rise {
+  from {
+    transform: translateY(60px) rotateX(66deg) scale(0.8);
+  }
+}
+@keyframes rm-drop {
+  from {
+    opacity: 0;
+    transform: translateZ(120px) rotateX(calc(var(--rm-tilt) * -1)) scale(0.5);
+  }
+}
+@keyframes rm-part {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(var(--dx), var(--dy), 0) scale(1.4);
+  }
+}
+@keyframes rm-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(var(--drift), 0, 0);
+  }
+}
+@keyframes rm-fog {
+  from {
+    transform: translateX(-2.5%);
+  }
+  to {
+    transform: translateX(2.5%);
+  }
+}
+@keyframes rm-glint {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes rm-pulse {
+  from {
+    opacity: 0.95;
+    transform: scale(0.25);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+@keyframes rm-breathe {
+  from {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
+@keyframes rm-spark {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-46px) scale(0.2);
+  }
+}
+@keyframes rm-blink {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Smaller screens flatten the tilt and shrink the pins so nothing crowds. */
+@media (max-width: 1023px) {
+  .rm-stage {
+    --rm-tilt: 30deg;
+    --rm-pin: 0.9;
+  }
+}
+@media (max-width: 639px) {
+  .rm-stage {
+    --rm-tilt: 22deg;
+    --rm-pin: 0.72;
+    perspective: 900px;
+    padding: 9% 0 5%;
+  }
+  .rm-world {
+    width: 108%;
+    margin-left: -4%;
+  }
+  .rm-beacon[data-status="in-progress"] i {
+    left: -24px;
+    top: -24px;
+    width: 48px;
+    height: 48px;
+  }
+  .rm-beacon[data-final] i {
+    left: -18px;
+    top: -18px;
+    width: 36px;
+    height: 36px;
+  }
+  .rm-cloud {
+    filter: blur(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rm-float,
+  .rm-cloud,
+  .rm-fog,
+  .rm-glint,
+  .rm-beacon i,
+  .rm-status-dot,
+  .rm-world,
+  .rm-route,
+  .rm-marker,
+  .rm-beacon {
+    animation: none !important;
+  }
+  .rm-spark,
+  .rm-glint {
+    display: none;
+  }
+  .rm-marker {
+    transition: none;
+  }
 }
