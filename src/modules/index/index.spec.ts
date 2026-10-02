@@ -55,11 +55,11 @@ test("prelaunch exposes labeled placeholder copy without trade redirects or gene
   await page.goto("/#token");
   await expect(
     page
-      .locator("#token")
+      .locator("#heroContent")
       .getByRole("button", { name: "Copy token contract placeholder" }),
   ).toBeEnabled();
   await expect(
-    page.locator("#token").getByRole("button", { name: "Buy $NILLA" }),
+    page.locator("#heroContent").getByRole("button", { name: "Buy $NILLA" }),
   ).toBeDisabled();
   const urls = await page
     .locator("a[href^='http']")

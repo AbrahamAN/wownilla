@@ -102,7 +102,7 @@ test("reduced motion keeps the dungeon still and content readable", async ({
   await expect(page.locator(".dust")).toHaveCount(0);
   await expect(page.locator("#chat p")).toHaveCount(7);
   await page.locator("#token").scrollIntoViewIfNeeded();
-  await expect(page.locator("#token h2")).toHaveText("The Character Sheet");
+  await expect(page.locator("#token h2")).toHaveText("How it works");
 });
 
 test("server content remains visible without JavaScript", async ({

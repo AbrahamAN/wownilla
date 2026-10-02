@@ -1,11 +1,8 @@
 import { MarketPanel } from "./market-panel";
-import { LaunchDetails } from "@/modules/index/common/launch-details";
 import { siteConfig } from "@/modules/index/common/site-config";
-import { Reveal, BarFill } from "@/modules/common/reveal";
-import { ContractAddress } from "@/modules/index/common/contract-address";
-import { ProjectActions } from "@/modules/index/common/project-actions";
+import { Reveal } from "@/modules/common/reveal";
 
-/** Preserves the original token section while isolating its interactive controls. */
+/** Explains the prelaunch project in three server-rendered steps before the market and buying guide. */
 export function TokenSection() {
   return (
     <section
@@ -21,157 +18,86 @@ export function TokenSection() {
       ></div>
       <div className="relative max-w-6xl mx-auto">
         <Reveal tag="div" className="reveal text-center">
-          <div className="eyebrow">{"Token"}</div>
+          <div className="eyebrow">The guild handbook</div>
           <h2 className="title-gold mt-4 text-4xl sm:text-5xl md:text-6xl leading-[1.05]">
-            {"The Character Sheet"}
+            How it works
           </h2>
           <p className="mt-4 max-w-xl mx-auto text-base text-parch2">
-            {"Prelaunch character sheet. Project claims await confirmation."}
+            Three things to know before the gates open.
+          </p>
+          <p className="mt-5 font-narrow text-xs tracking-[0.18em] uppercase text-gold">
+            01 · Pair / 02 · Vault / 03 · Guild
           </p>
         </Reveal>
-        <Reveal
-          tag="div"
-          className="reveal mt-14 grid gap-6 lg:grid-cols-[1fr_1.35fr] items-stretch"
-        >
-          <div className="panel p-6 md:p-8 flex flex-col items-center justify-center text-center overflow-hidden">
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background:
-                  "radial-gradient(circle at 50% 38%, rgba(212,175,55,0.2), transparent 55%)",
-              }}
-            ></div>
-            <div className="coin-stage relative w-44 h-44 md:w-52 md:h-52">
-              <svg className="coin absolute inset-0 w-full h-full drop-shadow-[0_18px_30px_rgba(0,0,0,0.7)]">
-                <use href="#coin-art"></use>
-              </svg>
-            </div>
-            <div className="relative mt-6 font-morpheus text-3xl text-goldhi [text-shadow:0_2px_0_#000]">
-              {siteConfig.ticker}
-            </div>
-            <div className="relative mt-1 font-narrow text-sm text-parch2 tracking-wide">
-              {"Item Level 9000 · "}
-              <span style={{ color: "var(--legendary)" }}>{"Legendary"}</span>
-            </div>
-            <div className="relative mt-6 w-full max-w-sm">
-              <ContractAddress />
-              <div className="mt-4">
-                <LaunchDetails />
+        <div className="how-it-works-grid mt-12 grid gap-6 lg:grid-cols-3">
+          {[
+            {
+              number: "01",
+              label: "Pair",
+              status: "Planned",
+              title: "Paired with tokenized $MSFT",
+              description: `${siteConfig.ticker}'s planned pair is Robinhood's tokenized $MSFT on ${siteConfig.chain.name}. From software to the cloud, the guild rides alongside the tools that power the digital world.`,
+              artwork: "coin-art",
+            },
+            {
+              number: "02",
+              label: "Vault",
+              status: "Planned",
+              title: "Trading fees feed the vault",
+              description: `Trading fees are planned to flow into the ${siteConfig.launchpad.name} community vault—the guild's shared war chest. The Auction House brings activity back to the community.`,
+              artwork: "swords",
+            },
+            {
+              number: "03",
+              label: "Guild",
+              status: "Planned",
+              title: "Guild driven",
+              description: `${siteConfig.ticker} holders are the guild. Its members will fully guide the direction of this community token, shaping its ideas, culture and next chapter. The guild sets the course.`,
+              artwork: "logo-w",
+            },
+          ].map((step) => (
+            <Reveal
+              tag="article"
+              key={step.number}
+              className="reveal panel how-it-works-card p-6 md:p-8"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <span
+                  className="how-it-works-number font-morpheus text-goldhi"
+                  aria-hidden="true"
+                >
+                  {step.number}
+                </span>
+                <span className="plate">{step.status}</span>
               </div>
-              <div className="mt-4">
-                <ProjectActions />
+              <p className="mt-4 font-narrow text-xs uppercase tracking-[0.18em] text-gold">
+                {step.label}
+              </p>
+              <h3 className="mt-3 font-friz text-2xl leading-snug text-parch">
+                {step.title}
+              </h3>
+              <p className="mt-4 font-narrow text-lg leading-relaxed text-parch2">
+                {step.description}
+              </p>
+              <div className="how-it-works-art mt-auto pt-8" aria-hidden="true">
+                <svg
+                  viewBox={
+                    step.artwork === "coin-art" ? "0 0 200 200" : "0 0 24 24"
+                  }
+                  className="text-goldhi"
+                >
+                  <use href={`#${step.artwork}`} />
+                </svg>
               </div>
-            </div>
-          </div>
+            </Reveal>
+          ))}
+        </div>
 
-          <div className="panel p-5 md:p-8">
-            <p className="mb-5 text-sm text-parch2 leading-relaxed">
-              The original supply, transfer tax, liquidity, team and allocation
-              claims below are unconfirmed. They are not approved tokenomics or
-              verified onchain facts.
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              <div className="tile p-4">
-                <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
-                  {"Ticker"}
-                </div>
-                <div className="token-stat mt-1 font-friz text-lg text-goldhi">
-                  {siteConfig.ticker}
-                </div>
-              </div>
-              <div className="tile p-4">
-                <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
-                  {"Supply"}
-                </div>
-                <div className="token-stat mt-1 font-friz text-lg text-goldhi">
-                  {"1B · unconfirmed"}
-                </div>
-              </div>
-              <div className="tile p-4">
-                <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
-                  {"Transfer tax claim"}
-                </div>
-                <div className="token-stat mt-1 font-friz text-lg text-goldhi">
-                  {"0% / 0% · unconfirmed"}
-                </div>
-              </div>
-              <div className="tile p-4">
-                <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
-                  {"Liquidity"}
-                </div>
-                <div className="token-stat mt-1 font-friz text-lg text-parch">
-                  {"Burn claim unverified"}
-                </div>
-              </div>
-              <div className="tile p-4">
-                <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
-                  {"Chain"}
-                </div>
-                <div className="token-stat mt-1 font-friz text-lg text-parch">
-                  {siteConfig.chain.name || "Not confirmed"}
-                </div>
-              </div>
-              <div className="tile p-4">
-                <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
-                  {"Team bag"}
-                </div>
-                <div className="token-stat mt-1 font-friz text-lg text-goldhi">
-                  {"0 · unconfirmed "}
-                  <span className="font-narrow text-xs text-parch2">
-                    {"(project claim)"}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-8">
-              <div className="font-friz text-xs tracking-[0.22em] uppercase text-gold">
-                {"Loot Distribution · unconfirmed proposal"}
-              </div>
-              <div className="mt-4 space-y-4 font-narrow">
-                <div>
-                  <div className="flex justify-between text-[15px]">
-                    <span className="text-parch">
-                      {"Community & Liquidity"}
-                    </span>
-                    <span className="text-goldhi font-bold">{"90%"}</span>
-                  </div>
-                  <div className="bar-track mt-1.5 h-3.5 overflow-hidden">
-                    <BarFill
-                      width="90%"
-                      background="linear-gradient(180deg,#E2C46A,#B88632 60%,#8E6524)"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-[15px]">
-                    <span className="text-parch">
-                      {"Guild Bank (marketing)"}
-                    </span>
-                    <span className="text-goldhi font-bold">{"7%"}</span>
-                  </div>
-                  <div className="bar-track mt-1.5 h-3.5 overflow-hidden">
-                    <BarFill
-                      width="7%"
-                      background="linear-gradient(180deg,#B33A3A,#8B2020 60%,#5E1414)"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-[15px]">
-                    <span className="text-parch">{"Raid Loot (airdrops)"}</span>
-                    <span className="text-goldhi font-bold">{"3%"}</span>
-                  </div>
-                  <div className="bar-track mt-1.5 h-3.5 overflow-hidden">
-                    <BarFill
-                      width="3%"
-                      background="linear-gradient(180deg,#3B6CC0,#2455A4 60%,#173A74)"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Reveal>
+        <p className="mt-6 max-w-3xl mx-auto text-center text-sm leading-relaxed text-parch2">
+          Prelaunch design. The deployed pair, fee routing and community
+          decision rules await verification. Wownilla is independent of
+          Microsoft and Robinhood.
+        </p>
 
         <MarketPanel />
         <div className="mt-16">

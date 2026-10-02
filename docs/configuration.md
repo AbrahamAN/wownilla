@@ -63,3 +63,70 @@ Verified directly against Robinhood's public asset registry: MSFT is an active M
 Navbar price is an **indicative token reference**, calculated as `(underlying bid + ask) / 2 × currentMultiplier`. It is not a DEX trade price or an assertion that NILLA is paired with MSFT. The source link's accessible description and tooltip expose the calculation and issuer-generated quote time. Quotes older than two minutes are marked stale; halt/error/empty states are explicit. No API keys, wallet connection, transactions or reference-site backend are used. Browser-test fixtures exercise failures; production data comes exclusively from Robinhood.
 
 NILLA remains unlaunched with the copyable `NILLA-CONTRACT-COMING-SOON` sentinel. Its real address, decimals, verified trading pair and token-specific LONG destination remain unresolved. NILLA/MSFT pairing, vault holdings and fee mechanisms remain unconfirmed and disabled.
+
+## Section 2: trading and chart activation checklist
+
+The Auction House remains a server-rendered placeholder. Changing configuration
+alone does **not** enable a chart: no embedding code exists yet. Provider selection
+(`market.provider: "geckoterminal"`) records an intended candidate, not verified
+Robinhood Chain support. Trading and chart readiness are separate reviews.
+
+| Required input      | Exact config field(s)                                                                  | Evidence required before activation                                                                                                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Confirmed launch    | `launchStatus`                                                                         | Authoritative dated launch announcement, then `live`                                                                                                                                                       |
+| NILLA deployment    | `token.value`, `token.format`, `token.verified`, `token.decimals`, `token.explorerUrl` | Full deployed address, contract code, decimals and token-specific explorer on mainnet 4663; project confirmation                                                                                           |
+| Intended network    | `chain.id`, `chain.name`                                                               | Robinhood Chain mainnet 4663; verify the NILLA deployment is on this chain                                                                                                                                 |
+| Trading destination | `links.buy`                                                                            | Exact NILLA destination on the confirmed venue; validate network and token identity, never a platform homepage                                                                                             |
+| Provider support    | `market.provider`, `chain.providerNetwork`                                             | Current provider documentation and live metadata must confirm mainnet 4663 support, its exact provider network identifier and embed support                                                                |
+| Pair identity       | `market.pairId`, `market.verified`                                                     | Exact opaque pool ID from provider metadata, network, venue and both base/quote contract identities; verify NILLA is actually in the pool and record orientation                                           |
+| Quote asset         | `quote.value`, `quote.format`, `quote.verified`, `quote.explorerUrl`                   | Full quote contract and authoritative identity on the same chain; do not infer MSFT pairing from the navbar reference                                                                                      |
+| Chart and pair URLs | Future provider integration, not yet fields                                            | Canonical HTTPS embed and external pair-page URLs derived using documented provider rules, verified against the same metadata; preserve/encode opaque IDs without address validation or case normalization |
+
+Before an approved future embed is enabled, record the source URLs, reviewed date,
+network mapping, token contracts/decimals, pool metadata and reviewer decision.
+A `verified` flag is an editorial record, not an onchain proof. Any unsupported
+network, mismatched identity or missing input must keep the placeholder in place.
+
+The future embed must preserve the existing 420px mobile / 520px desktop frame,
+load lazily, have an accessible title identifying NILLA and the verified pair,
+and expose the verified external pair link. Define a readable unavailable/error
+fallback without fabricated prices, handle provider failure, and clean up any
+added observers, listeners, requests and timers. Human approval is required before
+implementing this live integration.
+
+The former Character Sheet is now **How it works**: three numbered explanations
+of the planned MSFT pair, LONG community vault and holder-led guild. Original speculative
+supply, transfer-tax, liquidity, team and allocation figures have been removed
+from this UI. The user now specifies a planned Robinhood tokenized MSFT pair, trading fees
+flowing to the LONG community vault, and community direction fully guided by
+NILLA holders. These are approved project intentions, not verified deployed
+mechanics. Burns, locks, returns and holder rewards are not supplied or asserted. This replaces the earlier tokenomics disclosure design. The existing
+buying guide remains separate and unchanged pending its own review.
+
+The user superseded automatic screenshot generation and visual verification with
+manual review during Section 2. Newly captured baseline images are retained; no
+further screenshots are generated. Final visual parity, browser zoom and artwork
+review belong to that manual review.
+
+## User-specified pair, vault and guild plans
+
+The How it works cards now explain **pair → vault → guild**. The MSFT naming uses
+Robinhood's [official Stock Token documentation](https://docs.robinhood.com/chain/stock-token-apis/).
+The intended pairing does not establish Microsoft affiliation, direct equity
+ownership by NILLA holders, redemption rights or guaranteed price tracking.
+
+The existing MSFT reference contract is identified separately in `siteConfig.msft`.
+Do not populate/verify `quote` or `market` solely from the user's planned pairing:
+actual provider metadata must prove that the NILLA pool contains this exact MSFT
+contract on mainnet 4663. Trading and chart activation gates remain unchanged.
+
+For LONG fee routing, still obtain the exact vault address and chain, fee source,
+rate and routed share, collection asset, routing contracts/transactions,
+LONG/project documentation and custody/access rules. No percentages, automatic
+returns, burning, locking, balances or withdrawal rights are inferred. `vault.enabled`
+remains false; no live vault UI or transaction feature is implemented.
+
+For guild direction, still document holder eligibility, proposal/decision process,
+voting or consensus rules if any, and how decisions are executed. The statement
+that holders fully guide the community is user-specified intent; it does not assert
+that an onchain DAO, treasury-control mechanism or voting application exists.

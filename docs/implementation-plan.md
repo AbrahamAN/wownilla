@@ -165,3 +165,115 @@ The user approved Section 1 and explicitly requested commit and push to the remo
 Pre-commit inspection found newer local navbar refinements: the MSFT price is a single-line `$MSFT` ticker and only X is displayed among social controls. These edits are preserved. Quote freshness/halt/error details remain in the source tooltip and accessible description; regression assertions now check those attributes and the X-only social controls. The first full pre-commit run had 48 passes and four stale UI expectations; corrected expectations are rerun against the production build below.
 
 Final pre-commit verification: lint, typecheck and production build passed; **52 tests passed (39.8s)** across desktop/mobile. Latest preserved navbar layout screenshots: `docs/evidence/approved-section1-390.png` and `approved-section1-1440.png`, both without horizontal overflow. Remote `origin/main` was fetched and matched local HEAD before this commit.
+
+## Section 2 Market + Token — authorized implementation map
+
+Section 1 is approved at `fffd37bbe9e17bccbbdc3299ceff7dc5832bd369`. This request authorizes completing Section 2 before human review; it does not authorize later sections or publication. Existing evidence deletions are unrelated and will be preserved.
+
+| Feature                  | Actual checkout path / symbol                                | Exact modify/create path                                                                                                                 | Reuse and intended change                                                                                                                                                                           | Checks                                                                                                      |
+| ------------------------ | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Character Sheet          | `src/modules/index/token/token-section.tsx` / `TokenSection` | modify same and `src/modules/index/token/token.css`                                                                                      | Keep coin, Reveal, BarFill, ContractAddress, LaunchDetails and ProjectActions. Present identity first; retain historical claims and allocation artwork in a native, clearly unconfirmed disclosure. | Keyboard disclosure, no-JS readability, responsive typography, no fabricated tokenomics                     |
+| Auction House            | `src/modules/index/token/market-panel.tsx` / `MarketPanel`   | modify same and `src/modules/index/token/token.css`                                                                                      | Keep the existing 420/520px frame and coin art. Explain deployment, pair and provider prerequisites without adding data, embeds or external market links.                                           | Native #market entry, fixed dimensions, no provider requests/iframe                                         |
+| Activation documentation | `docs/configuration.md`                                      | modify same                                                                                                                              | Map exact config fields and evidence required for trading and a separately approved future chart implementation; opaque pool IDs, both token identities, support and fallback requirements.         | Cross-check against actual siteConfig fields; no implied automatic embed activation                         |
+| Acceptance and evidence  | `src/modules/index/token/config.spec.ts`                     | create `src/modules/index/token/market-token.spec.ts`; new screenshots `docs/evidence/market-token-*.png`, `docs/evidence/auction-*.png` | Installed Chrome, reuse current Playwright setup; preserve approved Section 1 checks.                                                                                                               | 390/768/1440, keyboard, effective 200% zoom, reduced motion, no JS/overflow, lint/typecheck/build/full test |
+
+Implementation sequence: capture reference/local baseline → acceptance checks → refine existing server sections and owned CSS → document activation inputs → production validation → request Section 2 approval. Mechanics/buying cards remain untouched for the next approval gate. The user subsequently requested stopping evidence generation and will verify visuals manually; further screenshot comparison and visual review are delegated to the user.
+
+### Section 2 review checkpoint
+
+Implemented identity-first Character Sheet and native unconfirmed-tokenomics
+disclosure; retained coin/allocation artwork and existing shared contracts/actions.
+Auction House retains the 420/520px static frame and now explains deployment,
+pair and provider prerequisites. No market data, embeds or trading destinations
+were added. Exact activation fields and evidence are in `docs/configuration.md`.
+Approved Section 1 code and the four buying quests were not changed.
+
+Installed Chrome successfully visited the live reference at 390/768/1440 before
+edits. That deployment has the original Character Sheet and no `#market` element;
+there is no matching Auction House reference panel. Baseline images captured before
+the user's stop request remain in the working tree. At the user's request, no
+further screenshot generation or final visual comparison was performed. Manual
+visual review, including actual browser zoom, remains pending with the user.
+
+Verification: `corepack yarn lint`, `corepack yarn typecheck`,
+`corepack yarn build` and `git diff --check` passed. Final production
+`corepack yarn test`: **58 passed (29.6s)** across desktop/mobile. Added checks cover
+keyboard disclosure/focus, no-JavaScript activation, native market entry, reduced
+motion, 390/768/1440 plus effective 720px width, no horizontal overflow, stable chart
+height and zero chart-provider requests/iframes. The 720px check tests the layout
+width equivalent of 200% zoom at 1440px; it does not operate browser zoom.
+The initial full run passed 56/58; two no-JavaScript click-stability timeouts were
+resolved by using native keyboard activation in the test. A concurrent targeted
+retry lost its production server when the suite ended; the final full rerun was
+sequential and passed.
+
+Remaining inputs: verified NILLA deployment/decimals/explorer, launch announcement,
+token-specific trade destination, provider network/embed support, exact opaque pool
+ID and both base/quote identities, approved tokenomics with evidence. Live chart
+integration remains disabled and requires a separate implementation approval.
+No commit, push, merge or deployment. Await Section 2 approval before mechanics
+and buying-guide work.
+
+## Approved Character Sheet replacement — How it works
+
+The user approved replacing the whole Character Sheet with a three-card explanation inspired by Artificial Inu's numbered layout. Approval is for identity → trading → community using confirmed prelaunch facts; no MSFT pairing, vault funding, burns or locks were confirmed. Keep the Auction House and existing buying guide below; do not add a second mechanics section. The approved hero remains untouched. Screenshots and visual comparison remain manual per the user's instruction.
+
+| Feature                     | Actual path / symbol                                                      | Exact modify path | Implementation and verification                                                                                                                                                                                   |
+| --------------------------- | ------------------------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Three numbered explanations | `src/modules/index/token/token-section.tsx` / `TokenSection`              | same file         | Replace sheet/card/stat/allocation block with a How it works heading and three framed `Reveal` articles. Reuse coin/quest artwork, font and rarity colors; desktop three columns/mobile stack; preserve `#token`. |
+| Owned styling               | `src/modules/index/token/token.css`                                       | same file         | Remove unused sheet/disclosure rules, add readable card/artwork sizing; preserve market frame sizing.                                                                                                             |
+| Section acceptance          | `src/modules/index/token/market-token.spec.ts`                            | same file         | Replace disclosure tests with three explanations, pending mechanics, no-JS and responsive checks.                                                                                                                 |
+| Existing journey assertions | `src/modules/index/index.spec.ts`, `src/modules/index/experience.spec.ts` | same files        | Update section heading and verify shared contract copy remains in the approved hero; retain navigation/prelaunch destination checks.                                                                              |
+| Current documentation       | `docs/configuration.md`                                                   | same file         | Supersede historical disclosure description: speculative sheet values leave this UI. Exact chart/trading prerequisites remain.                                                                                    |
+
+Sequence: write failing acceptance assertions → replace current sheet without additional features → production checks → human review. No publishing.
+
+Replacement verification: lint, typecheck, production build and diff whitespace
+checks passed; final production suite **58 passed (36.3s)** across desktop/mobile.
+New explanation assertions failed against the former sheet before implementation.
+One development assertion then caught LONG missing from the trading card; its
+planned launchpad copy was added before the successful production run. Checks cover
+three cards, pending mechanics, removed speculative figures, server/no-JS content,
+one-column layout at 390/720/768 and three columns at 1440, no document horizontal
+overflow, stable chart dimensions, native anchors and existing hero/clipboard/motion
+regressions. No new screenshots or final visual parity claim. Manual review remains
+at `http://localhost:3001/#token`. Token-specific deployment/pair/provider evidence
+and confirmed utility/fee/community rules remain outstanding. No commit, push,
+merge or deployment; awaiting review before further section changes.
+
+## User-specified How it works mechanics revision
+
+The user now supplies the intended three pillars: Robinhood tokenized MSFT pairing,
+trading fees to the LONG community vault, and community direction fully guided by
+NILLA holders. This supersedes the earlier absence of project intent; it does not
+verify a deployed pair, fee routing or implemented governance.
+
+| Feature               | Actual symbol / exact modify path                           | Reuse and scope                                                                                                                                                             | Checks                                                                                                       |
+| --------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Pillar copy           | `TokenSection`, `src/modules/index/token/token-section.tsx` | Same three cards/artwork/layout; change headings, labels and paragraphs, mark all as planned and identify tokenized MSFT explicitly. Add brief prelaunch verification note. | Three intended pillars; no equity/affiliation/returns claims; no fabricated fee rate or voting/custody rules |
+| Assertions            | `src/modules/index/token/market-token.spec.ts`              | Update existing copy expectations for the newly supplied intent.                                                                                                            | Planned status, pair/vault/guild wording, no-JS and existing responsive checks                               |
+| Evidence requirements | `docs/configuration.md`                                     | Record user-specified plans separately from deployed verification; actual trade/chart/vault flags remain disabled.                                                          | Exact remaining fee-routing, vault and governance evidence; no config gates enabled                          |
+
+Screenshots remain manual. No changes to hero, MSFT API, trading configuration,
+market placeholder, buying guide, or other sections; no publication authorized.
+
+Mechanics-copy verification: lint, typecheck, production build and diff whitespace
+checks passed. The changed-pillar assertion first failed against the previous copy.
+Production `corepack yarn test`: **57/58 passed (31.9s)**; all new section checks
+passed on desktop/mobile. The unchanged mobile faction-animation test failed on
+exact floating-point height equality (43.99999237060547 vs 44px). An isolated
+`corepack yarn test --last-failed` rerun **passed (1 test, 5.1s)** without code changes.
+No claim of a fully passing single 58-test run for this revision. Manual visual
+review remains with the user; no screenshots, commits or deployment.
+
+## Section 2 approval and requested publication
+
+The user approved the final pair/vault/guild cards and requested commit and push.
+Fresh pre-commit lint, typecheck and production build passed; full production test
+suite **58 passed (28.5s)** in a single run, including the previously intermittent
+animation assertion. `origin/main` was checked through GitHub CLI and matched
+`fffd37bbe9e17bccbbdc3299ceff7dc5832bd369` before the commit.
+Commit scope: the final How it works replacement, Auction House readiness copy,
+owned styling, colocated checks/journey assertions and configuration/implementation
+documentation. Pre-existing screenshot deletions and new local baseline screenshots
+are excluded. No separate deployment command is authorized or performed.
