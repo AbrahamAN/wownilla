@@ -1,4 +1,5 @@
-import { siteConfig } from "@/modules/index/common/site-config";
+import { ProjectActions } from "@/modules/index/common/project-actions";
+import { ContractAddress } from "@/modules/index/common/contract-address";
 import { Reveal, Counter } from "@/modules/common/reveal";
 import { GuildChat } from "./guild-chat";
 
@@ -39,57 +40,12 @@ export function CommunitySection() {
               {"Alliance tolerated"}
             </span>
           </div>
-          <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-3">
-            <a
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-gold inline-flex items-center gap-2 px-6 py-3.5 text-[13px]"
-            >
-              <svg
-                width="16"
-                height="16"
-                className="text-ink2"
-                aria-hidden="true"
-              >
-                <use href="#swords"></use>
-              </svg>
-              {"\n            Join the Guild\n          "}
-            </a>
-            <a
-              href={siteConfig.links.telegram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-dark inline-flex items-center gap-2 px-5 py-3.5 text-[12px]"
-            >
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path d="M21.5 3.6 2.8 10.8c-1 .4-1 1.8.1 2.1l4.6 1.4 1.8 5.6c.2.7 1.1.9 1.6.4l2.6-2.4 4.8 3.5c.6.4 1.4.1 1.6-.6L23 4.9c.2-.9-.7-1.6-1.5-1.3zM9.6 14.4l8.3-7.5-6.7 8.6-.3 3.1z"></path>
-              </svg>
-              {"\n            Telegram\n          "}
-            </a>
-            <a
-              href={siteConfig.links.x}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-dark inline-flex items-center gap-2 px-5 py-3.5 text-[12px]"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path d="M17.8 3h3.1l-6.8 7.8L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L2 3h6.4l4.4 5.8zM16.7 19.2h1.7L7.4 4.7H5.6z"></path>
-              </svg>
-              {"\n            Follow on X\n          "}
-            </a>
+          <div className="mt-8">
+            <ProjectActions />
+            <p className="mt-3 text-parch2 text-sm">
+              Official guild invites have not been confirmed. Explore the guild
+              lore while the gates are prepared.
+            </p>
           </div>
           <div className="mt-10 grid grid-cols-3 gap-3 max-w-lg mx-auto lg:mx-0">
             <div className="tile p-4 text-center">
@@ -159,17 +115,12 @@ export function CommunitySection() {
         <p className="mt-3 text-parch2">
           {"The loot roll is open. Your seat in the raid is waiting."}
         </p>
-        <a
-          href={siteConfig.links.telegram}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-gold mt-7 inline-flex items-center gap-2 px-9 py-3.5 text-[13px]"
-        >
-          <svg width="14" height="14" className="text-ink2" aria-hidden="true">
-            <use href="#logo-w"></use>
-          </svg>
-          {"\n        Join the Horde\n      "}
-        </a>
+        <div className="mt-7">
+          <ProjectActions />
+        </div>
+        <div className="mt-6">
+          <ContractAddress />
+        </div>
       </Reveal>
     </section>
   );

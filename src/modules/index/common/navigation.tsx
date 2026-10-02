@@ -8,6 +8,9 @@ import {
 } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
+import { MsftPrice } from "./msft-price";
+import { ProjectActions } from "./project-actions";
+
 const sections = ["about", "token", "lore", "community"];
 
 /** Keeps navigation state local while retaining native, shareable section links. */
@@ -42,7 +45,7 @@ export function Navigation() {
       }
     };
     const resize = () => {
-      if (window.innerWidth >= 640) setOpen(false);
+      if (window.innerWidth >= 1280) setOpen(false);
     };
     if (open) {
       document.addEventListener("click", outside);
@@ -61,10 +64,10 @@ export function Navigation() {
       id="siteHeader"
       className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:pt-5 anim-down pointer-events-none"
     >
-      <div className="relative pointer-events-auto w-full sm:w-auto max-w-[520px] sm:max-w-none">
+      <div className="relative pointer-events-auto w-full xl:w-auto max-w-[520px] xl:max-w-none">
         <nav
           id="navpill"
-          className={`nav-frame flex items-center justify-between sm:justify-start gap-5 sm:gap-8 md:gap-10 px-4 md:px-6 py-2.5${scrolled ? " scrolled" : ""}`}
+          className={`nav-frame flex items-center justify-between xl:justify-start gap-2 xl:gap-5 md:gap-5 px-4 md:px-6 py-2.5${scrolled ? " scrolled" : ""}`}
           aria-label="Primary"
         >
           <a
@@ -81,9 +84,12 @@ export function Navigation() {
             >
               <use href="#logo-w" />
             </svg>
-            <span className="logo-type text-[19px]">WOWNILLA</span>
+            <span className="logo-type text-[15px] sm:text-[19px]">
+              WOWNILLA
+            </span>
           </a>
-          <ul className="hidden sm:flex items-center gap-5 md:gap-8 font-friz uppercase text-[13px] tracking-[0.18em]">
+          <MsftPrice />
+          <ul className="hidden xl:flex items-center gap-5 font-friz uppercase text-[13px] tracking-[0.18em]">
             {sections.map((id) => (
               <li key={id}>
                 <a
@@ -98,18 +104,14 @@ export function Navigation() {
             ))}
           </ul>
           <div className="flex items-center gap-1.5">
-            <a
-              href="#community"
-              onClick={() => setOpen(false)}
-              className="btn btn-gold hidden min-[400px]:inline-block px-4 py-2 text-[11px] whitespace-nowrap"
-            >
-              Join the Horde
-            </a>
+            <div className="hidden xl:block">
+              <ProjectActions compact />
+            </div>
             <button
               id="menuBtn"
               type="button"
               onClick={() => setOpen((previous) => !previous)}
-              className="sm:hidden -mr-1 grid place-items-center w-10 h-10 rounded-[3px] text-goldhi hover:bg-bronze/30 transition-colors"
+              className="xl:hidden -mr-1 grid place-items-center w-10 h-10 rounded-[3px] text-goldhi hover:bg-bronze/30 transition-colors"
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
               aria-controls="mobileMenu"
@@ -133,7 +135,7 @@ export function Navigation() {
         </nav>
         <div
           id="mobileMenu"
-          className={`nav-frame sm:hidden absolute left-0 right-0 mt-2 p-2 font-friz uppercase tracking-[0.18em] text-[13px]${open ? " open" : ""}`}
+          className={`nav-frame xl:hidden absolute left-0 right-0 mt-2 p-2 font-friz uppercase tracking-[0.18em] text-[13px]${open ? " open" : ""}`}
           aria-hidden={!open}
           inert={!open}
         >
@@ -147,18 +149,14 @@ export function Navigation() {
               aria-current={active === id ? "location" : undefined}
             >
               {id[0].toUpperCase() + id.slice(1)}
-              <span className="text-[10px] text-gold">
+              <span className="text-[10px] text-gold" aria-hidden="true">
                 {["I", "II", "III", "IV"][index]}
               </span>
             </a>
           ))}
-          <a
-            href="#community"
-            onClick={() => setOpen(false)}
-            className="btn btn-gold mt-2 flex justify-center px-4 py-3 text-[12px] min-[400px]:hidden"
-          >
-            Join the Horde
-          </a>
+          <div className="border-t border-bronze mt-2 pt-3">
+            <ProjectActions compact />
+          </div>
         </div>
       </div>
     </header>

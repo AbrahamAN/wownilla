@@ -1,4 +1,6 @@
+import { MsftProvider } from "./common/msft-provider";
 import "./intro/music.css";
+import "./common/project.css";
 import "./hero/logo.css";
 import "./common/navigation.css";
 import "./hero/hero.css";
@@ -29,16 +31,18 @@ export function IndexPage() {
   return (
     <>
       <Artwork />
-      <Experience scene={<QueueScene />}>
-        <Navigation />
-        <HeroSection />
-        <AboutSection />
-        <TokenSection />
-        <LoreSection />
-        <CommunitySection />
-        <Footer />
-        <ScrollProgress />
-      </Experience>
+      <MsftProvider>
+        <Experience scene={<QueueScene />}>
+          <Navigation />
+          <HeroSection />
+          <AboutSection />
+          <TokenSection />
+          <LoreSection />
+          <CommunitySection />
+          <Footer />
+          <ScrollProgress />
+        </Experience>
+      </MsftProvider>
     </>
   );
 }

@@ -37,11 +37,10 @@ src/modules/common/          Page-independent artwork and motion primitives
 New pages get their own sibling under `src/modules`. Browser tests live with
 their owning page or vertical; `src/app` only composes page modules.
 
-Edit `src/modules/index/common/site-config.ts` for social links, contract text, media URLs, and music
-volume. Existing contract and social placeholders are preserved. Place media in
+Edit `src/modules/index/common/site-config.ts` for the $NILLA ticker, prelaunch status, LONG launchpad, Robinhood Chain, social links, contract details, media URLs, and music
+volume. Contract, trade and social destinations stay as placeholders until verified. See `docs/configuration.md` for launch inputs and `docs/implementation-plan.md` for the human review checkpoint. Place media in
 `public/assets`. Set `heroVideo` to a public URL to replace the canvas when playback
-succeeds; leave it empty for the dungeon. Music starts on the first allowed browser
-gesture and mute lasts for the current visit.
+succeeds; leave it empty for the dungeon. Music defaults off and starts only when the visitor chooses Play music.
 
 `src/app/robots.ts` serves a public, allow-all `/robots.txt`. Metadata lives in the
 root layout. No canonical domain or sitemap is assumed.

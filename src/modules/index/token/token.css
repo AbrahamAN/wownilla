@@ -8,3 +8,15 @@
 #token .panel .grid > .tile:nth-child(2) > .font-friz {
   font-size: min(1.25rem, 12cqw);
 }
+
+.market-frame {
+  height: 420px;
+}
+@media (min-width: 768px) {
+  .market-frame {
+    height: 520px;
+  }
+}
+.token-stat {
+  overflow-wrap: anywhere;
+}

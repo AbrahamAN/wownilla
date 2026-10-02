@@ -10,7 +10,6 @@ import {
   useSyncExternalStore,
 } from "react";
 import type { ReactNode } from "react";
-import { useReducedMotion } from "motion/react";
 import { siteConfig } from "@/modules/index/common/site-config";
 import { LoginQueue } from "./login-queue";
 
@@ -40,9 +39,9 @@ export function Experience({
     "idle",
   );
   const [removed, setRemoved] = useState(false);
-  const [wanted, setWanted] = useState(true);
+  const [wanted, setWanted] = useState(false);
   const [available, setAvailable] = useState(Boolean(siteConfig.heroMusic));
-  const wantedRef = useRef(true);
+  const wantedRef = useRef(false);
   const audio = useRef<HTMLAudioElement>(null);
   const controls = useRef({
     play: () => {},
@@ -52,39 +51,45 @@ export function Experience({
   });
   const leaving = useRef(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const reduced = useReducedMotion();
 
   const enter = useCallback(() => {
     if (leaving.current) return;
     leaving.current = true;
-    setTransition("entering");
-    timers.current.push(
-      setTimeout(
-        () => {
-          setEntered(true);
-          setTransition("gone");
-          document.documentElement.classList.remove("queued");
-          const target = document.getElementById(location.hash.slice(1));
-          target?.scrollIntoView({ behavior: "instant" });
-          document
-            .getElementById("siteHeader")
-            ?.querySelector("a")
-            ?.focus({ preventScroll: true });
-          timers.current.push(setTimeout(() => setRemoved(true), 800));
-        },
-        reduced ? 150 : 1050,
-      ),
-    );
-  }, [reduced]);
+    setEntered(true);
+    setRemoved(true);
+    setTransition("gone");
+    document.documentElement.classList.remove("queued");
+    try {
+      localStorage.setItem("wownilla-entered", "true");
+    } catch {
+      /* Private browsing may disable storage. */
+    }
+    document
+      .getElementById("siteHeader")
+      ?.querySelector("a")
+      ?.focus({ preventScroll: true });
+  }, []);
 
   useEffect(() => {
     const currentTimers = timers.current;
-    document.documentElement.classList.add("queued");
+    const syncEntry = () => {
+      let repeat = false;
+      try {
+        repeat = localStorage.getItem("wownilla-entered") === "true";
+      } catch {
+        /* Optional persistence. */
+      }
+      if (location.hash || repeat) enter();
+      else document.documentElement.classList.add("queued");
+    };
+    syncEntry();
+    window.addEventListener("hashchange", syncEntry);
     return () => {
       currentTimers.forEach(clearTimeout);
+      window.removeEventListener("hashchange", syncEntry);
       document.documentElement.classList.remove("queued");
     };
-  }, []);
+  }, [enter]);
 
   useEffect(() => {
     const element = audio.current;
@@ -148,12 +153,6 @@ export function Experience({
       generation++;
       fade(0, 500, () => element.pause());
     };
-    const unlock = (event: Event) => {
-      if (event.target instanceof Element && event.target.closest("#musicBtn"))
-        return;
-      if (wantedRef.current && element.paused && !controls.current.failed)
-        play();
-    };
     const visibility = () => {
       if (document.hidden) {
         hiddenPause = !element.paused;
@@ -171,18 +170,13 @@ export function Experience({
       queueMicrotask(() => {
         if (!disposed) fail();
       });
-    window.addEventListener("pointerdown", unlock, true);
-    window.addEventListener("keydown", unlock, true);
     document.addEventListener("visibilitychange", visibility);
-    play();
     return () => {
       disposed = true;
       generation++;
       cancelAnimationFrame(frame);
       element.pause();
       element.removeEventListener("error", fail);
-      window.removeEventListener("pointerdown", unlock, true);
-      window.removeEventListener("keydown", unlock, true);
       document.removeEventListener("visibilitychange", visibility);
     };
   }, []);
@@ -213,7 +207,7 @@ export function Experience({
         ref={audio}
         id="heroMusic"
         src={siteConfig.heroMusic || undefined}
-        preload="auto"
+        preload="none"
         loop
       />
       {available ? (

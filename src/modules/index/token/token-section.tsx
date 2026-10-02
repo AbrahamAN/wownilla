@@ -1,6 +1,9 @@
+import { MarketPanel } from "./market-panel";
+import { LaunchDetails } from "@/modules/index/common/launch-details";
 import { siteConfig } from "@/modules/index/common/site-config";
 import { Reveal, BarFill } from "@/modules/common/reveal";
-import { CopyContract } from "./copy-contract";
+import { ContractAddress } from "@/modules/index/common/contract-address";
+import { ProjectActions } from "@/modules/index/common/project-actions";
 
 /** Preserves the original token section while isolating its interactive controls. */
 export function TokenSection() {
@@ -23,7 +26,7 @@ export function TokenSection() {
             {"The Character Sheet"}
           </h2>
           <p className="mt-4 max-w-xl mx-auto text-base text-parch2">
-            {"Stats rolled by the community. Min-maxed for maximum memes."}
+            {"Prelaunch character sheet. Project claims await confirmation."}
           </p>
         </Reveal>
         <Reveal
@@ -44,99 +47,85 @@ export function TokenSection() {
               </svg>
             </div>
             <div className="relative mt-6 font-morpheus text-3xl text-goldhi [text-shadow:0_2px_0_#000]">
-              {"$WOWN"}
+              {siteConfig.ticker}
             </div>
             <div className="relative mt-1 font-narrow text-sm text-parch2 tracking-wide">
               {"Item Level 9000 · "}
               <span style={{ color: "var(--legendary)" }}>{"Legendary"}</span>
             </div>
             <div className="relative mt-6 w-full max-w-sm">
-              <div className="font-friz text-[11px] tracking-[0.22em] uppercase text-gold mb-2 text-left">
-                {"Contract"}
+              <ContractAddress />
+              <div className="mt-4">
+                <LaunchDetails />
               </div>
-              <div className="flex items-center gap-2 tile px-3 py-2">
-                <code
-                  id="contract"
-                  className="flex-1 truncate text-left font-narrow text-sm text-parch"
-                >
-                  {siteConfig.contract}
-                </code>
-                <CopyContract />
+              <div className="mt-4">
+                <ProjectActions />
               </div>
-              <a
-                href={siteConfig.links.buy}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-gold mt-3 flex items-center justify-center gap-2 px-6 py-3 text-[12px]"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  className="text-ink2"
-                  aria-hidden="true"
-                >
-                  <use href="#logo-w"></use>
-                </svg>
-                {"\n              Buy at the Auction House\n            "}
-              </a>
             </div>
           </div>
 
           <div className="panel p-5 md:p-8">
+            <p className="mb-5 text-sm text-parch2 leading-relaxed">
+              The original supply, transfer tax, liquidity, team and allocation
+              claims below are unconfirmed. They are not approved tokenomics or
+              verified onchain facts.
+            </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div className="tile p-4">
                 <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
                   {"Ticker"}
                 </div>
-                <div className="mt-1 font-friz text-xl text-goldhi">
-                  {"$WOWN"}
+                <div className="token-stat mt-1 font-friz text-lg text-goldhi">
+                  {siteConfig.ticker}
                 </div>
               </div>
               <div className="tile p-4">
                 <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
                   {"Supply"}
                 </div>
-                <div className="mt-1 font-friz text-xl text-goldhi">
-                  {"1,000,000,000"}
+                <div className="token-stat mt-1 font-friz text-lg text-goldhi">
+                  {"1B · unconfirmed"}
                 </div>
               </div>
               <div className="tile p-4">
                 <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
-                  {"Tax"}
+                  {"Transfer tax claim"}
                 </div>
-                <div className="mt-1 font-friz text-xl text-goldhi">
-                  {"0% / 0%"}
+                <div className="token-stat mt-1 font-friz text-lg text-goldhi">
+                  {"0% / 0% · unconfirmed"}
                 </div>
               </div>
               <div className="tile p-4">
                 <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
                   {"Liquidity"}
                 </div>
-                <div className="mt-1 font-friz text-xl text-parch">
-                  {"Burned in lava"}
+                <div className="token-stat mt-1 font-friz text-lg text-parch">
+                  {"Burn claim unverified"}
                 </div>
               </div>
               <div className="tile p-4">
                 <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
                   {"Chain"}
                 </div>
-                <div className="mt-1 font-friz text-xl text-parch">{"TBA"}</div>
+                <div className="token-stat mt-1 font-friz text-lg text-parch">
+                  {siteConfig.chain.name || "Not confirmed"}
+                </div>
               </div>
               <div className="tile p-4">
                 <div className="font-narrow text-[11px] tracking-[0.16em] uppercase text-parch2">
                   {"Team bag"}
                 </div>
-                <div className="mt-1 font-friz text-xl text-goldhi">
-                  {"0 "}
+                <div className="token-stat mt-1 font-friz text-lg text-goldhi">
+                  {"0 · unconfirmed "}
                   <span className="font-narrow text-xs text-parch2">
-                    {"(we're broke)"}
+                    {"(project claim)"}
                   </span>
                 </div>
               </div>
             </div>
             <div className="mt-8">
               <div className="font-friz text-xs tracking-[0.22em] uppercase text-gold">
-                {"Loot Distribution"}
+                {"Loot Distribution · unconfirmed proposal"}
               </div>
               <div className="mt-4 space-y-4 font-narrow">
                 <div>
@@ -184,6 +173,7 @@ export function TokenSection() {
           </div>
         </Reveal>
 
+        <MarketPanel />
         <div className="mt-16">
           <Reveal
             tag="h3"
@@ -250,9 +240,7 @@ export function TokenSection() {
                 {"Visit the Auction House"}
               </h4>
               <p className="mt-1 font-narrow text-[15px] text-parch2">
-                {
-                  "Head to a DEX, paste the contract and swap for $WOWN. Undercut nobody."
-                }
+                {`The ${siteConfig.ticker} launch is planned on ${siteConfig.launchpad.name}. The verified token destination will be posted when the gates open.`}
               </p>
             </Reveal>
             <Reveal

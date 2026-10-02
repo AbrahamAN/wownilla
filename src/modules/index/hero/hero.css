@@ -140,3 +140,161 @@
   background: #f2d27a;
   box-shadow: 0 0 6px 1px rgba(212, 175, 55, 0.6);
 }
+
+/* The centered portal retains room for readable launch utilities at narrow widths and zoom. */
+.hero-section {
+  padding-block: 100px 90px;
+}
+.hero-section #heroContent {
+  position: relative;
+  min-height: calc(100svh - 190px);
+}
+.hero-section .hero-logo {
+  width: min(94vw, 580px);
+}
+.hero-section .cine-top,
+.hero-section .cine-bot {
+  display: none;
+}
+@media (max-width: 639px) {
+  .hero-section {
+    padding-block: 100px 70px;
+  }
+  .hero-section #heroContent {
+    padding-block: 20px;
+  }
+}
+
+/* Small faction sigils carry red, gold or blue while the original ornate artwork stays intact. */
+.faction-badge {
+  --faction-accent: var(--goldhi);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: min(100%, 310px);
+  min-height: 44px;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--bronze);
+  border-radius: 3px;
+  background: var(--ink);
+  box-shadow:
+    inset 0 1px 0 var(--leather),
+    0 6px 16px rgb(0 0 0 / 0.5);
+  font-family: var(--font-marcellus), serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 10px;
+}
+.faction-badge[data-faction="horde"] {
+  --faction-accent: var(--horde);
+}
+.faction-badge[data-faction="alliance"] {
+  --faction-accent: var(--alliance);
+}
+.faction-sigil {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: 1px solid var(--faction-accent);
+  border-radius: 2px;
+  color: color-mix(in srgb, var(--faction-accent) 75%, var(--parch) 25%);
+  background: var(--ink2);
+  transition:
+    color 180ms,
+    border-color 180ms;
+}
+.faction-message {
+  flex: 1;
+  color: var(--parch);
+}
+.faction-pause {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--parch2);
+  flex-shrink: 0;
+}
+.faction-pause:hover {
+  color: var(--goldhi);
+}
+@media (prefers-reduced-motion: reduce) {
+  .faction-sigil {
+    transition: none;
+  }
+}
+
+.hero-section #heroContent {
+  padding-top: 20px;
+}
+.hero-contract {
+  max-width: 32rem;
+}
+.hero-contract .contract-row {
+  padding-block: 0.5rem;
+}
+.hero-punchline {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.faction-message {
+  display: grid;
+  place-items: center;
+  min-height: 24px;
+}
+.faction-message-text {
+  grid-area: 1 / 1;
+  display: block;
+}
+
+/* The desktop identity and proposition share a row; narrower screens retain their reading order. */
+.hero-layout {
+  display: grid;
+  width: 100%;
+  max-width: 1200px;
+}
+.hero-identity,
+.hero-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  margin-inline: auto;
+}
+.hero-identity {
+  max-width: 580px;
+}
+.hero-details {
+  max-width: 580px;
+}
+@media (min-width: 1024px) {
+  .hero-section #heroContent {
+    justify-content: center;
+  }
+  .hero-layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(2rem, 5vw, 5rem);
+  }
+  .hero-section .hero-logo {
+    width: 100%;
+  }
+  .hero-details {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .hero-details .hero-punchline {
+    margin-top: 0;
+  }
+  .hero-details .hero-utilities {
+    align-items: flex-start;
+  }
+  .hero-details .project-actions,
+  .hero-details .launch-details {
+    justify-content: flex-start;
+  }
+}

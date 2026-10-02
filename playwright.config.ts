@@ -22,9 +22,11 @@ export default defineConfig({
       use: { ...devices["iPhone 13"], defaultBrowserType: "chromium" },
     },
   ],
-  webServer: {
-    command: "corepack yarn start --port 4173",
-    url: "http://127.0.0.1:4173",
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: process.env.PLAYWRIGHT_BASE_URL
+    ? undefined
+    : {
+        command: "corepack yarn start --port 4173",
+        url: "http://127.0.0.1:4173",
+        reuseExistingServer: !process.env.CI,
+      },
 });

@@ -29,6 +29,7 @@ export function LoginQueue({
     gesture.current = needsGesture;
   }, [needsGesture]);
   useEffect(() => {
+    button.current?.focus({ preventScroll: true });
     if (transition !== "idle") return;
     let frame = 0;
     const timers: ReturnType<typeof setTimeout>[] = [];
@@ -166,7 +167,7 @@ export function LoginQueue({
             className={`q-btn mt-4 w-[70%] rounded-md py-1.5 text-sm md:text-base${phase === "ready" ? " enter-world" : ""}`}
             onClick={enter}
           >
-            {phase === "ready" ? "Enter World" : "Cancel"}
+            {phase === "ready" ? "Enter World" : "Skip intro · Enter World"}
           </button>
         </div>
       </div>

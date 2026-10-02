@@ -1,55 +1,114 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { siteConfig } from "@/modules/index/common/site-config";
 
-/** Copies the configured contract, preserving feedback and the legacy clipboard fallback. */
-export function CopyContract() {
-  const [label, setLabel] = useState("Copy");
+/** Reports clipboard success only after a full-address write resolves; denial leaves selectable text. */
+export function CopyContract({
+  address,
+  label,
+  placeholder = false,
+}: {
+  address: string;
+  label: string;
+  placeholder?: boolean;
+}) {
+  const [feedback, setFeedback] = useState("");
+  const [pending, setPending] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [denied, setDenied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  useEffect(() => () => clearTimeout(timer.current), []);
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      clearTimeout(timer.current);
+    };
+  }, []);
   async function copy() {
-    let copied = false;
+    if (!address || pending) return;
+    clearTimeout(timer.current);
+    setPending(true);
+    setCopied(false);
+    setFeedback("");
+    setDenied(false);
     try {
-      await navigator.clipboard.writeText(siteConfig.contract);
-      copied = true;
-    } catch {
-      const field = document.createElement("textarea");
-      field.value = siteConfig.contract;
-      field.readOnly = true;
-      field.style.cssText = "position:fixed;opacity:0";
-      document.body.appendChild(field);
-      field.select();
-      try {
-        copied = document.execCommand("copy");
-      } catch {
-        copied = false;
+      await navigator.clipboard.writeText(address);
+      if (mounted.current) {
+        setCopied(true);
+        setFeedback(
+          placeholder
+            ? "Copied placeholder — not a live contract."
+            : "Copied full address.",
+        );
+        timer.current = setTimeout(() => {
+          setCopied(false);
+          setFeedback("");
+        }, 2000);
       }
-      field.remove();
-      document.getElementById("copyBtn")?.focus({ preventScroll: true });
-      if (!copied) {
-        const contract = document.getElementById("contract");
-        if (contract) {
-          const range = document.createRange();
-          range.selectNodeContents(contract);
-          window.getSelection()?.removeAllRanges();
-          window.getSelection()?.addRange(range);
-        }
+    } catch {
+      if (mounted.current) {
+        setDenied(true);
+        setFeedback(
+          "Copy did not complete. Select the text below and copy manually.",
+        );
+      }
+    } finally {
+      if (mounted.current) {
+        setPending(false);
       }
     }
-    setLabel(copied ? "Copied!" : "Select & copy");
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => setLabel("Copy"), 1600);
   }
   return (
-    <button
-      id="copyBtn"
-      type="button"
-      className="btn btn-dark shrink-0 px-3 py-1.5 text-[10px]"
-      onClick={copy}
-      aria-live="polite"
-    >
-      {label}
-    </button>
+    <div className="copy-control">
+      <button
+        type="button"
+        className="btn btn-dark contract-copy-icon"
+        onClick={copy}
+        disabled={!address}
+        aria-disabled={!address || pending}
+        aria-busy={pending}
+        data-copied={copied}
+        aria-label={`Copy ${label}`}
+        title={`Copy ${label}`}
+      >
+        <svg
+          className="copy-glyph"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          aria-hidden="true"
+        >
+          <rect x="8" y="8" width="12" height="12" rx="2" />
+          <path d="M16 8V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h4" />
+        </svg>
+        <svg
+          className="copy-check"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m5 12 4 4L19 6" />
+        </svg>
+      </button>
+      <span
+        role="status"
+        className={denied ? "copy-feedback text-sm text-parch2" : "sr-only"}
+      >
+        {pending ? "Copying…" : feedback}
+        {denied ? (
+          <code className="copy-full-value block mt-2">{address}</code>
+        ) : null}
+      </span>
+    </div>
   );
 }
