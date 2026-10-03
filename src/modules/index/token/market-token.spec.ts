@@ -54,7 +54,9 @@ test("market keeps a stable, data-free frame at all review widths", async ({
     await expect(market).toContainText("Verified deployment");
     await expect(market).toContainText("Verified pair");
     await expect(market).toContainText("Provider support");
-    await expect(market.locator("iframe, a[href^='http']")).toHaveCount(0);
+    await expect(
+      market.locator("iframe, a[href^='http']:not(.msft-contract a)"),
+    ).toHaveCount(0);
     expect(
       await market
         .locator(".market-frame")

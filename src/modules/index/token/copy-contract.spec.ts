@@ -1,6 +1,21 @@
 import { expect, test } from "@playwright/test";
+import { siteConfig } from "../common/site-config";
 
-test("copies the exact labeled prelaunch placeholder after clipboard resolves", async ({
+test.beforeEach(async ({ page }) => {
+  await page.route("**/api/msft", (route) =>
+    route.fulfill({
+      json: {
+        address: siteConfig.msft.address,
+        price: null,
+        generatedAt: null,
+        observedAt: new Date().toISOString(),
+        halted: false,
+      },
+    }),
+  );
+});
+
+test("copies the full verified contract after clipboard resolves", async ({
   page,
 }) => {
   await page.clock.install({ time: new Date("2026-10-02T00:00:00Z") });
@@ -21,23 +36,21 @@ test("copies the exact labeled prelaunch placeholder after clipboard resolves", 
     });
   });
   await page.goto("/#top");
-  const control = page.locator("#heroContent .contract-address");
-  await expect(control).toContainText("Token Contract");
+  const control = page.locator("#market .msft-contract");
+  await expect(control).toContainText("MSFT");
   const copy = control.getByRole("button", {
-    name: "Copy token contract placeholder",
+    name: "Copy MSFT token contract",
   });
   await copy.click();
   await expect(copy).toHaveAttribute("aria-busy", "true");
   await expect(control.getByRole("status")).not.toContainText("Copied");
   expect(await page.locator("html").getAttribute("data-copied-value")).toBe(
-    "NILLA-CONTRACT-COMING-SOON",
+    siteConfig.msft.address,
   );
   await page.evaluate(() =>
     document.dispatchEvent(new Event("resolve-clipboard")),
   );
-  await expect(control.getByRole("status")).toHaveText(
-    "Copied placeholder — not a live contract.",
-  );
+  await expect(control.getByRole("status")).toHaveText("Copied full address.");
   await expect(copy).toHaveAttribute("data-copied", "true");
   await expect(control.getByRole("status")).toHaveCSS("position", "absolute");
   await expect(copy).toBeFocused();
@@ -50,7 +63,7 @@ test("copies the exact labeled prelaunch placeholder after clipboard resolves", 
   await expect(copy).toBeFocused();
 });
 
-test("copy rejection exposes selectable placeholder text without claiming success", async ({
+test("copy rejection exposes selectable full address text without claiming success", async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -60,9 +73,9 @@ test("copy rejection exposes selectable placeholder text without claiming succes
     });
   });
   await page.goto("/#top");
-  const control = page.locator("#heroContent .contract-address");
+  const control = page.locator("#market .msft-contract");
   const copy = control.getByRole("button", {
-    name: "Copy token contract placeholder",
+    name: "Copy MSFT token contract",
   });
   await copy.click();
   await expect(control.getByRole("status")).toContainText("Select the text");
@@ -73,7 +86,7 @@ test("copy rejection exposes selectable placeholder text without claiming succes
     "text",
   );
   await expect(control.locator(".copy-full-value")).toHaveText(
-    "NILLA-CONTRACT-COMING-SOON",
+    siteConfig.msft.address,
   );
   await expect(copy).toBeFocused();
 });
@@ -89,7 +102,7 @@ test("reduced motion switches the success icon without a fade", async ({
     }),
   );
   await page.goto("/#top");
-  const copy = page.locator("#heroContent .contract-address button");
+  const copy = page.locator("#market .msft-contract button");
   await copy.click();
   await expect(copy).toHaveAttribute("data-copied", "true");
   await expect(copy.locator(".copy-check")).toHaveCSS("opacity", "1");

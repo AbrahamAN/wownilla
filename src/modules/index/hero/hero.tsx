@@ -150,7 +150,7 @@ export function Achievement() {
   useEffect(() => {
     if (!entered) return;
     const show = setTimeout(() => setPhase("show"), 2600);
-    const hide = setTimeout(() => setPhase("hide"), 9100);
+    const hide = setTimeout(() => setPhase("hide"), 5600);
     return () => {
       clearTimeout(show);
       clearTimeout(hide);

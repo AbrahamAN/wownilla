@@ -1,13 +1,29 @@
 import Image from "next/image";
-import { ContractAddress } from "@/modules/index/common/contract-address";
-import { ProjectActions } from "@/modules/index/common/project-actions";
-import { LaunchDetails } from "@/modules/index/common/launch-details";
-import { siteConfig } from "@/modules/index/common/site-config";
+import { CopyContract } from "@/modules/index/token/copy-contract";
+import { PlatformMark } from "@/modules/index/common/platform-mark";
+import { ExternalArrow } from "@/modules/index/common/external-arrow";
+import {
+  isUsableAddress,
+  projectDestinations,
+  safeProjectUrl,
+  siteConfig,
+} from "@/modules/index/common/site-config";
 import { HeroBackground, HeroContent, Achievement } from "./hero";
-import { FactionBadge } from "./faction-badge";
 
-/** Preserves the original top section while isolating its interactive controls. */
+/** Presents the guild invitation while keeping unverified trading and community actions unavailable. */
 export function HeroSection() {
+  const destinations = projectDestinations();
+  const address = isUsableAddress(siteConfig.token)
+    ? siteConfig.token.value
+    : "";
+  const network = safeProjectUrl(siteConfig.resources.network, [
+    "robinhood.com",
+  ]);
+  const launchpad = safeProjectUrl(
+    siteConfig.launchpad.url,
+    ["app.long.xyz"],
+    true,
+  );
   return (
     <section
       id="top"
@@ -20,7 +36,6 @@ export function HeroSection() {
       <HeroContent>
         <div className="hero-layout">
           <div className="hero-identity">
-            <FactionBadge />
             <div className="relative flex justify-center w-full">
               <div
                 className="coin-glow pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-[110%] max-w-[900px] aspect-[2/1] rounded-full"
@@ -39,14 +54,12 @@ export function HeroSection() {
                   height={563}
                   decoding="async"
                   fetchPriority="high"
+                  loading="eager"
                   className="hero-logo w-[min(94vw,640px)] lg:w-[700px] h-auto select-none"
                   draggable="false"
                   unoptimized
                 />
               </div>
-            </div>
-            <div className="hero-contract mt-4 w-full anim-up d3">
-              <ContractAddress />
             </div>
           </div>
           <div className="hero-details">
@@ -55,27 +68,124 @@ export function HeroSection() {
               <span className="block">vanilla guild.</span>
             </h1>
             <p className="hero-proposition anim-up d3 mt-4 max-w-xl text-sm md:text-base leading-relaxed text-parch/85 [text-shadow:0_2px_8px_#000]">
-              {`${siteConfig.ticker} is coming to Robinhood Chain through LONG. Built for the guild, shared across factions. The grind is eternal.`}
+              $NILLA on Robinhood Chain, launched through LONG. Both factions
+              welcome. Someone tell the healer.
             </p>
-            <div className="hero-utilities anim-up d4 mt-6 flex flex-col items-center">
-              <ProjectActions />
-              <div className="mt-4 mb-4">
-                <LaunchDetails />
-              </div>
-              <p className="anim-up d5 font-narrow text-[11px] sm:text-xs text-parch2 mt-4 tracking-wide">
-                {"Not financial advice. Just a really good meme."}
-              </p>
+            <div className="hero-actions anim-up d4">
+              {destinations.buy ? (
+                <a
+                  className="btn btn-gold"
+                  href={destinations.buy}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Buy $NILLA <ExternalArrow />
+                </a>
+              ) : (
+                <button
+                  className="btn btn-gold"
+                  disabled
+                  aria-describedby="hero-destination-status"
+                >
+                  Buy $NILLA <ExternalArrow />
+                </button>
+              )}
+              {destinations.community ? (
+                <a
+                  className="btn btn-dark hero-community"
+                  href={destinations.community}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Join the Tavern
+                </a>
+              ) : (
+                <button
+                  className="btn btn-dark hero-community"
+                  disabled
+                  aria-describedby="hero-destination-status"
+                >
+                  Join the Tavern
+                </button>
+              )}
             </div>
+            {!destinations.buy || !destinations.community ? (
+              <p
+                id="hero-destination-status"
+                className="hero-availability font-narrow text-parch2"
+              >
+                {!destinations.buy ? "Purchase link unavailable." : ""}{" "}
+                {!destinations.community ? "X Community link unavailable." : ""}
+              </p>
+            ) : null}
+          </div>
+          <div className="hero-contract anim-up d4">
+            <div className="hero-contract-strip tile">
+              <span className="font-narrow text-goldhi">$NILLA</span>
+              <code
+                className="contract-value text-parch"
+                title={address || undefined}
+                aria-label={
+                  address ? `$NILLA contract address: ${address}` : undefined
+                }
+              >
+                {address
+                  ? `${address.slice(0, 6)}…${address.slice(-4)}`
+                  : "Contract unavailable"}
+              </code>
+              <CopyContract
+                address={address}
+                label="$NILLA contract address"
+                successMessage="Copied!"
+                showLabel
+              />
+            </div>
+          </div>
+          <div className="hero-badges anim-up d5">
+            <div className="launch-details">
+              {network ? (
+                <a
+                  className="nav-link"
+                  href={network}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <PlatformMark platform="robinhood" /> Robinhood Chain{" "}
+                  <ExternalArrow />
+                </a>
+              ) : (
+                <span>Robinhood Chain</span>
+              )}
+              {launchpad ? (
+                <a
+                  className="nav-link"
+                  href={launchpad}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LONG launchpad"
+                >
+                  <PlatformMark platform="long" />
+                  <ExternalArrow />
+                </a>
+              ) : (
+                <span>LONG</span>
+              )}
+            </div>
+            <p className="hero-disclaimer font-narrow text-parch2">
+              Not financial advice. Just a really good meme.
+            </p>
           </div>
         </div>
       </HeroContent>
 
       <Achievement />
+      {/* Section 2 will take ownership of this destination when it is implemented. */}
+      <span id="why" className="hero-why-anchor" aria-hidden="true" />
       <a
-        href="#about"
-        className="scroll-hint hidden md:flex absolute z-20 bottom-10 left-1/2 -translate-x-1/2 flex-col items-center gap-1 font-friz uppercase text-[10px] tracking-[0.3em] text-parch2 hover:text-goldhi transition-colors anim-up d5"
+        href="#why"
+        className="scroll-hint flex absolute z-20 bottom-10 left-1/2 -translate-x-1/2 flex-col items-center gap-1 font-friz uppercase text-[10px] tracking-[0.3em] text-parch2 hover:text-goldhi transition-colors anim-up d5"
       >
-        {"\n      Begin your quest\n      "}
+        Begin Your Quest
         <svg
           width="14"
           height="14"

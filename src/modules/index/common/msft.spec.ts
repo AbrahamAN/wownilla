@@ -85,7 +85,7 @@ test("shared fetch supplies distinct full MSFT copy and source-priced navbar", a
   await expect(page.locator("#navpill .msft-price")).toContainText(
     "MSFT $502.00",
   );
-  const control = page.locator("#heroContent .msft-contract");
+  const control = page.locator("#market .msft-contract");
   await control
     .getByRole("button", { name: "Copy MSFT token contract" })
     .click();
@@ -114,8 +114,8 @@ test("shared fetch supplies distinct full MSFT copy and source-priced navbar", a
     }),
   ).toBe(true);
   expect(requests).toBe(1);
-  await expect(page.locator("#heroContent .contract-address")).toContainText(
-    "NILLA-CONTRACT-COMING-SOON",
+  await expect(page.locator("#heroContent .hero-contract")).toContainText(
+    "Contract unavailable",
   );
 });
 
@@ -137,9 +137,7 @@ test("empty, stale and failed prices remain truthful; invalid identity cannot en
   );
   await page.reload();
   await expect(page.locator(".msft-price")).toContainText("MSFT —");
-  await expect(
-    page.locator("#heroContent .msft-contract button"),
-  ).toBeEnabled();
+  await expect(page.locator("#market .msft-contract button")).toBeEnabled();
   await page.route("**/api/msft", (route) =>
     route.fulfill({ json: { ...snapshot, address: "0xwrong" } }),
   );
@@ -148,10 +146,8 @@ test("empty, stale and failed prices remain truthful; invalid identity cannot en
     "title",
     /Retrying/,
   );
-  await expect(
-    page.locator("#heroContent .msft-contract button"),
-  ).toBeDisabled();
-  await expect(page.locator("#heroContent .msft-contract")).not.toContainText(
+  await expect(page.locator("#market .msft-contract button")).toBeDisabled();
+  await expect(page.locator("#market .msft-contract")).not.toContainText(
     "NILLA-CONTRACT",
   );
   await page.route("**/api/msft", (route) =>
@@ -162,9 +158,7 @@ test("empty, stale and failed prices remain truthful; invalid identity cannot en
     "title",
     /Retrying/,
   );
-  await expect(
-    page.locator("#heroContent .msft-contract button"),
-  ).toBeDisabled();
+  await expect(page.locator("#market .msft-contract button")).toBeDisabled();
 });
 
 test("polling pauses while hidden and resumes with one request", async ({

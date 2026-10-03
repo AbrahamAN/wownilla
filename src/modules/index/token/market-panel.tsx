@@ -1,3 +1,4 @@
+import { MsftContract } from "../common/msft-contract";
 import { siteConfig } from "../common/site-config";
 
 /** Reserves a stable chart space until the project has a launched token and verified trading pair. */
@@ -41,6 +42,9 @@ export function MarketPanel() {
         The Auction House opens after verification. No price, volume, liquidity
         or holder figures are available here before launch.
       </p>
+      <div className="token-contracts mt-5">
+        <MsftContract />
+      </div>
       <dl className="market-requirements mt-5 grid gap-3 sm:grid-cols-3">
         {[
           [

@@ -49,73 +49,34 @@ test("music is opt-in and menu supports native token links and Escape", async ({
   await expect(page.locator("#token")).toBeInViewport();
 });
 
-test("prelaunch exposes labeled placeholder copy without trade redirects or generic socials", async ({
-  page,
-}) => {
-  await page.goto("/#token");
-  await expect(
-    page
-      .locator("#heroContent")
-      .getByRole("button", { name: "Copy token contract placeholder" }),
-  ).toBeEnabled();
-  await expect(
-    page.locator("#heroContent").getByRole("button", { name: "Buy $NILLA" }),
-  ).toBeDisabled();
-  const urls = await page
-    .locator("a[href^='http']")
-    .evaluateAll((links) => links.map((link) => link.getAttribute("href")));
-  expect(urls).not.toContain("https://dexscreener.com");
-  expect(urls).not.toContain("https://discord.com");
-  expect(urls).not.toContain("https://t.me");
-  expect(urls).not.toContain("https://x.com/Wownillaa");
-});
-
-test("checkpoint uses NILLA, branded social placeholders and external buy arrows", async ({
-  page,
-}) => {
-  await page.goto("/#top");
-  await expect(page.locator("#heroContent")).toContainText("$NILLA");
-  await expect(page.locator("body")).not.toContainText("$WOWN");
-  await expect(page.locator("body")).not.toContainText("Join the Horde");
-  await expect(page.locator("body")).not.toContainText("unavailable");
-  const actions = page.locator("#heroContent .project-actions");
-  const buy = actions.getByRole("button", { name: "Buy $NILLA", exact: true });
-  await expect(buy).toBeDisabled();
-  await expect(buy.locator(".external-arrow")).toBeVisible();
-  for (const name of ["X"]) {
-    const social = actions.getByRole("button", {
-      name: `${name} · coming soon`,
-      exact: true,
-    });
-    await expect(social).toBeDisabled();
-    await expect(social.locator("svg")).toBeVisible();
-  }
-  await expect(actions.locator(".social-links button")).toHaveCount(1);
-  await expect(
-    page.locator("#heroContent").getByRole("link", { name: "LONG launchpad" }),
-  ).toHaveAttribute("href", "https://app.long.xyz/");
-  await expect(
-    page.locator("#heroContent").getByRole("link", { name: "Robinhood Chain" }),
-  ).toHaveAttribute("href", "https://robinhood.com/us/en/crypto/chain/");
-});
-
-test("hero puts placeholder directly beneath logo and includes the punchline and platform marks", async ({
+test("Hero keeps missing destinations and contract unavailable without redirecting", async ({
   page,
 }) => {
   await page.goto("/#top");
   const hero = page.locator("#heroContent");
+  await expect(
+    hero.getByRole("button", { name: "Copy $NILLA contract address" }),
+  ).toBeDisabled();
+  await expect(hero.getByRole("button", { name: "Buy $NILLA" })).toBeDisabled();
+  await expect(
+    hero.getByRole("button", { name: "Join the Tavern" }),
+  ).toBeDisabled();
+  await expect(hero).toContainText("Contract unavailable");
+  await expect(hero).not.toContainText("NILLA-CONTRACT-COMING-SOON");
+  await expect(hero).not.toContainText("MSFT");
+  await expect(hero).not.toContainText("Prelaunch");
+  await expect(hero.locator(".faction-badge")).toHaveCount(0);
   await expect(hero.getByRole("heading", { level: 1 })).toHaveText(
     "The onchain vanilla guild.",
   );
-  await expect(hero).not.toContainText("Read the Lore");
-  await expect(hero).not.toContainText("$NILLA token contract");
-  await expect(hero.locator(".hero-contract .contract-address")).toBeVisible();
-  await expect(hero.locator(".robinhood-mark")).toBeVisible();
-  await expect(hero.locator(".long-mark")).toBeVisible();
-  expect(
-    await hero.evaluate((root) => {
-      const logo = root.querySelector(".hero-wordmark")?.parentElement;
-      return logo?.nextElementSibling?.classList.contains("hero-contract");
-    }),
-  ).toBe(true);
+  await expect(hero.locator(".hero-proposition")).toHaveText(
+    "$NILLA on Robinhood Chain, launched through LONG. Both factions welcome. Someone tell the healer.",
+  );
+  await expect(
+    hero.getByRole("link", { name: "LONG launchpad" }),
+  ).toHaveAttribute("href", "https://app.long.xyz/");
+  await expect(
+    hero.getByRole("link", { name: "Robinhood Chain" }),
+  ).toHaveAttribute("href", "https://robinhood.com/us/en/crypto/chain/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
 });

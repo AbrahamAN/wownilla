@@ -25,7 +25,13 @@ export interface ProjectConfig {
     explorerUrl: string;
   };
   market: { provider: "geckoterminal"; pairId: string; verified: boolean };
-  links: { x: string; telegram: string; discord: string; buy: string };
+  links: {
+    x: string;
+    community: string;
+    telegram: string;
+    discord: string;
+    buy: string;
+  };
   resources: { wallet: string; network: string; gas: string };
   approvedTokenomics: string;
   vault: { enabled: boolean; address: ProjectAddress; documentation: string };
@@ -78,7 +84,13 @@ export const siteConfig: ProjectConfig = {
       "https://robinhoodchain.blockscout.com/token/0xe93237C50D904957Cf27E7B1133b510C669c2e74",
   },
   market: { provider: "geckoterminal", pairId: "", verified: false },
-  links: { x: "", telegram: "", discord: "", buy: "" },
+  links: {
+    x: "https://x.com/Wownillaa",
+    community: "",
+    telegram: "",
+    discord: "",
+    buy: "",
+  },
   resources: {
     wallet: "",
     network: "https://robinhood.com/us/en/crypto/chain/",
@@ -155,15 +167,13 @@ export function projectDestinations(config: ProjectConfig = siteConfig) {
       config.chain.id &&
       config.chain.name &&
       isUsableAddress(config.token)
-        ? safeProjectUrl(config.links.buy, [
-            "app.long.xyz",
-            "app.uniswap.org",
-            "jup.ag",
-            "raydium.io",
-            "pancakeswap.finance",
-            "aerodrome.finance",
-          ])
+        ? safeProjectUrl(config.links.buy, ["app.long.xyz"])
         : undefined,
+    community: /^https:\/\/x\.com\/i\/communities\/\d+\/?$/.test(
+      config.links.community,
+    )
+      ? safeProjectUrl(config.links.community, ["x.com"])
+      : undefined,
     x: safeProjectUrl(config.links.x, ["x.com"]),
     discord: safeProjectUrl(config.links.discord, [
       "discord.gg",

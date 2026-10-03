@@ -7,10 +7,14 @@ export function CopyContract({
   address,
   label,
   placeholder = false,
+  successMessage = "Copied full address.",
+  showLabel = false,
 }: {
   address: string;
   label: string;
   placeholder?: boolean;
+  successMessage?: string;
+  showLabel?: boolean;
 }) {
   const [feedback, setFeedback] = useState("");
   const [pending, setPending] = useState(false);
@@ -39,7 +43,7 @@ export function CopyContract({
         setFeedback(
           placeholder
             ? "Copied placeholder — not a live contract."
-            : "Copied full address.",
+            : successMessage,
         );
         timer.current = setTimeout(() => {
           setCopied(false);
@@ -72,6 +76,11 @@ export function CopyContract({
         aria-label={`Copy ${label}`}
         title={`Copy ${label}`}
       >
+        {showLabel ? (
+          <span className="copy-button-label">
+            {copied ? "Copied!" : "Copy"}
+          </span>
+        ) : null}
         <svg
           className="copy-glyph"
           width="14"

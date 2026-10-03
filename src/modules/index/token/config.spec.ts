@@ -70,7 +70,9 @@ test("Auction House reserves an honest chart placeholder before launch", async (
     "$NILLA chart coming soon",
   );
   await expect(page.locator("#market iframe")).toHaveCount(0);
-  await expect(page.locator("#market a[href^='http']")).toHaveCount(0);
+  await expect(
+    page.locator("#market a[href^='http']:not(.msft-contract a)"),
+  ).toHaveCount(0);
 });
 
 test("launch platform links are informational while NILLA trading remains gated", () => {
