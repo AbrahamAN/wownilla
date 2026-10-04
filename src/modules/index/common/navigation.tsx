@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { MsftPrice } from "./msft-price";
 import { ProjectActions } from "./project-actions";
 
-const sections = ["about", "token", "lore", "community"];
+const sections = ["tavern", "token", "lore", "community"];
 
 /** Keeps navigation state local while retaining native, shareable section links. */
 export function Navigation() {

@@ -1,30 +1,193 @@
-/* ---------- Item tooltip (Classic style) ---------- */
-.tooltip-card {
-  background: linear-gradient(
-    180deg,
-    rgba(16, 13, 10, 0.97),
-    rgba(8, 7, 6, 0.98)
+/* One continuous, warmly lit scene replaces the old character panel and inventory. */
+.tavern-section {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(4rem, 7vw, 7rem) 1.5rem;
+  background:
+    radial-gradient(
+      ellipse 55% 55% at 75% 55%,
+      rgb(184 100 34 / 0.12),
+      transparent
+    ),
+    var(--ink);
+}
+.tavern-legacy-anchor {
+  position: absolute;
+  top: 0;
+  scroll-margin-top: 88px;
+}
+.tavern-layout {
+  display: grid;
+  gap: 2.5rem;
+  align-items: center;
+  max-width: 75rem;
+  margin-inline: auto;
+}
+.tavern-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 30rem;
+}
+.tavern-title {
+  margin-top: 1.25rem;
+  font-size: clamp(2.5rem, 4.4vw, 4.1rem);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.tavern-description,
+.tavern-welcome {
+  font-size: clamp(1rem, 1.35vw, 1.125rem);
+  line-height: 1.85;
+}
+.tavern-description {
+  margin-top: 1.75rem;
+}
+.tavern-welcome {
+  margin-top: 1.25rem;
+}
+.tavern-invitation {
+  margin-top: 2rem;
+}
+.tavern-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 48px;
+  padding: 0.9rem 1.5rem;
+  border-color: var(--gold);
+  background: rgb(11 10 8 / 0.45);
+  font-size: 12px;
+}
+.tavern-cta:disabled {
+  opacity: 0.85;
+}
+.tavern-availability {
+  margin-top: 0.75rem;
+  font-size: 13px;
+}
+.tavern-scene {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  aspect-ratio: 3 / 2;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 15%,
+    #000 94%,
+    transparent
   );
-  border: 1px solid var(--bronze);
-  border-radius: 3px;
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.9),
-    inset 0 0 0 2px rgba(184, 134, 50, 0.18),
-    0 20px 40px -14px rgba(0, 0, 0, 0.9);
-  transition:
-    transform 0.4s var(--ease-out),
-    box-shadow 0.4s var(--ease-out),
-    border-color 0.4s;
 }
-.tooltip-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--rarity, var(--gold));
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.9),
-    inset 0 0 0 2px rgba(184, 134, 50, 0.25),
-    0 26px 50px -14px rgba(0, 0, 0, 0.95),
-    0 0 22px -8px var(--rarity, var(--gold));
+.tavern-artwork {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 58% 55%;
 }
+.tavern-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.tavern-firelight {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 45% 55% at 74% 32%,
+    rgb(255 165 66 / 0.55),
+    rgb(225 111 31 / 0.15) 50%,
+    transparent 80%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.2;
+  animation: tavernFirelight 7s ease-in-out infinite alternate paused;
+}
+.tavern-atmosphere .dust {
+  top: 100% !important;
+  background: #efb55d;
+  animation-name: tavernEmberRise;
+  animation-duration: 24s !important;
+  animation-timing-function: linear;
+  animation-play-state: paused;
+}
+.tavern-atmosphere .dust:nth-child(3n) {
+  animation-duration: 30s !important;
+}
+.tavern-atmosphere .dust.magic {
+  box-shadow: 0 0 7px rgb(255 176 73 / 0.6);
+}
+.tavern-atmosphere[data-running="true"] .dust,
+.tavern-atmosphere[data-running="true"] .tavern-firelight {
+  animation-play-state: running !important;
+}
+@keyframes tavernEmberRise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  12% {
+    opacity: 0.65;
+  }
+  70% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--dx, 30px), -700px, 0);
+  }
+}
+@keyframes tavernFirelight {
+  0%,
+  100% {
+    opacity: 0.13;
+  }
+  35% {
+    opacity: 0.28;
+  }
+  70% {
+    opacity: 0.18;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tavern-atmosphere {
+    display: none;
+  }
+}
+@media (min-width: 1024px) {
+  .tavern-layout {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr);
+    gap: 1.5rem;
+  }
+  .tavern-scene {
+    margin-right: -1.5rem;
+  }
+}
+@media (max-width: 1023px) {
+  .tavern-copy {
+    max-width: 40rem;
+  }
+  .tavern-scene {
+    margin-inline: -1.5rem;
+    aspect-ratio: 4 / 3;
+    mask-image: linear-gradient(
+      180deg,
+      transparent,
+      #000 12%,
+      #000 85%,
+      transparent
+    );
+  }
+}
+@media (max-width: 639px) {
+  .tavern-cta {
+    width: 100%;
+  }
+}
+
+/* The existing achievement still uses this shared visual from the original About styles. */
 .item-icon {
   background: radial-gradient(circle at 35% 30%, #3a2718, #0b0a08 75%);
   border: 2px solid var(--rarity, var(--gold));

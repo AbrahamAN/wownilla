@@ -27,8 +27,8 @@ export function Footer() {
           className="flex flex-wrap justify-center gap-x-6 gap-y-2 font-friz uppercase text-[12px] tracking-[0.18em]"
           aria-label="Footer"
         >
-          <a href="#about" className="nav-link">
-            {"About"}
+          <a href="#tavern" className="nav-link">
+            {"Tavern"}
           </a>
           <a href="#token" className="nav-link">
             {"Token"}
