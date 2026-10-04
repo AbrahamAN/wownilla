@@ -1,62 +1,108 @@
-import { siteConfig } from "./site-config";
-import { LaunchDetails } from "./launch-details";
-import { ContractAddress } from "./contract-address";
-import { ProjectActions } from "./project-actions";
-/** Renders the original guild links and project disclaimer. */
+import Image from "next/image";
+import { CopyContract } from "../token/copy-contract";
+import {
+  isUsableAddress,
+  projectDestinations,
+  siteConfig,
+} from "./site-config";
+
+/** Keeps guild destinations and contract controls consistent while preserving the legal attribution. */
 export function Footer() {
+  const destinations = projectDestinations();
+  const address = isUsableAddress(siteConfig.token)
+    ? siteConfig.token.value
+    : "";
   return (
-    <footer className="bg-stone px-4 pt-14 pb-16 border-t border-bronze">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center md:items-start justify-between gap-8 text-center md:text-left">
-        <div>
-          <a href="#top" className="inline-flex items-center gap-2">
-            <svg
-              width="24"
-              height="24"
-              className="text-goldhi"
-              aria-hidden="true"
+    <footer className="site-footer bg-stone">
+      <div className="footer-content">
+        <div className="footer-brand">
+          <a href="#top" aria-label="Wownilla — back to top">
+            <Image
+              src="/assets/wownilla-logo.webp"
+              alt="Wownilla"
+              width={1433}
+              height={563}
+              sizes="180px"
+              className="footer-logo"
+            />
+          </a>
+          <p className="font-narrow text-parch2">{`${siteConfig.ticker} is a meme coin with no intrinsic value or expectation of financial return. Not financial advice. Just a really good meme.`}</p>
+        </div>
+        <div className="footer-links">
+          <nav aria-label="Footer" className="font-friz">
+            {[
+              { href: "#why", label: "Why Wownilla" },
+              { href: "#tavern", label: "Tavern" },
+              { href: "#token", label: "Auction House" },
+              { href: "#vault", label: "Guild Vault" },
+              { href: "#lore", label: "Road Ahead" },
+              { href: "#community", label: "One Slot Open" },
+            ].map((link) => (
+              <a key={link.href} href={link.href} className="nav-link">
+                {link.label}
+              </a>
+            ))}
+          </nav>
+          <div className="footer-community">
+            {destinations.community ? (
+              <a
+                className="btn btn-dark"
+                href={destinations.community}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                X Community
+              </a>
+            ) : (
+              <button
+                className="btn btn-dark"
+                disabled
+                title="X Community link unavailable"
+              >
+                X Community unavailable
+              </button>
+            )}
+          </div>
+          <div className="footer-contract tile">
+            <span className="font-narrow text-goldhi">$NILLA</span>
+            <code
+              className="contract-value text-parch2"
+              title={address || undefined}
+              aria-label={
+                address
+                  ? `$NILLA contract address: ${address}`
+                  : "$NILLA contract unavailable"
+              }
             >
-              <use href="#logo-w"></use>
-            </svg>
-            <span className="logo-type text-[26px]">{"WOWNILLA"}</span>
-          </a>
-          <p className="mt-3 max-w-sm font-narrow text-sm leading-relaxed text-parch2">
-            {`${siteConfig.ticker} is a meme coin with no intrinsic value or expectation of financial return. Not financial advice. Just a really good meme.`}
-          </p>
+              {address
+                ? `${address.slice(0, 8)}…${address.slice(-6)}`
+                : "Contract unavailable"}
+            </code>
+            {address ? (
+              <CopyContract
+                address={address}
+                label="$NILLA contract"
+                showLabel
+                successMessage="Copied!"
+              />
+            ) : (
+              <button
+                className="btn btn-dark"
+                disabled
+                aria-label="Copy $NILLA contract"
+              >
+                Copy
+              </button>
+            )}
+          </div>
         </div>
-        <nav
-          className="flex flex-wrap justify-center gap-x-6 gap-y-2 font-friz uppercase text-[12px] tracking-[0.18em]"
-          aria-label="Footer"
-        >
-          <a href="#tavern" className="nav-link">
-            {"Tavern"}
-          </a>
-          <a href="#token" className="nav-link">
-            {"Auction House"}
-          </a>
-          <a href="#lore" className="nav-link">
-            {"Road Ahead"}
-          </a>
-          <a href="#community" className="nav-link">
-            {"Community"}
-          </a>
-        </nav>
-      </div>
-      <div className="max-w-3xl mx-auto mt-8">
-        <ProjectActions />
-        <div className="mt-4">
-          <LaunchDetails />
+        <div className="footer-attribution font-narrow text-parch2">
+          <span>© 2026 WOWNILLA. Forged by the guild.</span>
+          <span>
+            Fan-made parody. Not affiliated with, endorsed by, or connected to
+            Blizzard Entertainment.
+          </span>
         </div>
-        <div className="mt-6">
-          <ContractAddress />
-        </div>
-      </div>
-      <div className="max-w-6xl mx-auto mt-10 pt-6 border-t border-leather flex flex-col md:flex-row justify-between gap-2 font-narrow text-[12px] text-parch2/80 text-center md:text-left">
-        <span>{"© 2026 WOWNILLA. Forged by the guild."}</span>
-        <span>
-          {
-            "Fan-made parody. Not affiliated with, endorsed by, or connected to Blizzard Entertainment."
-          }
-        </span>
       </div>
     </footer>
   );

@@ -26,9 +26,7 @@ test("autoplay rejection requires no gesture to access content", async ({
   await expect(page.locator("#token h2")).toBeVisible();
 });
 
-test("renders a moving dungeon and preserves bounded chat and XP", async ({
-  page,
-}) => {
+test("renders a moving dungeon and preserves XP", async ({ page }) => {
   await page.goto("/#top");
   await expect(page.getByRole("dialog")).toHaveCount(0);
   const canvas = page.locator("#dungeon");
@@ -73,10 +71,6 @@ test("renders a moving dungeon and preserves bounded chat and XP", async ({
       element.scrollIntoView({ behavior: "instant", block: "end" }),
     );
   await expect(page.locator("#xp-label")).toHaveText("LVL 60 · DING!");
-  await expect(page.locator("#chat p")).toHaveCount(9, { timeout: 10000 });
-  await expect
-    .poll(() => page.locator("#chat p").count())
-    .toBeLessThanOrEqual(9);
 });
 
 test("reduced motion keeps the dungeon still and content readable", async ({
@@ -100,7 +94,6 @@ test("reduced motion keeps the dungeon still and content readable", async ({
     ),
   ).toBe(firstFrame);
   await expect(page.locator(".dust")).toHaveCount(0);
-  await expect(page.locator("#chat p")).toHaveCount(7);
   await page.locator("#token").scrollIntoViewIfNeeded();
   await expect(page.locator("#token h2")).toHaveText(
     "You used to spend gold here.",

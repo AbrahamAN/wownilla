@@ -102,7 +102,9 @@ export function Navigation() {
                     ? "Road Ahead"
                     : id === "token"
                       ? "Auction House"
-                      : id[0].toUpperCase() + id.slice(1)}
+                      : id === "community"
+                        ? "One Slot Open"
+                        : id[0].toUpperCase() + id.slice(1)}
                 </a>
               </li>
             ))}
@@ -156,7 +158,9 @@ export function Navigation() {
                 ? "Road Ahead"
                 : id === "token"
                   ? "Auction House"
-                  : id[0].toUpperCase() + id.slice(1)}
+                  : id === "community"
+                    ? "One Slot Open"
+                    : id[0].toUpperCase() + id.slice(1)}
               <span className="text-[10px] text-gold" aria-hidden="true">
                 {["I", "II", "III", "IV"][index]}
               </span>
