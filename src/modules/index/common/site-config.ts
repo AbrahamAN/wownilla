@@ -115,7 +115,7 @@ export const siteConfig: ProjectConfig = {
       format: "unconfigured",
       explorerUrl: "",
     },
-    documentation: "",
+    documentation: "https://x.com/longdotxyz/status/2105813946125148650",
   },
   feeMechanics: "",
   announcement: "",

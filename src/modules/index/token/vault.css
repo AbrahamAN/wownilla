@@ -1,0 +1,111 @@
+/* A compact bank scene continues the trading window's textures without implying live balances. */
+.vault-section {
+  padding: clamp(3.5rem, 6vw, 6rem) 1.5rem;
+  background:
+    radial-gradient(
+      ellipse 55% 70% at 75% 50%,
+      rgb(157 103 36 / 0.07),
+      transparent
+    ),
+    var(--ink);
+}
+.vault-layout {
+  display: grid;
+  gap: 2rem;
+  max-width: 68rem;
+  margin-inline: auto;
+  align-items: center;
+}
+.vault-copy {
+  grid-area: copy;
+  min-width: 0;
+}
+.vault-layout {
+  grid-template-areas: "copy" "panel" "action";
+}
+.vault-copy .eyebrow {
+  justify-content: flex-start;
+}
+.vault-copy h2 {
+  margin-top: 1.25rem;
+  font-size: clamp(2.25rem, 3.6vw, 3.25rem);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.vault-copy > p:last-child {
+  margin-top: 1.5rem;
+  font-size: clamp(1rem, 1.35vw, 1.125rem);
+  line-height: 1.85;
+  max-width: 35rem;
+}
+.vault-panel {
+  grid-area: panel;
+  min-width: 0;
+  padding: 0.75rem clamp(1rem, 2.5vw, 1.75rem) 1.5rem;
+  border: 1px solid var(--bronze);
+  background:
+    radial-gradient(
+      ellipse at 50% 25%,
+      rgb(179 129 46 / 0.09),
+      transparent 60%
+    ),
+    linear-gradient(180deg, rgb(37 26 15 / 0.7), rgb(11 10 8 / 0.9)),
+    var(--tex-leather);
+  box-shadow: inset 0 0 30px rgb(0 0 0 / 0.35);
+}
+.vault-chest {
+  display: block;
+  width: min(100%, 320px);
+  height: auto;
+  margin-inline: auto;
+}
+.vault-mechanics {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.vault-mechanics li {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding-block: 0.9rem;
+  border-top: 1px solid rgb(155 112 45 / 0.25);
+  font-size: clamp(0.95rem, 1.3vw, 1rem);
+  line-height: 1.5;
+}
+.vault-step {
+  color: var(--goldhi);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+.vault-action {
+  grid-area: action;
+}
+.vault-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 48px;
+  padding: 0.9rem 1.5rem;
+  border-color: var(--gold);
+  font-size: 12px;
+}
+@media (min-width: 900px) {
+  .vault-layout {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr);
+    grid-template-areas: "copy panel" "action panel";
+    gap: 1.75rem 4rem;
+  }
+  .vault-copy {
+    align-self: end;
+  }
+  .vault-action {
+    align-self: start;
+  }
+}
+@media (max-width: 639px) {
+  .vault-cta {
+    width: 100%;
+  }
+}

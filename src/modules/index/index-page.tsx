@@ -14,6 +14,7 @@ import "./community/chat.css";
 import "./community/community.css";
 import "./intro/intro.css";
 import "./token/token.css";
+import "./token/vault.css";
 import "./common/reduced-motion.css";
 import { Artwork } from "@/modules/common/artwork";
 import { Experience } from "@/modules/index/intro/experience";
@@ -23,6 +24,7 @@ import { HeroSection } from "@/modules/index/hero/hero-section";
 import { WhySection } from "@/modules/index/why/why-section";
 import { AboutSection } from "@/modules/index/about/about-section";
 import { TokenSection } from "@/modules/index/token/token-section";
+import { GuildVault } from "@/modules/index/token/guild-vault";
 import { LoreSection } from "@/modules/index/lore/lore-section";
 import { CommunitySection } from "@/modules/index/community/community-section";
 import { Footer } from "@/modules/index/common/footer";
@@ -40,6 +42,7 @@ export function IndexPage() {
           <WhySection />
           <AboutSection />
           <TokenSection />
+          <GuildVault />
           <LoreSection />
           <CommunitySection />
           <Footer />
