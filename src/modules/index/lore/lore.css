@@ -249,7 +249,7 @@
 .rm-beacon i + i {
   display: none;
 }
-.rm-beacon[data-status="in-progress"] i {
+.rm-beacon[data-selected="true"] i {
   left: -38px;
   top: -38px;
   width: 76px;
@@ -259,7 +259,7 @@
   box-shadow: 0 0 22px rgba(212, 175, 55, 0.7);
   animation: rm-pulse 2.8s ease-out infinite;
 }
-.rm-beacon[data-status="in-progress"] i + i {
+.rm-beacon[data-selected="true"] i + i {
   display: block;
   animation-delay: 1.4s;
 }
@@ -300,7 +300,7 @@
     filter 0.35s;
   -webkit-tap-highlight-color: transparent;
 }
-.rm-marker[data-status="in-progress"] {
+.rm-marker[data-selected="true"] {
   --pin: #d4af37;
   --pin-light: #fff0b4;
   --pin-edge: #3a2718;
@@ -314,13 +314,13 @@
   --pin-glyph: #d9cba3;
 }
 .rm-marker:hover,
-.rm-marker[aria-expanded="true"] {
+.rm-marker[aria-pressed="true"] {
   --rm-lift: 1.16;
   filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.6))
     drop-shadow(0 0 12px rgba(232, 215, 168, 0.7)) brightness(1.15);
 }
-.rm-marker[data-status="in-progress"]:hover,
-.rm-marker[data-status="in-progress"][aria-expanded="true"] {
+.rm-marker[data-selected="true"]:hover,
+.rm-marker[data-selected="true"][aria-pressed="true"] {
   filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.6))
     drop-shadow(0 0 18px rgba(255, 226, 130, 0.95)) brightness(1.12);
 }
@@ -365,7 +365,7 @@
   color: var(--parch2);
   white-space: nowrap;
 }
-.rm-marker[data-status="in-progress"] .rm-marker-tag {
+.rm-marker[data-selected="true"] .rm-marker-tag {
   border-color: var(--goldhi);
   color: var(--goldhi);
 }
@@ -381,103 +381,6 @@
   opacity: 0;
   pointer-events: none;
   animation: rm-spark 3.5s ease-out infinite;
-}
-
-/* ---------- Tooltip ---------- */
-.rm-panel-anchor {
-  position: absolute;
-  z-index: 5;
-  pointer-events: none;
-}
-.rm-panel-anchor[data-side="above"] {
-  transform: translateY(calc(-100% - 26px));
-}
-.rm-panel-anchor[data-side="below"] {
-  transform: translateY(16px);
-}
-.rm-panel {
-  position: relative;
-  padding: 16px 18px 18px;
-  border: 1px solid var(--gold);
-  border-radius: 3px;
-  background-color: rgba(20, 15, 10, 0.88);
-  background-image:
-    linear-gradient(180deg, rgba(58, 39, 24, 0.4), transparent 45%),
-    var(--tex-parch);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  box-shadow:
-    inset 0 0 0 3px rgba(11, 10, 8, 0.85),
-    inset 0 0 0 4px rgba(184, 134, 50, 0.35),
-    inset 0 0 30px rgba(0, 0, 0, 0.6),
-    0 20px 40px -14px #000;
-}
-.rm-panel::after {
-  content: "";
-  position: absolute;
-  left: var(--notch);
-  width: 12px;
-  height: 12px;
-  margin-left: -6px;
-  background: #17110b;
-  border: solid var(--gold);
-  transform: rotate(45deg);
-}
-.rm-panel-anchor[data-side="above"] .rm-panel::after {
-  bottom: -7px;
-  border-width: 0 1px 1px 0;
-}
-.rm-panel-anchor[data-side="below"] .rm-panel::after {
-  top: -7px;
-  border-width: 1px 0 0 1px;
-}
-.rm-panel-title {
-  color: var(--parch);
-}
-.rm-panel[data-status="in-progress"] {
-  border-color: var(--goldhi);
-  background-image:
-    linear-gradient(180deg, rgba(212, 175, 55, 0.22), transparent 50%),
-    var(--tex-parch);
-  box-shadow:
-    inset 0 0 0 3px rgba(11, 10, 8, 0.85),
-    inset 0 0 0 4px rgba(212, 175, 55, 0.6),
-    inset 0 0 30px rgba(0, 0, 0, 0.55),
-    0 20px 40px -14px #000,
-    0 0 34px -4px rgba(212, 175, 55, 0.55);
-}
-.rm-panel[data-status="in-progress"]::after {
-  border-color: var(--goldhi);
-}
-.rm-panel[data-status="in-progress"] .rm-panel-title {
-  color: var(--goldhi);
-}
-
-/* Status badge, shared by the tooltip and the ledger. */
-.rm-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-marcellus), serif;
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--parch2);
-}
-.rm-status[data-status="in-progress"] {
-  padding: 2px 8px;
-  border: 1px solid var(--goldhi);
-  background: rgba(212, 175, 55, 0.14);
-  color: #f6e6a8;
-}
-.rm-status-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--goldhi);
-  box-shadow: 0 0 8px var(--goldhi);
-  transform: rotate(45deg);
-  animation: rm-blink 1.6s ease-in-out infinite alternate;
 }
 
 /* ---------- Entrance ---------- */
@@ -501,9 +404,8 @@
   animation-delay: calc(var(--i) * 0.2s + 2s);
 }
 
-/* Rest offscreen, and hold the world still while a tooltip is anchored. */
-.rm-idle *,
-.rm-open .rm-float {
+/* Pause the world whenever its stage or browser tab is hidden. */
+.rm-idle * {
   animation-play-state: paused !important;
 }
 
@@ -617,7 +519,7 @@
     width: 108%;
     margin-left: -4%;
   }
-  .rm-beacon[data-status="in-progress"] i {
+  .rm-beacon[data-selected="true"] i {
     left: -24px;
     top: -24px;
     width: 48px;
@@ -640,7 +542,6 @@
   .rm-fog,
   .rm-glint,
   .rm-beacon i,
-  .rm-status-dot,
   .rm-world,
   .rm-route,
   .rm-marker,
@@ -653,5 +554,117 @@
   }
   .rm-marker {
     transition: none;
+  }
+}
+
+/* Persistent details replace hover-only tooltips; native disclosure works without JavaScript. */
+.road-section {
+  padding: clamp(4rem, 7vw, 7rem) 1.5rem;
+  overflow: hidden;
+}
+.road-content {
+  max-width: 72rem;
+  margin-inline: auto;
+}
+.road-heading {
+  text-align: center;
+}
+.road-heading h2 {
+  margin-top: 1.25rem;
+  font-size: clamp(2.25rem, 4.5vw, 3.75rem);
+  line-height: 1.15;
+}
+.quest-details {
+  position: relative;
+  max-width: 58rem;
+  margin: 1.5rem auto 0;
+  display: grid;
+  gap: 1rem;
+}
+.quest-panel {
+  min-width: 0;
+  border: 1px solid var(--bronze);
+  background:
+    linear-gradient(180deg, rgb(51 35 19 / 0.75), rgb(11 10 8 / 0.92)),
+    var(--tex-leather);
+  scroll-margin-top: 100px;
+}
+.quest-panel summary {
+  cursor: pointer;
+  padding: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  min-height: 48px;
+}
+.quest-panel[open] {
+  border-color: var(--gold);
+}
+.quest-body {
+  padding: 1.5rem clamp(1.25rem, 3vw, 2.25rem) 2rem;
+}
+.quest-body h3 {
+  font-size: clamp(1.125rem, 1.8vw, 1.5rem);
+  line-height: 1.5;
+}
+.quest-description {
+  margin-top: 1rem;
+  line-height: 1.8;
+}
+.quest-checklist {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 0.75rem;
+  line-height: 1.7;
+}
+.quest-checklist li::marker {
+  color: var(--gold);
+}
+.quest-evaluation {
+  display: inline-block;
+  margin-left: 0.65rem;
+  color: var(--goldhi);
+  font-size: 13px;
+  padding-inline: 0.4rem;
+  border: 1px solid var(--bronze);
+}
+.quest-qualification {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--bronze);
+  font-size: 14px;
+  line-height: 1.8;
+}
+@media (min-width: 768px) {
+  .roadmap-quests[data-enhanced="true"] .quest-panel {
+    display: none;
+  }
+  .roadmap-quests[data-selected="awakening"][data-enhanced="true"]
+    [data-quest="awakening"],
+  .roadmap-quests[data-selected="expansion"][data-enhanced="true"]
+    [data-quest="expansion"],
+  .roadmap-quests[data-selected="ascension"][data-enhanced="true"]
+    [data-quest="ascension"],
+  .roadmap-quests[data-selected="eternal-realm"][data-enhanced="true"]
+    [data-quest="eternal-realm"] {
+    display: block;
+  }
+  .roadmap-quests[data-enhanced="true"] summary {
+    display: none;
+  }
+}
+@media (max-width: 767px) {
+  .rm-marker {
+    pointer-events: none;
+  }
+  .quest-body h3 {
+    display: none;
+  }
+  .quest-body {
+    padding-top: 0.25rem;
+  }
+  .quest-description {
+    margin-top: 0;
   }
 }

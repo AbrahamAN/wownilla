@@ -1,74 +1,82 @@
-/** Whether a roadmap phase is the active one or still sealed. */
-export type RoadmapStatus = "in-progress" | "locked";
-
-/**
- * One stop on the roadmap map. `position` is a percentage of the map's width
- * and height so markers and the route stay anchored while the world scales.
- */
+/** One community quest; map coordinates preserve the original route and artwork. */
 export interface RoadmapPhase {
   id: string;
-  /** Short numeral shown on the marker itself, where the full label will not fit. */
   mark: string;
   numeral: string;
   title: string;
-  status: RoadmapStatus;
   description: string;
+  items: { text: string; evaluation?: boolean }[];
+  qualification?: string;
   position: { x: number; y: number };
 }
 
-/** Player-facing label for each status, shared by the legend and tooltips. */
-export const STATUS_LABEL: Record<RoadmapStatus, string> = {
-  "in-progress": "In progress",
-  locked: "Locked",
-};
-
-/** Intrinsic map size; the SVG layers and the route share this coordinate space. */
+/** Intrinsic map size shared by its original SVG layers and route. */
 export const WORLD_WIDTH = 1000;
 export const WORLD_HEIGHT = 625;
 
-/**
- * Single source of truth for roadmap copy and marker placement. Descriptions
- * are thematic placeholders, so edit them here without touching the map.
- */
+/** Approved quests retain legacy waypoint identifiers as incoming-link destinations. */
 export const ROADMAP_PHASES: readonly RoadmapPhase[] = [
   {
     id: "awakening",
-    mark: "I",
-    numeral: "Phase I",
-    title: "The Awakening",
-    status: "in-progress",
+    mark: "01",
+    numeral: "QUEST 01",
+    title: "GET THE GUILD TOGETHER",
     description:
-      "A coin is minted, a sigil is drawn, and the guild gathers around the first campfire. Every legend needs a spawn point.",
+      "Launch $NILLA, open the tavern on X, and give the community its first home.",
+    items: [
+      { text: "Launch on LONG." },
+      { text: "Publish the token details and fee breakdown." },
+      { text: "Open the X Community." },
+      { text: "Release a starter pack of memes and artwork." },
+    ],
     position: { x: 25.5, y: 63.2 },
   },
   {
     id: "expansion",
-    mark: "II",
-    numeral: "Phase II",
-    title: "The Expansion",
-    status: "locked",
-    description:
-      "Word travels along the trade roads and new banners rise in distant taverns as the guild grows past its first borders.",
+    mark: "02",
+    numeral: "QUEST 02",
+    title: "MAKE SOME NEW STORIES",
+    description: "Get names out of the chat and into the party.",
+    items: [
+      { text: "Host our first community WoW event." },
+      { text: "Run a community meme contest." },
+      { text: "Establish a recurring gathering players can plan around." },
+      { text: "Share the best moments, screenshots, and terrible pulls." },
+    ],
     position: { x: 46, y: 27.2 },
   },
   {
     id: "ascension",
-    mark: "III",
-    numeral: "Phase III",
-    title: "The Ascension",
-    status: "locked",
-    description:
-      "Beyond the mountain passes a greater trial waits. Only a united guild will climb to the rarest heights.",
+    mark: "03",
+    numeral: "QUEST 03",
+    title: "EXPAND THE INVENTORY",
+    description: "Build on what the guild actually uses.",
+    items: [
+      { text: "Publish a clear view of the vault and its activity." },
+      { text: "Explore additional burn mechanics.", evaluation: true },
+      {
+        text: "Evaluate MSFT stock-token rewards for eligible holders.",
+        evaluation: true,
+      },
+    ],
+    qualification:
+      "Future token features depend on technical feasibility and LONG support. We’ll publish the rules before anything goes live.",
     position: { x: 70, y: 60.8 },
   },
   {
     id: "eternal-realm",
-    mark: "IV",
-    numeral: "Phase IV",
-    title: "The Eternal Realm",
-    status: "locked",
-    description:
-      "A distant shore half hidden in mist. Nobody has returned to say what waits there.",
+    mark: "04",
+    numeral: "QUEST 04",
+    title: "THE GUILD TAKES THE LEAD",
+    description: "The next adventure shouldn’t always come from us.",
+    items: [
+      { text: "Open community suggestions for events and challenges." },
+      { text: "Run community polls to choose upcoming activities." },
+      {
+        text: "Support player-hosted gatherings across regions and time zones.",
+      },
+      { text: "Publish the next quests based on what the guild wants to do." },
+    ],
     position: { x: 85, y: 22.4 },
   },
 ];

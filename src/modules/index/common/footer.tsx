@@ -34,7 +34,7 @@ export function Footer() {
             {"Auction House"}
           </a>
           <a href="#lore" className="nav-link">
-            {"Lore"}
+            {"Road Ahead"}
           </a>
           <a href="#community" className="nav-link">
             {"Community"}

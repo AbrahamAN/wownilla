@@ -4,7 +4,6 @@ import {
   WORLD_HEIGHT,
   WORLD_WIDTH,
 } from "@/modules/index/lore/roadmap-data";
-import type { RoadmapStatus } from "@/modules/index/lore/roadmap-data";
 
 /*
  * Original cartography for the roadmap world. Every shape is drawn here, so no
@@ -314,28 +313,8 @@ export function RouteLayer() {
   );
 }
 
-/** Padlock glyph shared by sealed markers and their tooltips. */
-export function LockGlyph({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 16 16" className={className} aria-hidden="true">
-      <path
-        d="M5 7V5a3 3 0 0 1 6 0v2"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <rect x="3" y="7" width="10" height="7.5" rx="1.4" fill="currentColor" />
-      <circle cx="8" cy="10.4" r="1.2" fill="#0b0a08" />
-    </svg>
-  );
-}
-
-/**
- * Map pin for one phase. Colors come from CSS variables on the marker, so the
- * same drawing serves the lit and the sealed state.
- */
-export function PinArt({ status }: { status: RoadmapStatus }) {
+/** Original map pin silhouette; every future quest remains an open destination. */
+export function PinArt() {
   return (
     <svg viewBox="0 0 44 58" className="rm-pin" aria-hidden="true">
       <ellipse cx="22" cy="55" rx="9" ry="2.6" fill="#000" fillOpacity="0.45" />
@@ -348,23 +327,10 @@ export function PinArt({ status }: { status: RoadmapStatus }) {
         d="M22 5.5A14.5 14.5 0 0 0 7.5 20c0 5 2.6 11 5.8 16.6C10.5 29 11 12 22 5.5Z"
       />
       <circle className="rm-pin-core" cx="22" cy="20" r="10.5" />
-      {status === "in-progress" ? (
-        <path
-          className="rm-pin-glyph"
-          d="M22 11.5l2.4 6.1 6.1 2.4-6.1 2.4L22 28.5l-2.4-6.1-6.1-2.4 6.1-2.4Z"
-        />
-      ) : (
-        <g className="rm-pin-glyph" transform="translate(14.5 12)">
-          <path
-            d="M4.7 6.6V4.7a2.8 2.8 0 0 1 5.6 0v1.9"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-          <rect x="2.8" y="6.6" width="9.4" height="7" rx="1.3" />
-        </g>
-      )}
+      <path
+        className="rm-pin-glyph"
+        d="M22 11.5l2.4 6.1 6.1 2.4-6.1 2.4L22 28.5l-2.4-6.1-6.1-2.4 6.1-2.4Z"
+      />
     </svg>
   );
 }
