@@ -31,7 +31,7 @@ export function Footer() {
             {"Tavern"}
           </a>
           <a href="#token" className="nav-link">
-            {"Token"}
+            {"Auction House"}
           </a>
           <a href="#lore" className="nav-link">
             {"Lore"}

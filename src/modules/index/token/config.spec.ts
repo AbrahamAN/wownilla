@@ -60,14 +60,14 @@ test("public links reject roots, unexpected hosts, credentials and executable pr
   );
 });
 
-test("Auction House reserves an honest chart placeholder before launch", async ({
+test("Auction House keeps an honest unavailable chart without deployment data", async ({
   page,
 }) => {
   await page.goto("/#market");
   await expect(page.locator("#queue")).toHaveCount(0);
   await expect(page.locator("#market")).toBeInViewport();
   await expect(page.locator("#market")).toContainText(
-    "$NILLA chart coming soon",
+    "$NILLA chart unavailable",
   );
   await expect(page.locator("#market iframe")).toHaveCount(0);
   await expect(

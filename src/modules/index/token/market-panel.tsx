@@ -1,73 +1,123 @@
 import { MsftContract } from "../common/msft-contract";
-import { siteConfig } from "../common/site-config";
+import { ExternalArrow } from "../common/external-arrow";
+import {
+  isUsableAddress,
+  projectDestinations,
+  siteConfig,
+} from "../common/site-config";
+import { CopyContract } from "./copy-contract";
 
-/** Reserves a stable chart space until the project has a launched token and verified trading pair. */
+/** Keeps trading controls and contract details truthful while verified market configuration is absent. */
 export function MarketPanel() {
+  const destinations = projectDestinations();
+  const address = isUsableAddress(siteConfig.token)
+    ? siteConfig.token.value
+    : "";
   return (
-    <section
+    <div
       id="market"
-      aria-labelledby="market-title"
-      className="panel mt-14 p-5 md:p-8 scroll-mt-24"
+      className="panel auction-panel"
+      role="region"
+      aria-label="The Auction House trading panel"
     >
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-        <h3
-          id="market-title"
-          className="font-morpheus text-2xl md:text-3xl text-goldhi"
-        >
-          The Auction House
-        </h3>
-        <span className="plate">Prelaunch</span>
+      <div className="auction-controls">
+        <div className="auction-actions">
+          {destinations.buy ? (
+            <a
+              className="btn btn-gold"
+              href={destinations.buy}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Buy $NILLA <ExternalArrow />
+            </a>
+          ) : (
+            <button
+              className="btn btn-gold"
+              disabled
+              aria-describedby="auction-trading-status"
+            >
+              Buy $NILLA <ExternalArrow />
+            </button>
+          )}
+          {destinations.chart ? (
+            <a
+              className="btn btn-dark"
+              href={destinations.chart}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Chart <ExternalArrow />
+            </a>
+          ) : (
+            <button
+              className="btn btn-dark"
+              disabled
+              aria-describedby="auction-trading-status"
+            >
+              View Chart <ExternalArrow />
+            </button>
+          )}
+          {(!destinations.buy || !destinations.chart) && (
+            <p
+              id="auction-trading-status"
+              className="auction-availability font-narrow text-parch2"
+            >
+              Trading links unavailable.
+            </p>
+          )}
+        </div>
+        <div className="auction-contract">
+          <p className="auction-contract-label font-narrow text-goldhi">
+            Contract Address <span className="text-parch2">$NILLA</span>
+          </p>
+          <div className="auction-contract-row">
+            <code className="contract-value text-parch">
+              {address || "Contract unavailable"}
+            </code>
+            {address ? (
+              <CopyContract
+                address={address}
+                label="$NILLA contract"
+                showLabel
+                copyLabel="Copy Contract"
+                successMessage="Copied!"
+              />
+            ) : (
+              <button
+                className="btn btn-dark"
+                disabled
+                aria-label="Copy Contract"
+              >
+                Copy Contract
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="market-frame tile flex flex-col items-center justify-center text-center p-6">
-        <svg
-          width="64"
-          height="64"
-          className="text-goldhi mb-5"
-          aria-hidden="true"
-        >
+      <div className="market-frame tile">
+        <svg width="64" height="64" className="text-goldhi" aria-hidden="true">
           <use href="#coin-art" />
         </svg>
-        <p className="font-friz text-xl md:text-2xl text-parch">
-          {siteConfig.ticker} chart coming soon
-        </p>
-        <p className="mt-4 max-w-md text-parch2 leading-relaxed">
-          The token has not launched yet. Its chart will appear here once the
-          deployment, trading pair and chart provider support are verified.
-        </p>
-        <span className="mt-6 font-narrow text-sm text-goldhi">
-          Prelaunch · no trading data available
-        </span>
+        <p className="font-friz text-parch">$NILLA chart unavailable</p>
+        <p className="text-parch2">A verified chart is not available yet.</p>
       </div>
-      <p className="mt-5 text-parch2 leading-relaxed">
-        The Auction House opens after verification. No price, volume, liquidity
-        or holder figures are available here before launch.
-      </p>
-      <div className="token-contracts mt-5">
+      <dl className="auction-pair-details font-narrow">
+        <div>
+          <dt>Network</dt>
+          <dd>{siteConfig.chain.name}</dd>
+        </div>
+        <div>
+          <dt>Pair</dt>
+          <dd>Unavailable</dd>
+        </div>
+      </dl>
+      <div className="auction-msft">
         <MsftContract />
       </div>
-      <dl className="market-requirements mt-5 grid gap-3 sm:grid-cols-3">
-        {[
-          [
-            "Verified deployment",
-            "The full NILLA address and decimals on Robinhood Chain mainnet, with a confirmed launch.",
-          ],
-          [
-            "Verified pair",
-            "The exact pool and both token contracts, including the quote asset. A ticker alone does not identify a pair.",
-          ],
-          [
-            "Provider support",
-            "A chart provider that supports the network and verified pool. A market link will accompany the chart once enabled.",
-          ],
-        ].map(([title, description]) => (
-          <div key={title} className="tile p-4">
-            <dt className="font-friz text-sm text-goldhi">{title}</dt>
-            <dd className="mt-2 font-narrow text-base text-parch2 leading-relaxed">
-              {description}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </section>
+      <p className="auction-attribution font-narrow text-parch2">
+        Wownilla is independent of Microsoft and Robinhood.
+      </p>
+    </div>
   );
 }

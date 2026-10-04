@@ -98,7 +98,9 @@ export function Navigation() {
                   className={`nav-link${active === id ? " is-active" : ""}`}
                   aria-current={active === id ? "location" : undefined}
                 >
-                  {id[0].toUpperCase() + id.slice(1)}
+                  {id === "token"
+                    ? "Auction House"
+                    : id[0].toUpperCase() + id.slice(1)}
                 </a>
               </li>
             ))}
@@ -148,7 +150,9 @@ export function Navigation() {
               className={`m-link flex items-center justify-between rounded-[2px] px-4 py-3.5${active === id ? " is-active" : ""}`}
               aria-current={active === id ? "location" : undefined}
             >
-              {id[0].toUpperCase() + id.slice(1)}
+              {id === "token"
+                ? "Auction House"
+                : id[0].toUpperCase() + id.slice(1)}
               <span className="text-[10px] text-gold" aria-hidden="true">
                 {["I", "II", "III", "IV"][index]}
               </span>

@@ -1,40 +1,201 @@
-/* Three framed explanations reuse landing artwork without client-only layout behavior. */
-.how-it-works-card {
+/* A single trading window uses the site's leather, bronze corners and gold borders. */
+.auction-section {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(4rem, 7vw, 7rem) 1.5rem;
+  background:
+    radial-gradient(
+      ellipse at 50% 35%,
+      rgb(164 110 46 / 0.09),
+      transparent 65%
+    ),
+    var(--ink);
+}
+.auction-content {
+  max-width: 72rem;
+  margin-inline: auto;
+}
+.auction-heading {
+  max-width: 45rem;
+  margin-inline: auto;
+  text-align: center;
+}
+.auction-heading h2 {
+  margin-top: 1.25rem;
+  font-size: clamp(2.25rem, 4.5vw, 3.75rem);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.auction-heading > p:last-child {
+  margin-top: 1.5rem;
+  font-size: clamp(1rem, 1.35vw, 1.125rem);
+  line-height: 1.8;
+}
+.auction-panel {
+  margin-top: 2.75rem;
+  padding: clamp(1rem, 3vw, 2rem);
+  border: 1px solid var(--bronze);
+  border-image: none;
+}
+.auction-panel::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  opacity: 0.65;
+  background:
+    linear-gradient(var(--gold), var(--gold)) top left / 16px 2px,
+    linear-gradient(var(--gold), var(--gold)) top left / 2px 16px,
+    linear-gradient(var(--gold), var(--gold)) top right / 16px 2px,
+    linear-gradient(var(--gold), var(--gold)) top right / 2px 16px,
+    linear-gradient(var(--gold), var(--gold)) bottom left / 16px 2px,
+    linear-gradient(var(--gold), var(--gold)) bottom left / 2px 16px,
+    linear-gradient(var(--gold), var(--gold)) bottom right / 16px 2px,
+    linear-gradient(var(--gold), var(--gold)) bottom right / 2px 16px;
+  background-repeat: no-repeat;
+}
+.auction-controls {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.auction-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-content: start;
+}
+.auction-actions .btn,
+.auction-contract-row .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 48px;
+  padding: 0.9rem 1.25rem;
+  font-size: 12px;
+}
+.auction-availability {
+  flex-basis: 100%;
+  font-size: 13px;
+}
+.auction-contract {
+  min-width: 0;
+}
+.auction-contract-label {
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+.auction-contract-label span {
+  margin-left: 0.5rem;
+}
+.auction-contract-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.65rem;
+}
+.auction-contract-row code {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+}
+.auction-contract-row .contract-copy-icon {
+  display: grid;
+  grid-template-columns: auto 14px;
+  flex-shrink: 0;
+}
+.auction-contract-row .copy-button-label {
+  grid-area: 1 / 1;
+}
+.auction-contract-row .contract-copy-icon svg {
+  grid-area: 1 / 2;
+}
+.market-frame {
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.how-it-works-number {
-  font-size: 3.5rem;
-  line-height: 1;
-  text-shadow: 0 2px 0 #000;
-}
-.how-it-works-art {
-  display: grid;
-  place-items: center;
-  min-height: 176px;
-  background: radial-gradient(
-    ellipse at 50% 60%,
-    rgba(212, 175, 55, 0.12),
-    transparent 65%
-  );
-}
-.how-it-works-art svg {
-  width: 128px;
-  height: 128px;
-  filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.5));
-}
-.market-requirements > div {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.market-frame {
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
   height: 420px;
+  padding: 1.5rem;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at center, rgb(122 82 29 / 0.08), transparent 65%),
+    #0b0a08;
+}
+.market-frame > p:first-of-type {
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+}
+.market-frame > p:last-child {
+  font-size: 14px;
+}
+.auction-pair-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+  margin-top: 1.25rem;
+  font-size: 14px;
+}
+.auction-pair-details > div {
+  display: flex;
+  gap: 0.6rem;
+}
+.auction-pair-details dt {
+  color: var(--goldhi);
+}
+.auction-pair-details dd {
+  color: var(--parch2);
+}
+.auction-msft {
+  margin-top: 1.25rem;
+  max-width: 42rem;
+}
+.auction-msft .contract-value {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.auction-msft .contract-copy-icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.auction-attribution {
+  margin-top: 1rem;
+  font-size: 13px;
 }
 @media (min-width: 768px) {
   .market-frame {
     height: 520px;
+  }
+}
+@media (min-width: 1024px) {
+  .auction-controls {
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem;
+  }
+}
+@media (max-width: 639px) {
+  .auction-actions .btn {
+    flex: 1;
+    padding-inline: 0.75rem;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .auction-contract-row code {
+    flex-basis: 100%;
+  }
+  .auction-contract-row .btn {
+    width: 100%;
+  }
+}
+@media (max-width: 380px) {
+  .auction-actions .btn {
+    flex-basis: 100%;
   }
 }

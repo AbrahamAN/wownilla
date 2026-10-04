@@ -34,7 +34,7 @@ test("music is opt-in and menu supports native token links and Escape", async ({
     await page.getByRole("button", { name: "Open menu" }).click();
     await page
       .locator("#mobileMenu")
-      .getByRole("link", { name: "Token", exact: true })
+      .getByRole("link", { name: "Auction House", exact: true })
       .click();
     await expect(
       page.getByRole("button", { name: "Open menu" }),
@@ -42,7 +42,7 @@ test("music is opt-in and menu supports native token links and Escape", async ({
   } else {
     await page
       .getByRole("navigation", { name: "Primary" })
-      .getByRole("link", { name: "Token", exact: true })
+      .getByRole("link", { name: "Auction House", exact: true })
       .click();
   }
   await expect(page).toHaveURL(/#token$/);

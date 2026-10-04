@@ -102,7 +102,9 @@ test("reduced motion keeps the dungeon still and content readable", async ({
   await expect(page.locator(".dust")).toHaveCount(0);
   await expect(page.locator("#chat p")).toHaveCount(7);
   await page.locator("#token").scrollIntoViewIfNeeded();
-  await expect(page.locator("#token h2")).toHaveText("How it works");
+  await expect(page.locator("#token h2")).toHaveText(
+    "You used to spend gold here.",
+  );
 });
 
 test("server content remains visible without JavaScript", async ({
@@ -116,7 +118,7 @@ test("server content remains visible without JavaScript", async ({
   await expect(page.locator("#token h2")).toBeVisible();
   await expect(page.locator("#why h2")).toBeVisible();
   await expect(page.locator("#why .why-story")).toBeVisible();
-  await expect(page.locator("#token .reveal").first()).toHaveCSS(
+  await expect(page.locator("#token .auction-heading")).toHaveCSS(
     "opacity",
     "1",
   );

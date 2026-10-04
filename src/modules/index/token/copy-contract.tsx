@@ -9,12 +9,14 @@ export function CopyContract({
   placeholder = false,
   successMessage = "Copied full address.",
   showLabel = false,
+  copyLabel = "Copy",
 }: {
   address: string;
   label: string;
   placeholder?: boolean;
   successMessage?: string;
   showLabel?: boolean;
+  copyLabel?: string;
 }) {
   const [feedback, setFeedback] = useState("");
   const [pending, setPending] = useState(false);
@@ -78,7 +80,7 @@ export function CopyContract({
       >
         {showLabel ? (
           <span className="copy-button-label">
-            {copied ? "Copied!" : "Copy"}
+            {copied ? "Copied!" : copyLabel}
           </span>
         ) : null}
         <svg

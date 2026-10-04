@@ -24,7 +24,12 @@ export interface ProjectConfig {
     sourceUrl: string;
     explorerUrl: string;
   };
-  market: { provider: "geckoterminal"; pairId: string; verified: boolean };
+  market: {
+    provider: "geckoterminal";
+    pairId: string;
+    verified: boolean;
+    chartUrl: string;
+  };
   links: {
     x: string;
     community: string;
@@ -83,7 +88,12 @@ export const siteConfig: ProjectConfig = {
     explorerUrl:
       "https://robinhoodchain.blockscout.com/token/0xe93237C50D904957Cf27E7B1133b510C669c2e74",
   },
-  market: { provider: "geckoterminal", pairId: "", verified: false },
+  market: {
+    provider: "geckoterminal",
+    pairId: "",
+    verified: false,
+    chartUrl: "",
+  },
   links: {
     x: "https://x.com/Wownillaa",
     community: "",
@@ -161,7 +171,23 @@ export function isUsableAddress(address: ProjectAddress) {
 
 /** Derives a single set of safe public actions for navbar, hero, sheet and closing CTA. */
 export function projectDestinations(config: ProjectConfig = siteConfig) {
+  const chart = safeProjectUrl(config.market.chartUrl, [
+    "www.geckoterminal.com",
+    "geckoterminal.com",
+  ]);
   return {
+    chart:
+      config.launchStatus === "live" &&
+      isUsableAddress(config.token) &&
+      isUsableAddress(config.quote) &&
+      config.market.verified &&
+      config.market.pairId &&
+      config.chain.providerNetwork &&
+      chart &&
+      new URL(chart).pathname ===
+        `/${encodeURIComponent(config.chain.providerNetwork)}/pools/${encodeURIComponent(config.market.pairId)}`
+        ? chart
+        : undefined,
     buy:
       config.launchStatus === "live" &&
       config.chain.id &&
