@@ -179,8 +179,6 @@ export function HeroSection() {
       </HeroContent>
 
       <Achievement />
-      {/* Section 2 will take ownership of this destination when it is implemented. */}
-      <span id="why" className="hero-why-anchor" aria-hidden="true" />
       <a
         href="#why"
         className="scroll-hint flex absolute z-20 bottom-10 left-1/2 -translate-x-1/2 flex-col items-center gap-1 font-friz uppercase text-[10px] tracking-[0.3em] text-parch2 hover:text-goldhi transition-colors anim-up d5"

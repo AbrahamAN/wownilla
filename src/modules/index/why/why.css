@@ -1,0 +1,125 @@
+/* A warm, open reading space continues the dungeon's fade without enclosing the story. */
+.why-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(5rem, 9vw, 8rem) 1.5rem;
+  background:
+    radial-gradient(
+      ellipse 70% 45% at 50% 20%,
+      rgb(184 134 50 / 0.08),
+      transparent
+    ),
+    linear-gradient(var(--ink), #100c08 55%, var(--ink));
+}
+.why-reading-column {
+  position: relative;
+  width: 100%;
+  max-width: 45rem;
+  margin-inline: auto;
+}
+.why-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 24%,
+    rgb(0 0 0 / 0.3) 38%,
+    rgb(0 0 0 / 0.3) 62%,
+    #000 76%,
+    #000 92%,
+    transparent
+  );
+}
+/* Override the shared dust's local drift so these motes begin below the reading space. */
+.why-atmosphere .dust {
+  top: 100% !important;
+  animation-name: whyEmberRise;
+  animation-duration: 36s !important;
+  animation-timing-function: linear;
+  animation-play-state: paused;
+}
+.why-atmosphere .dust:nth-child(3n) {
+  animation-duration: 42s !important;
+}
+.why-atmosphere .dust:nth-child(3n + 1) {
+  animation-duration: 30s !important;
+}
+.why-atmosphere[data-running="true"] .dust {
+  animation-play-state: running;
+}
+@keyframes whyEmberRise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  15% {
+    opacity: 0.55;
+  }
+  75% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--dx, 30px), -1050px, 0);
+  }
+}
+.why-title {
+  font-size: clamp(2.25rem, 5.2vw, 4.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-align: center;
+  text-wrap: balance;
+}
+.why-subheading {
+  margin-top: 1.5rem;
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.7;
+  text-align: center;
+  text-wrap: balance;
+}
+.why-story {
+  display: grid;
+  gap: 1.75rem;
+  margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  font-size: clamp(1rem, 1.35vw, 1.125rem);
+  line-height: 1.85;
+}
+.why-invitation {
+  margin-top: 2.5rem;
+  text-align: center;
+}
+.why-cta {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+  padding: 0.9rem 1.75rem;
+  border-color: var(--gold);
+  background: rgb(11 10 8 / 0.45);
+  font-size: 12px;
+}
+.why-cta:disabled {
+  opacity: 0.85;
+}
+.why-availability {
+  margin-top: 0.75rem;
+  font-size: 13px;
+}
+@media (max-width: 639px) {
+  .why-story {
+    gap: 1.5rem;
+  }
+  .why-cta {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .why-atmosphere {
+    display: none;
+  }
+}

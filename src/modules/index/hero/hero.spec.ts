@@ -88,6 +88,7 @@ test("Hero preserves layout order, readable controls and a valid scroll destinat
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/#why$/);
   await expect(page.locator("#why")).toHaveCount(1);
+  await expect(page.locator("#why")).toBeInViewport();
 });
 
 test("Hero fits a narrow mobile viewport", async ({ page }) => {

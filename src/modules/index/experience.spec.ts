@@ -114,6 +114,8 @@ test("server content remains visible without JavaScript", async ({
   await page.goto(`${baseURL}/#token`);
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.locator("#token h2")).toBeVisible();
+  await expect(page.locator("#why h2")).toBeVisible();
+  await expect(page.locator("#why .why-story")).toBeVisible();
   await expect(page.locator("#token .reveal").first()).toHaveCSS(
     "opacity",
     "1",

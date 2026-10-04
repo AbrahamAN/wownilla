@@ -4,6 +4,7 @@ import "./common/project.css";
 import "./hero/logo.css";
 import "./common/navigation.css";
 import "./hero/hero.css";
+import "./why/why.css";
 import "./common/coin.css";
 import "./about/about.css";
 import "./common/bars.css";
@@ -19,6 +20,7 @@ import { Experience } from "@/modules/index/intro/experience";
 import { QueueScene } from "@/modules/index/intro/queue-scene";
 import { Navigation } from "@/modules/index/common/navigation";
 import { HeroSection } from "@/modules/index/hero/hero-section";
+import { WhySection } from "@/modules/index/why/why-section";
 import { AboutSection } from "@/modules/index/about/about-section";
 import { TokenSection } from "@/modules/index/token/token-section";
 import { LoreSection } from "@/modules/index/lore/lore-section";
@@ -35,6 +37,7 @@ export function IndexPage() {
         <Experience scene={<QueueScene />}>
           <Navigation />
           <HeroSection />
+          <WhySection />
           <AboutSection />
           <TokenSection />
           <LoreSection />
