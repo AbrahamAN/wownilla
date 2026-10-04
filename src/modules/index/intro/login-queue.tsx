@@ -131,7 +131,7 @@ export function LoginQueue({
       <Particles queue />
       <div className="q-ui absolute top-4 left-4 md:top-6 md:left-8 flex flex-col items-center select-none">
         <Image
-          src="/assets/wownilla-logo.webp"
+          src="/assets/wownilla-logo-mug.webp"
           alt="WOWNILLA"
           width={1433}
           height={563}

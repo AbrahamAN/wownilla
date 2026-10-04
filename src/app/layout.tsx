@@ -35,7 +35,8 @@ export const metadata: Metadata = {
   description:
     "WOWNILLA — a community-powered meme forged in the chaos of Azeroth. Not financial advice. Just a really good meme.",
   icons: {
-    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23D4AF37' d='M12 1l1.6 2.2L12 5.4 10.4 3.2zM1.5 5h4.6l3.6 10.6L12 9v5.6L10 20H8.1zM22.5 5h-4.6l-3.6 10.6L12 9v5.6l2 5.4h1.9z'/%3E%3C/svg%3E",
+    icon: { url: "/assets/wownilla-mug-icon.png", type: "image/png" },
+    apple: "/assets/wownilla-mug-apple.png",
   },
 };
 

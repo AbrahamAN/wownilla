@@ -40,7 +40,6 @@ export const ROADMAP_PHASES: readonly RoadmapPhase[] = [
     items: [
       { text: "Host our first community WoW event." },
       { text: "Run a community meme contest." },
-      { text: "Establish a recurring gathering players can plan around." },
       { text: "Share the best moments, screenshots, and terrible pulls." },
     ],
     position: { x: 46, y: 27.2 },

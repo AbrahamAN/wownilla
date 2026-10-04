@@ -9,7 +9,8 @@ Public configuration lives in `src/modules/index/common/site-config.ts`. It is i
 - The user specified LONG as the planned launchpad (`https://app.long.xyz/`) and Robinhood Chain as the network (`https://robinhood.com/us/en/crypto/chain/`). These are public informational links, not token-specific trading destinations. Robinhood Chain mainnet ID 4663 is now verified from official network documentation and the MSFT asset registry; the NILLA provider network/pair remains unconfigured. LONG was blocked by Cloudflare in installed Chrome during the recheck; its web text fetch succeeded. Robinhood Chain loaded in Chrome.
 - Auction House is an intentional static placeholder, with no provider requests, iframe or generated prices. Actual embedding is future work requiring human approval and verified pair metadata.
 - Original music and Canvas dungeon are retained. Music defaults off.
-- `public/assets/wownilla-logo.webp` is the only image original in the checkout. It is listed as reusable brand artwork; no meme collection is invented.
+- `public/assets/wownilla-logo.webp` is the original wordmark, kept as the baseline. It is listed as reusable brand artwork; no meme collection is invented.
+- The user supplied the foaming wooden mug as the coin logo. `wownilla-mug.webp` is the mug cut out of its backdrop, with no rim or coin face, and backs the shared `#logo-mug` and `#coin-art` symbols, `wownilla-mug-icon.png` and `wownilla-mug-apple.png` are the browser icons, and `wownilla-logo-mug.webp` is the wordmark with the mug standing on its globe (used by the hero and the intro queue).
 
 ## Unresolved project inputs
 

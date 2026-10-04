@@ -164,7 +164,7 @@ export function Achievement() {
     >
       <div className="relative grid place-items-center w-11 h-11 item-icon">
         <svg width="22" height="22" className="text-goldhi" aria-hidden="true">
-          <use href="#logo-w" />
+          <use href="#logo-mug" />
         </svg>
       </div>
       <div className="text-left">

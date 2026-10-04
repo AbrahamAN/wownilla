@@ -82,7 +82,7 @@ export function Navigation() {
               className="text-goldhi"
               aria-hidden="true"
             >
-              <use href="#logo-w" />
+              <use href="#logo-mug" />
             </svg>
             <span className="logo-type text-[15px] sm:text-[19px]">
               WOWNILLA

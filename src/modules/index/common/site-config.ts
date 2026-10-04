@@ -126,9 +126,9 @@ export const siteConfig: ProjectConfig = {
     {
       id: "guild-sigil",
       title: "The Wownilla Guild Sigil",
-      alt: "Ornate golden Wownilla wordmark with a blue fantasy portal",
+      alt: "Ornate golden Wownilla wordmark with the foaming wooden mug coin logo",
       kind: "image",
-      src: "/assets/wownilla-logo.webp",
+      src: "/assets/wownilla-logo-mug.webp",
     },
   ],
 };

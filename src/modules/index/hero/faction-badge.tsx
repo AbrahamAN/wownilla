@@ -55,7 +55,7 @@ export function FactionBadge() {
         title="Next faction message"
       >
         <svg width="15" height="15" aria-hidden="true">
-          <use href="#logo-w" />
+          <use href="#logo-mug" />
         </svg>
       </button>
       <span className="faction-message">

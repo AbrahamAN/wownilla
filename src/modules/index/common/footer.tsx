@@ -18,7 +18,7 @@ export function Footer() {
         <div className="footer-brand">
           <a href="#top" aria-label="Wownilla — back to top">
             <Image
-              src="/assets/wownilla-logo.webp"
+              src="/assets/wownilla-logo-mug.webp"
               alt="Wownilla"
               width={1433}
               height={563}

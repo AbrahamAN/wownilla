@@ -48,7 +48,7 @@ export function HeroSection() {
               ></div>
               <div className="hero-wordmark anim-up d2 w-full flex justify-center">
                 <Image
-                  src="/assets/wownilla-logo.webp"
+                  src="/assets/wownilla-logo-mug.webp"
                   alt="Wownilla"
                   width={1433}
                   height={563}
