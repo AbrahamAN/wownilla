@@ -1,4 +1,5 @@
 import Image from "next/image";
+import guildReunionCutout from "../../../../public/assets/wownilla-guild-reunion-complete.webp";
 import { CopyContract } from "@/modules/index/token/copy-contract";
 import { PlatformMark } from "@/modules/index/common/platform-mark";
 import { ExternalArrow } from "@/modules/index/common/external-arrow";
@@ -36,88 +37,112 @@ export function HeroSection() {
       <HeroContent>
         <div className="hero-layout">
           <div className="hero-identity">
-            <div className="relative flex justify-center w-full">
-              <div
-                className="coin-glow pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-[110%] max-w-[900px] aspect-[2/1] rounded-full"
-                style={{
-                  background:
-                    "radial-gradient(ellipse, rgba(212,175,55,0.28) 0%, rgba(184,134,50,0.1) 45%, rgba(184,134,50,0) 70%)",
-                  filter: "blur(14px)",
-                }}
-                aria-hidden="true"
-              ></div>
-              <div className="hero-wordmark anim-up d2 w-full flex justify-center">
-                <Image
-                  src="/assets/wownilla-logo-mug.webp"
-                  alt="Wownilla"
-                  width={1433}
-                  height={563}
-                  decoding="async"
-                  fetchPriority="high"
-                  loading="eager"
-                  className="hero-logo w-[min(94vw,640px)] lg:w-[700px] h-auto select-none"
-                  draggable="false"
-                  unoptimized
-                />
-              </div>
+            <div className="hero-artwork anim-up d2">
+              <Image
+                src={guildReunionCutout}
+                alt="A smirking orc rests a hand on a human adventurer’s shoulder while a dwarf priest looks on."
+                loading="eager"
+                fetchPriority="high"
+                className="hero-reunion"
+                draggable="false"
+                unoptimized
+              />
             </div>
           </div>
-          <div className="hero-details">
-            <h1 className="hero-punchline title-gold mt-6 anim-up d3">
-              <span className="block text-parch">The onchain </span>
-              <span className="block">vanilla guild.</span>
-            </h1>
-            <p className="hero-proposition anim-up d3 mt-4 max-w-xl text-sm md:text-base leading-relaxed text-parch/85 [text-shadow:0_2px_8px_#000]">
-              $NILLA on Robinhood Chain, launched through LONG. Both factions
-              welcome. Someone tell the healer.
-            </p>
-            <div className="hero-actions anim-up d4">
-              {destinations.buy ? (
-                <a
-                  className="btn btn-gold"
-                  href={destinations.buy}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Buy $NILLA <ExternalArrow />
-                </a>
-              ) : (
-                <button
-                  className="btn btn-gold"
-                  disabled
-                  aria-describedby="hero-destination-status"
-                >
-                  Buy $NILLA <ExternalArrow />
-                </button>
-              )}
-              {destinations.community ? (
-                <a
-                  className="btn btn-dark hero-community"
-                  href={destinations.community}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Join the Tavern
-                </a>
-              ) : (
-                <button
-                  className="btn btn-dark hero-community"
-                  disabled
-                  aria-describedby="hero-destination-status"
-                >
-                  Join the Tavern
-                </button>
-              )}
-            </div>
-            {!destinations.buy || !destinations.community ? (
-              <p
-                id="hero-destination-status"
-                className="hero-availability font-narrow text-parch2"
-              >
-                {!destinations.buy ? "Purchase link unavailable." : ""}{" "}
-                {!destinations.community ? "X Community link unavailable." : ""}
+          <div className="hero-copy-column">
+            <div className="hero-details">
+              <h1 className="hero-punchline title-gold mt-6 anim-up d3">
+                <span className="block text-parch">The onchain </span>
+                <span className="block">vanilla guild.</span>
+              </h1>
+              <p className="hero-proposition anim-up d3 mt-4 max-w-xl text-sm md:text-base leading-relaxed text-parch/85 [text-shadow:0_2px_8px_#000]">
+                $NILLA on Robinhood Chain, launched through LONG. Both factions
+                welcome. Someone tell the healer.
               </p>
-            ) : null}
+              <div className="hero-actions anim-up d4">
+                {destinations.buy ? (
+                  <a
+                    className="btn btn-gold"
+                    href={destinations.buy}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Buy $NILLA <ExternalArrow />
+                  </a>
+                ) : (
+                  <button
+                    className="btn btn-gold"
+                    disabled
+                    aria-describedby="hero-destination-status"
+                  >
+                    Buy $NILLA <ExternalArrow />
+                  </button>
+                )}
+                {destinations.community ? (
+                  <a
+                    className="btn btn-dark hero-community"
+                    href={destinations.community}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Join the Tavern
+                  </a>
+                ) : (
+                  <button
+                    className="btn btn-dark hero-community"
+                    disabled
+                    aria-describedby="hero-destination-status"
+                  >
+                    Join the Tavern
+                  </button>
+                )}
+              </div>
+              {!destinations.buy || !destinations.community ? (
+                <p
+                  id="hero-destination-status"
+                  className="hero-availability font-narrow text-parch2"
+                >
+                  {!destinations.buy ? "Purchase link unavailable." : ""}{" "}
+                  {!destinations.community
+                    ? "X Community link unavailable."
+                    : ""}
+                </p>
+              ) : null}
+            </div>
+            <div className="hero-badges anim-up d5">
+              <div className="launch-details">
+                {network ? (
+                  <a
+                    className="nav-link"
+                    href={network}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <PlatformMark platform="robinhood" /> Robinhood Chain{" "}
+                    <ExternalArrow />
+                  </a>
+                ) : (
+                  <span>Robinhood Chain</span>
+                )}
+                {launchpad ? (
+                  <a
+                    className="nav-link"
+                    href={launchpad}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="LONG launchpad"
+                  >
+                    <PlatformMark platform="long" />
+                    <ExternalArrow />
+                  </a>
+                ) : (
+                  <span>LONG</span>
+                )}
+              </div>
+              <p className="hero-disclaimer font-narrow text-parch2">
+                Not financial advice. Just a really good meme.
+              </p>
+            </div>
           </div>
           <div className="hero-contract anim-up d4">
             <div className="hero-contract-strip tile">
@@ -140,40 +165,6 @@ export function HeroSection() {
                 showLabel
               />
             </div>
-          </div>
-          <div className="hero-badges anim-up d5">
-            <div className="launch-details">
-              {network ? (
-                <a
-                  className="nav-link"
-                  href={network}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <PlatformMark platform="robinhood" /> Robinhood Chain{" "}
-                  <ExternalArrow />
-                </a>
-              ) : (
-                <span>Robinhood Chain</span>
-              )}
-              {launchpad ? (
-                <a
-                  className="nav-link"
-                  href={launchpad}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LONG launchpad"
-                >
-                  <PlatformMark platform="long" />
-                  <ExternalArrow />
-                </a>
-              ) : (
-                <span>LONG</span>
-              )}
-            </div>
-            <p className="hero-disclaimer font-narrow text-parch2">
-              Not financial advice. Just a really good meme.
-            </p>
           </div>
         </div>
       </HeroContent>

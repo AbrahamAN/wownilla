@@ -36,6 +36,7 @@ test("Hero preserves layout order, readable controls and a valid scroll destinat
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/#top");
   await expect(page.locator("#dungeon")).toBeVisible();
+  await expect(page.locator("#heroContent .hero-logo")).toHaveCount(0);
   const boxes = await page.locator("#heroContent").evaluate((root) => {
     const rect = (selector: string) => {
       const element = root.querySelector(selector);
@@ -51,7 +52,8 @@ test("Hero preserves layout order, readable controls and a valid scroll destinat
       };
     };
     return {
-      logo: rect(".hero-logo"),
+      artwork: rect(".hero-artwork"),
+      image: rect(".hero-reunion"),
       heading: rect("h1"),
       description: rect(".hero-proposition"),
       actions: rect(".hero-actions"),
@@ -62,14 +64,30 @@ test("Hero preserves layout order, readable controls and a valid scroll destinat
       viewport: innerWidth,
     };
   });
+  expect(boxes.image.width).toBeCloseTo(boxes.image.height, 1);
+  const artwork = page.getByRole("img", {
+    name: "A smirking orc rests a hand on a human adventurer’s shoulder while a dwarf priest looks on.",
+  });
+  await expect(artwork).toHaveAttribute("loading", "eager");
+  await expect
+    .poll(() =>
+      artwork.evaluate(
+        (image) =>
+          image instanceof HTMLImageElement &&
+          image.complete &&
+          image.naturalWidth === 1254,
+      ),
+    )
+    .toBe(true);
   expect(boxes.pageWidth).toBeLessThanOrEqual(boxes.viewport);
   expect(boxes.copy.height).toBeGreaterThanOrEqual(44);
   if (testInfo.project.name === "desktop") {
-    expect(boxes.logo.right).toBeLessThan(boxes.heading.left);
-    expect(boxes.logo.width).toBeLessThan(440);
-    expect(boxes.contract.top - boxes.logo.bottom).toBeLessThan(25);
+    expect(boxes.artwork.width).toBeLessThanOrEqual(393);
+    expect(boxes.artwork.right).toBeLessThan(boxes.heading.left);
+    expect(boxes.contract.top - boxes.artwork.bottom).toBeLessThan(25);
   } else {
-    expect(boxes.heading.top).toBeGreaterThanOrEqual(boxes.logo.bottom);
+    expect(boxes.artwork.width).toBeLessThanOrEqual(250);
+    expect(boxes.heading.top).toBeGreaterThanOrEqual(boxes.artwork.bottom);
     expect(boxes.description.top).toBeGreaterThan(boxes.heading.bottom);
     expect(boxes.actions.top).toBeGreaterThan(boxes.description.bottom);
     expect(boxes.contract.top).toBeGreaterThan(boxes.actions.bottom);
