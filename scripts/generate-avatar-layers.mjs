@@ -1,9 +1,9 @@
 /**
- * Paints the avatar forge layers in a heroic fantasy-portrait style and
- * rasterizes them into `public/avatar`: realistic proportions, a warm key
- * light with a cool rim light, soft shading and a brushy grain. Every layer
- * shares the same face anchors (eyes, mouth, crown of the head) and the same
- * brush distortion, so any combination lines up on any race.
+ * Draws the avatar forge layers as memecoin-style profile pictures and
+ * rasterizes them into `public/avatar`: flat cel colors, one shadow tone and
+ * thick ink outlines with a hand-drawn wobble. Every layer shares the same
+ * skull and face anchors (eyes, mouth, crown of the head), so any combination
+ * lines up on any race.
  *
  * Uses the `sharp` that Next.js installs; this script is not part of the build.
  *
@@ -22,33 +22,35 @@ const root = join(
 );
 
 /** Shared face anchors, in a 1024 square whose x axis is centered on the face. */
-const EYE_X = 80;
-/** Eyes are drawn at portrait size, then enlarged around their own center. */
-const EYE_SCALE = 1.3;
-const EYE_Y = 438;
-const MOUTH_Y = 600;
+const EYE_X = 104;
+const EYE_Y = 452;
+const MOUTH_Y = 664;
 
-const INK = "#120a1c";
-const SHADOW = "#150b26";
-const WARM = "#fff1d0";
-const RIM = "#9fdcff";
-const GOLD = "#e0a528";
-const STEEL = "#8f9bab";
-const IVORY = "#efe2bd";
-const AUBURN = "#a3451a";
-const GREY = "#bdb9b0";
-const WOOD = "#6e4322";
-const CORAL = "#f2683a";
-const CREAM = "#eadfae";
+const INK = "#170f14";
+const LINE = 13;
+const SHADE = "#2b1245";
+const LIGHT = "#fff6d8";
+const WHITE = "#fffdf2";
+const GOLD = "#f5c531";
+const GOLD_DARK = "#c98a12";
+const STEEL = "#9aa6b8";
+const IRON = "#5d6b82";
+const IVORY = "#f6ecc9";
+const BONE = "#c9b27a";
+const WOOD = "#9a6234";
+const LEATHER = "#8a4f2a";
+const RED = "#e2363f";
+const AUBURN = "#d2601f";
+const GREY = "#d6d3dc";
+const CORAL = "#ff7a52";
+const CREAM = "#f6efc4";
+const SMOKE = "#f4f0e8";
 
 let uid = 0;
-const nextId = () => `i${++uid}`;
-
-/** Gradient, filter and clip definitions collected while one image is drawn. */
+/** Clip and filter definitions collected while one image is drawn. */
 let defs = [];
-const blurIds = new Map();
 function def(make) {
-  const id = nextId();
+  const id = `i${++uid}`;
   defs.push(make(id));
   return id;
 }
@@ -56,7 +58,7 @@ function def(make) {
 const channels = (color) =>
   [1, 3, 5].map((start) => Number.parseInt(color.slice(start, start + 2), 16));
 
-/** Blends two hex colors; lights and shadows derive from one base tone. */
+/** Blends two hex colors; shadows and lights derive from one base tone. */
 function mix(from, to, amount) {
   const target = channels(to);
   return `#${channels(from)
@@ -67,44 +69,55 @@ function mix(from, to, amount) {
     )
     .join("")}`;
 }
+const shadeOf = (color, amount = 0.3) => mix(color, SHADE, amount);
+const lightOf = (color, amount = 0.4) => mix(color, LIGHT, amount);
 
-const stopList = (stops) =>
-  stops
-    .map(
-      ([offset, color, alpha = 1]) =>
-        `<stop offset="${offset}" stop-color="${color}" stop-opacity="${alpha}"/>`,
-    )
-    .join("");
-const linear = (x1, y1, x2, y2, stops) =>
-  `url(#${def((id) => `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stopList(stops)}</linearGradient>`)})`;
-const radial = (cx, cy, r, stops) =>
-  `url(#${def((id) => `<radialGradient id="${id}" gradientUnits="userSpaceOnUse" cx="${cx}" cy="${cy}" r="${r}">${stopList(stops)}</radialGradient>`)})`;
-
-/** Softens shapes into painted shading; one filter per radius per image. */
-function blur(amount, content) {
-  let id = blurIds.get(amount);
-  if (!id) {
-    id = def(
-      (fresh) =>
-        `<filter id="${fresh}" filterUnits="userSpaceOnUse" x="-580" y="-60" width="1160" height="1150"><feGaussianBlur stdDeviation="${amount}"/></filter>`,
-    );
-    blurIds.set(amount, id);
-  }
-  return `<g filter="url(#${id})">${content}</g>`;
-}
-
+const fill = (d, color, opacity = 1) =>
+  `<path d="${d}" fill="${color}"${opacity < 1 ? ` opacity="${opacity}"` : ""}/>`;
+const ink = (d, width = LINE, color = INK) =>
+  `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const dash = (d, width, color, pattern) =>
+  `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" stroke-dasharray="${pattern}"/>`;
+const box = (x, y, width, height, color = INK) =>
+  `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${color}"/>`;
 const clipTo = (d, content) =>
   `<g clip-path="url(#${def((id) => `<clipPath id="${id}"><path d="${d}"/></clipPath>`)})">${content}</g>`;
+const turn = (degrees, x, y, content) =>
+  `<g transform="rotate(${degrees} ${x} ${y})">${content}</g>`;
+/** Soft glow behind lasers and moonlit eyes; the only blur in the set. */
+const glow = (amount, content) =>
+  `<g filter="url(#${def((id) => `<filter id="${id}" filterUnits="userSpaceOnUse" x="-600" y="-80" width="1200" height="1200"><feGaussianBlur stdDeviation="${amount}"/></filter>`)})">${content}</g>`;
 
-const P = (d, fill, opacity = 1) =>
-  `<path d="${d}" fill="${fill}" opacity="${opacity}"/>`;
-const E = (cx, cy, rx, ry, fill, opacity = 1, turn = 0) =>
-  `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}" opacity="${opacity}"${turn ? ` transform="rotate(${turn} ${cx} ${cy})"` : ""}/>`;
-const S = (d, stroke, width, opacity = 1) =>
-  `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" opacity="${opacity}"/>`;
+/** An ellipse as a path, so it can be clipped, mirrored and cel shaded. */
+const oval = (cx, cy, rx, ry = rx) =>
+  `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 0 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 0 ${cx - rx} ${cy} Z`;
 
-/** Draws a right-hand shape and its mirror image across the face. */
-const both = (shape) => `${shape}<g transform="scale(-1 1)">${shape}</g>`;
+const star = (x, y, r) =>
+  `M ${x} ${y - r} L ${x + r * 0.28} ${y - r * 0.28} L ${x + r} ${y} L ${x + r * 0.28} ${y + r * 0.28} L ${x} ${y + r} L ${x - r * 0.28} ${y + r * 0.28} L ${x - r} ${y} L ${x - r * 0.28} ${y - r * 0.28} Z`;
+
+/** Flips a path across the face. Paths here keep every number space separated. */
+function mirror(d) {
+  return d.replace(/([MLCQAHV])([^MLCQAHVZ]*)/g, (_, command, args) => {
+    const n = args.trim().split(/\s+/).filter(Boolean).map(Number);
+    if (command === "A") {
+      for (let i = 0; i < n.length; i += 7) {
+        n[i + 2] = -n[i + 2];
+        n[i + 4] = n[i + 4] ? 0 : 1;
+        n[i + 5] = -n[i + 5];
+      }
+    } else if (command !== "V") {
+      for (let i = 0; i < n.length; i += command === "H" ? 1 : 2) n[i] = -n[i];
+    }
+    return `${command} ${n.join(" ")} `;
+  });
+}
+const flip = (d, side) => (side > 0 ? d : mirror(d));
+
+/**
+ * Draws a right-hand path and its mirror. The mirror is a new path rather
+ * than a flipped group, so the light stays on the same side of both.
+ */
+const pair = (d, draw) => draw(d, 1) + draw(mirror(d), -1);
 
 /**
  * Closes a path that is symmetric across the face from its right half:
@@ -113,1419 +126,1124 @@ const both = (shape) => `${shape}<g transform="scale(-1 1)">${shape}</g>`;
  */
 function symmetric([startX, startY], segments) {
   const points = [[startX, startY], ...segments.map((s) => s.slice(-2))];
-  let d = `M${startX} ${startY}`;
-  for (const s of segments) d += (s.length === 2 ? "L" : "C") + s.join(" ");
+  let d = `M ${startX} ${startY}`;
+  for (const s of segments)
+    d += ` ${s.length === 2 ? "L" : "C"} ${s.join(" ")}`;
   for (let i = segments.length - 1; i >= 0; i--) {
     const s = segments[i];
     const [x, y] = points[i];
     d +=
       s.length === 2
-        ? `L${-x} ${y}`
-        : `C${-s[2]} ${s[3]} ${-s[0]} ${s[1]} ${-x} ${y}`;
+        ? ` L ${-x} ${y}`
+        : ` C ${-s[2]} ${s[3]} ${-s[0]} ${s[1]} ${-x} ${y}`;
   }
-  return `${d}Z`;
+  return `${d} Z`;
 }
 
-/** Key-lit fill: warm light from the upper left falling into cool shadow. */
-const lit = (color, [x1, y1, x2, y2]) =>
-  linear(x1, y1, x2, y2, [
-    [0, mix(color, WARM, 0.4)],
-    [0.5, color],
-    [1, mix(color, SHADOW, 0.6)],
-  ]);
-
-/** Cool back light hugging the right edge of a shape. */
-const rimLight = (d, from, to, width = 14) =>
-  clipTo(
-    d,
-    blur(
-      3,
-      S(
-        d,
-        linear(from, 0, to, 0, [
-          [0, RIM, 0],
-          [1, RIM, 0.85],
-        ]),
-        width,
-      ),
-    ),
+/**
+ * One cel-shaded form: the shape in its shadow tone, the base tone slid toward
+ * the light so a crescent of shadow is left on the far edge, then the outline.
+ * `inner` is extra detail clipped to the shape.
+ */
+function cel(d, color, options = {}) {
+  const {
+    by = [-16, -12],
+    inner = "",
+    width = LINE,
+    shade = shadeOf(color),
+  } = options;
+  return (
+    fill(d, shade) +
+    clipTo(
+      d,
+      `<path d="${d}" fill="${color}" transform="translate(${by[0]} ${by[1]})"/>${inner}`,
+    ) +
+    (width ? ink(d, width) : "")
   );
+}
 
-/** One painted form: lit fill, soft inner shading clipped to it, rim light. */
-const form = (d, color, box, inner = "", rim = [0, 260]) =>
-  P(d, lit(color, box)) +
-  (inner ? clipTo(d, inner) : "") +
-  (rim ? rimLight(d, rim[0], rim[1]) : "");
+/** Overlapping blobs outlined as one cloud: smoke, foam, fur. */
+const cloud = (blobs, color) =>
+  blobs
+    .map(
+      ([x, y, r]) =>
+        `<circle cx="${x}" cy="${y}" r="${r + LINE / 2}" fill="${INK}"/>`,
+    )
+    .join("") +
+  blobs
+    .map(
+      ([x, y, r]) =>
+        `<circle cx="${x}" cy="${y}" r="${r - LINE / 2}" fill="${color}"/>`,
+    )
+    .join("");
 
-/** Hair, fur and beards: a form with light and dark strands brushed over it. */
-const hairMass = (d, color, box, light = "", dark = "", rim = [0, 240]) =>
-  form(
-    d,
-    color,
-    box,
-    (dark ? S(dark, mix(color, SHADOW, 0.6), 6, 0.45) : "") +
-      (light ? blur(1, S(light, mix(color, WARM, 0.5), 5, 0.55)) : ""),
-    rim,
-  );
+/** A band with an ink edge on both sides: chains, stems, trims, hafts. */
+const cord = (d, width, color) => ink(d, width + 14) + ink(d, width, color);
 
-const headPath = ({ T, W, K, J, C, CW }) =>
+/**
+ * Every race keeps the same cranium (`top`, `W`) so hair and headgear fit,
+ * and differs from the cheeks down.
+ */
+const headPath = ({ top = 190, W = 226, cheek, J, jawY, CW, CY, C }) =>
   symmetric(
-    [0, T],
+    [0, top],
     [
-      [W * 0.62, T, W, T + 85, W, 375],
-      [W, 440, K, 470, K, 520],
-      [K, 570, J, 595, J * 0.97, 630],
-      [J * 0.85, 630 + (C - 630) * 0.7, CW, C, 0, C],
+      [W * 0.66, top, W, top + 80, W, 380],
+      [W, 440, cheek, 480, cheek, 530],
+      [cheek, 580, J, 600, J, jawY],
+      [J, jawY + 70, CW + 64, CY - 4, CW, CY],
+      [CW * 0.6, C, CW * 0.3, C, 0, C],
     ],
   );
 
 const bodyPath = ({ nw, sw }) =>
   symmetric(
-    [0, 620],
+    [0, 690],
     [
-      [nw, 620],
-      [nw, 735],
-      [nw, 775, nw + 40, 790, nw + 110, 805],
-      [sw * 0.8, 830, sw, 900, sw, 1045],
-      [0, 1045],
+      [nw, 690],
+      [nw, 762],
+      [nw + 34, 792, nw + 96, 800, nw + 150, 816],
+      [sw * 0.86, 846, sw, 912, sw, 1090],
+      [0, 1090],
     ],
   );
 
-function nose(c, w, tip = 540, tint = c.base) {
-  return (
-    blur(
-      7,
-      P(
-        `M${w * 0.3} 436L${w * 1.05} ${tip - 6}L${w * 0.2} ${tip + 8}Z`,
-        c.deep,
-        0.5,
-      ),
-    ) +
-    blur(5, S(`M-5 440Q-10 500 -3 ${tip - 22}`, c.light, 11, 0.65)) +
-    blur(
-      3,
-      E(0, tip - 6, w * 0.78, w * 0.56, mix(tint, c.light, 0.25), 0.95) +
-        both(E(w * 0.82, tip, w * 0.34, w * 0.3, mix(tint, c.shade, 0.4), 0.9)),
-    ) +
-    both(E(w * 0.6, tip + 6, w * 0.3, w * 0.19, c.deep, 0.9)) +
-    blur(3, E(-w * 0.22, tip - 14, w * 0.3, w * 0.18, "#ffffff", 0.55))
-  );
-}
-
 const MUSTACHE = symmetric(
-  [0, 560],
+  [0, 592],
   [
-    [46, 536, 122, 544, 168, 622],
-    [116, 612, 56, 630, 0, 600],
+    [40, 580, 116, 578, 180, 636],
+    [204, 664, 206, 704, 176, 718],
+    [140, 714, 124, 652, 92, 644],
+    [60, 638, 30, 642, 0, 642],
   ],
 );
 const mustache = (color) =>
-  hairMass(
-    MUSTACHE,
-    color,
-    [-160, 540, 160, 620],
-    "M-136 596Q-80 560 -12 572M14 572Q80 560 138 598",
-    "M-120 604Q-70 580 -8 584M10 584Q70 580 122 606",
-    [40, 160],
-  );
+  cel(MUSTACHE, color, {
+    by: [-8, -10],
+    inner: ink(
+      "M -156 668 Q -100 612 -22 616 M 22 616 Q 100 612 156 668",
+      7,
+      shadeOf(color, 0.45),
+    ),
+  });
 
-const BROW = "M22 396Q76 356 164 384Q174 400 160 412Q88 388 26 418Z";
-const brows = (color) =>
-  both(
-    P(BROW, lit(color, [20, 370, 160, 430])) +
-      S("M40 396Q88 372 152 392", mix(color, WARM, 0.45), 4, 0.6),
-  );
+const BUSHY_BROW =
+  "M 18 432 Q 40 366 138 352 Q 208 356 226 398 Q 190 388 160 400 Q 128 388 100 404 Q 70 396 34 446 Z";
+const bushyBrows = (color) =>
+  pair(BUSHY_BROW, (d) => cel(d, color, { by: [-6, -10] }));
+
+const ORC_EAR = "M 212 404 L 408 314 Q 378 448 236 532 Z";
+const ELF_EAR =
+  "M 210 418 C 300 398 396 326 470 214 C 436 396 334 500 224 530 Z";
+const FIN =
+  "M 216 404 L 392 318 L 356 420 L 412 450 L 356 484 L 384 556 L 226 510 Z";
 
 /**
  * Races, in the order of the `race` category in `avatar.config.ts`. `back` is
- * drawn behind the head, `torso` and `face` are shading clipped to the body
- * and head, and `front` sits on top. `tones` are the three skin options.
+ * drawn behind the head, `torso` and `face` are detail clipped to the body and
+ * head, and `front` sits on top. `tones` are the three skin options.
  */
 const RACES = [
   {
-    // Dwarf: broad face, bulbous nose, bushy brows and a braided mustache.
-    tones: ["#e2b08a", "#c4875c", "#7d4d33"],
-    head: { T: 228, W: 182, K: 188, J: 158, C: 664, CW: 86 },
-    body: { nw: 128, sw: 430 },
-    back: (c, { K }) =>
-      both(
-        P(
-          `M${K - 8} 440C${K + 40} 420 ${K + 52} 470 ${K + 40} 510C${K + 30} 540 ${K + 5} 540 ${K - 8} 520Z`,
-          lit(c.base, [K, 420, K + 60, 540]),
-        ) + blur(4, E(K + 18, 482, 11, 24, c.deep, 0.65)),
-      ),
-    face: () => blur(12, both(E(118, 532, 42, 24, "#d2452c", 0.3))),
-    front: (c) =>
-      nose(c, 44, 540, mix(c.base, "#d2452c", 0.3)) +
-      brows(AUBURN) +
-      both(
-        [628, 662, 694]
-          .map((y, index) =>
-            E(
-              156,
-              y,
-              20,
-              19,
-              index % 2
-                ? mix(AUBURN, SHADOW, 0.3)
-                : lit(AUBURN, [136, y - 20, 176, y + 20]),
+    // Dwarf: round face, rosy cheeks, bulb nose, bushy brows and a mustache.
+    tones: ["#f5c9a4", "#dc9d70", "#935f41"],
+    head: { cheek: 246, J: 250, jawY: 630, CW: 120, CY: 752, C: 770 },
+    body: { nw: 150, sw: 430 },
+    back: (c) =>
+      pair(
+        "M 222 426 C 286 396 314 462 296 516 C 282 556 244 558 226 536 Z",
+        (d, side) =>
+          cel(d, c.base, {
+            shade: c.shade,
+            inner: ink(
+              flip("M 250 454 C 278 448 286 488 268 514", side),
+              8,
+              c.deep,
             ),
-          )
-          .join("") +
-          P("M142 726L170 726L156 774Z", mix(AUBURN, SHADOW, 0.2)) +
-          `<rect x="137" y="710" width="38" height="17" rx="5" fill="${lit(GOLD, [137, 708, 175, 730])}"/>`,
-      ) +
-      mustache(AUBURN),
+          }),
+      ),
+    face: (c) =>
+      pair(oval(156, 566, 46, 28), (d) =>
+        fill(d, mix(c.base, RED, 0.42), 0.75),
+      ),
+    front: (c) =>
+      mustache(AUBURN) +
+      cel(oval(0, 536, 58, 48), mix(c.base, RED, 0.3), {
+        by: [-10, -8],
+        width: 11,
+        inner: fill(oval(-22, 514, 14, 9), LIGHT, 0.75),
+      }) +
+      bushyBrows(AUBURN),
   },
   {
-    // Orc: green, massive jaw, pointed ears, heavy brow ridge and tusks.
-    tones: ["#8fb04a", "#5f8a35", "#3a5c2c"],
-    head: { T: 215, W: 176, K: 192, J: 188, C: 700, CW: 112 },
-    body: { nw: 152, sw: 480 },
-    back: (c, { K }) =>
-      both(
-        P(
-          `M${K - 12} 425L${K + 118} 352Q${K + 70} 470 ${K - 8} 525Z`,
-          lit(c.base, [K - 10, 350, K + 120, 520]),
-        ) +
-          P(
-            `M${K + 4} 444L${K + 80} 396Q${K + 48} 462 ${K + 4} 498Z`,
+    // Orc: massive jaw, swept ears, heavy brow slabs, tusks and a scar.
+    tones: ["#a8d957", "#72b53c", "#3f8a4b"],
+    head: { cheek: 238, J: 264, jawY: 650, CW: 150, CY: 782, C: 798 },
+    body: { nw: 168, sw: 456 },
+    back: (c) =>
+      pair(ORC_EAR, (d, side) =>
+        cel(d, c.base, {
+          shade: c.shade,
+          inner: fill(
+            flip("M 244 430 L 362 374 Q 338 448 250 496 Z", side),
             c.deep,
-            0.6,
-          ) +
-          S(`M${K - 6} 428L${K + 114} 356`, c.light, 5, 0.5),
-      ) +
-      `<circle cx="${-(K + 46)}" cy="486" r="18" fill="none" stroke="${lit(GOLD, [-K - 70, 466, -K - 26, 506])}" stroke-width="8"/>`,
+          ),
+        }),
+      ) + cord(oval(-322, 452, 24), 10, GOLD),
     face: (c) =>
-      blur(10, E(0, 656, 96, 26, c.light, 0.35)) +
-      blur(8, both(E(84, 398, 70, 16, c.light, 0.35, -8))),
-    front: (c) =>
-      nose(c, 40, 532) +
-      both(P("M14 408Q74 368 174 376L178 404Q88 392 20 430Z", c.deep, 0.9)) +
-      S(
-        "M-152 352L-120 414M-112 500L-100 548",
-        mix(c.base, "#f0c8b8", 0.55),
-        6,
-        0.6,
-      ) +
-      S("M-74 640Q0 664 74 640", c.deep, 8, 0.5) +
-      both(
-        P(
-          "M50 630Q46 566 84 518Q104 574 92 634Z",
-          linear(46, 520, 104, 630, [
-            [0, "#fffbe8"],
-            [0.6, IVORY],
-            [1, "#a8935c"],
-          ]),
-        ) + S("M84 530Q96 580 90 628", "#8a7748", 5, 0.5),
+      pair(
+        "M 8 450 L 18 388 Q 120 338 212 362 Q 226 384 208 402 Q 118 388 8 450 Z",
+        (d) =>
+          cel(d, mix(c.base, c.shade, 0.6), { by: [-6, -12], shade: c.deep }),
       ),
+    front: (c) =>
+      ink("M -46 524 Q -62 584 -22 590 Q 0 598 22 590 Q 62 584 46 524", 11) +
+      pair(oval(22, 566, 9, 13), (d) => fill(d, INK)) +
+      ink("M -24 532 Q -30 546 -24 556", 8, c.light) +
+      pair(
+        "M 98 686 C 88 610 112 550 156 506 C 164 560 178 630 166 686 Z",
+        (d, side) =>
+          cel(d, IVORY, { by: [-12, -4], shade: BONE }) +
+          ink(flip("M 84 692 Q 132 712 180 692", side), 10),
+      ) +
+      ink(
+        "M -196 296 L -164 352 M -202 322 L -176 312 M -186 344 L -160 334",
+        7,
+      ) +
+      ink("M -56 744 Q 0 762 56 744", 9),
   },
   {
-    // Murloc: teal fish-folk with a spined crest, side fins and bulging eyes.
-    tones: ["#5fc9b0", "#2a9a8f", "#1c5f73"],
-    head: { T: 228, W: 196, K: 206, J: 150, C: 652, CW: 70 },
-    body: { nw: 58, sw: 240 },
-    lips: false,
-    back: (c, { K }) => {
-      const crest = "M-92 306L-64 140L-26 240L4 96L38 240L72 152L96 306Z";
-      const fin = `M${K - 24} 418L${K + 116} 330L${K + 76} 420L${K + 132} 452L${K + 76} 484L${K + 106} 554L${K - 24} 500Z`;
-      return (
-        form(
-          crest,
-          CORAL,
-          [-90, 100, 100, 300],
-          S(
-            "M-50 290L-60 180M2 290L4 140M54 290L68 190",
-            mix(CORAL, SHADOW, 0.5),
-            6,
-            0.6,
-          ),
-          [0, 100],
-        ) +
-        both(
-          form(
-            fin,
-            CORAL,
-            [K, 330, K + 130, 550],
-            S(
-              `M${K} 440L${K + 76} 398M${K} 458L${K + 90} 452M${K} 476L${K + 70} 506`,
-              mix(CORAL, SHADOW, 0.5),
-              6,
-              0.6,
-            ),
-            [K, K + 130],
-          ),
-        )
-      );
-    },
-    torso: () => blur(6, E(0, 1010, 122, 140, CREAM, 0.95)),
-    face: (c) =>
-      blur(5, E(0, 672, 220, 108, CREAM, 0.95)) +
-      blur(
-        6,
-        E(118, 292, 20, 18, c.deep, 0.4) +
-          E(160, 350, 12, 11, c.deep, 0.4) +
-          E(70, 268, 10, 9, c.deep, 0.4),
-      ),
-    front: (c) =>
-      both(
-        `<circle cx="${EYE_X}" cy="${EYE_Y}" r="64" fill="${radial(
-          EYE_X - 14,
-          EYE_Y - 18,
-          80,
-          [
-            [0, c.light],
-            [0.6, c.base],
-            [1, c.shade],
-          ],
-        )}"/>` +
-          S(
-            `M${EYE_X - 52} ${EYE_Y + 38}Q${EYE_X} ${EYE_Y + 78} ${EYE_X + 52} ${EYE_Y + 38}`,
-            c.deep,
+    // Fish-folk: pale jaw, crest spines, side fins and frog-like eye mounds.
+    tones: ["#77e0c4", "#35b3a8", "#2c7699"],
+    head: { cheek: 256, J: 238, jawY: 636, CW: 96, CY: 744, C: 760 },
+    body: { nw: 92, sw: 320 },
+    back: () =>
+      cel(
+        "M -96 300 L -70 158 L -32 232 L 2 84 L 40 232 L 76 166 L 100 300 Z",
+        CORAL,
+        {
+          by: [-10, -4],
+          inner: ink(
+            "M -50 290 L -62 208 M 2 290 L 2 150 M 54 290 L 68 214",
             7,
-            0.45,
+            shadeOf(CORAL, 0.45),
           ),
-      ) + both(E(12, 540, 5, 9, c.deep, 0.9)),
+        },
+      ) +
+      pair(FIN, (d, side) =>
+        cel(d, CORAL, {
+          by: [-10, -8],
+          inner: ink(
+            flip(
+              "M 236 440 L 350 400 M 240 458 L 368 452 M 236 478 L 346 510",
+              side,
+            ),
+            7,
+            shadeOf(CORAL, 0.45),
+          ),
+        }),
+      ),
+    torso: () => fill(oval(0, 1030, 150, 190), CREAM),
+    face: (c) =>
+      fill(oval(0, 736, 270, 144), CREAM) +
+      fill(oval(176, 288, 20, 16), c.deep, 0.45) +
+      fill(oval(130, 250, 12, 10), c.deep, 0.45) +
+      fill(oval(-170, 330, 14, 11), c.deep, 0.45),
+    front: (c) =>
+      pair(oval(EYE_X, EYE_Y - 4, 84), (d) =>
+        cel(d, lightOf(c.base, 0.22), { by: [-8, -8], shade: c.shade }),
+      ) + pair(oval(14, 574, 6, 10), (d) => fill(d, INK)),
   },
   {
-    // Night elf: violet, long swept ears, long pale brows, cheek markings, moon.
-    tones: ["#c9a3e8", "#9670cf", "#5a4599"],
-    head: { T: 210, W: 160, K: 158, J: 118, C: 700, CW: 34 },
-    body: { nw: 64, sw: 300 },
-    back: (c, { K }) =>
-      both(
-        P(
-          `M${K - 18} 432C${K + 70} 400 ${K + 170} 330 ${K + 262} 236C${K + 190} 400 ${K + 90} 500 ${K - 12} 524Z`,
-          lit(c.base, [K, 240, K + 200, 520]),
-        ) +
-          P(
-            `M${K + 4} 452C${K + 70} 422 ${K + 140} 366 ${K + 206} 300C${K + 150} 400 ${K + 76} 470 ${K + 4} 498Z`,
+    // Moon elf: violet, long swept ears and brows, cheek marks and a crescent.
+    tones: ["#d6b3f5", "#a67ee6", "#6b55b5"],
+    head: { cheek: 226, J: 198, jawY: 630, CW: 62, CY: 772, C: 792 },
+    body: { nw: 100, sw: 366 },
+    back: (c) =>
+      pair(ELF_EAR, (d, side) =>
+        cel(d, c.base, {
+          shade: c.shade,
+          inner: fill(
+            flip(
+              "M 240 446 C 300 430 372 374 420 306 C 390 400 320 466 244 494 Z",
+              side,
+            ),
             c.deep,
-            0.6,
-          ) +
-          S(
-            `M${K - 6} 434C${K + 70} 402 ${K + 168} 334 ${K + 256} 244`,
-            c.light,
-            5,
-            0.6,
           ),
+        }),
       ),
-    front: (c, { K }) => {
-      const moon = def(
-        (id) =>
-          `<clipPath id="${id}"><path clip-rule="evenodd" d="M-60 250H60V370H-60ZM-8 306a20 20 0 1 0 40 0a20 20 0 1 0 -40 0Z"/></clipPath>`,
-      );
-      return (
-        nose(c, 22) +
-        both(
-          P(
-            `M22 398Q84 370 156 382Q236 370 ${K + 150} 310Q244 392 156 400Q84 392 26 414Z`,
-            linear(20, 390, K + 150, 320, [
-              [0, "#ffffff"],
-              [1, "#b9c8f5"],
-            ]),
-          ),
-        ) +
-        both(
-          P("M150 478Q112 540 136 620Q84 556 150 478Z", c.deep, 0.75) +
-            P("M108 486Q84 530 98 586Q62 540 108 486Z", c.deep, 0.75),
-        ) +
-        blur(
-          8,
-          `<circle cx="0" cy="312" r="30" fill="#fff3b0" opacity=".5"/>`,
-        ) +
-        `<circle cx="0" cy="312" r="25" fill="#fff6c8" clip-path="url(#${moon})"/>`
-      );
-    },
+    face: (c) =>
+      pair("M 196 510 Q 150 586 176 690 Q 96 596 196 510 Z", (d) =>
+        fill(d, mix(c.base, "#3a1a70", 0.62)),
+      ) +
+      cel("M 6 262 A 34 34 0 1 0 6 330 A 46 46 0 0 1 6 262 Z", "#fff3a8", {
+        by: [-4, -4],
+        width: 8,
+        shade: GOLD,
+      }),
+    front: () =>
+      ink("M -8 520 Q -22 572 2 580 Q 18 580 22 566", 10) +
+      pair(
+        "M 22 408 Q 100 372 196 386 Q 276 374 336 310 Q 306 404 200 414 Q 100 400 28 428 Z",
+        (d) => cel(d, "#f6f4ff", { by: [-6, -8], shade: "#b9b4e8", width: 10 }),
+      ),
   },
 ];
 
-/** One race in one skin tone: lit body and head plus the race's own features. */
+/** One race in one skin tone: body, head and the race's own features. */
 function figure(race, tone) {
   const base = race.tones[tone];
   const c = {
     base,
-    light: mix(base, WARM, 0.42),
-    shade: mix(base, SHADOW, 0.45),
-    deep: mix(base, SHADOW, 0.78),
+    shade: shadeOf(base),
+    deep: shadeOf(base, 0.55),
+    light: lightOf(base),
   };
-  const h = race.head;
-  const { nw, sw } = race.body;
-  const head = headPath(h);
+  const { nw } = race.body;
   return (
-    (race.back?.(c, h) ?? "") +
-    form(
-      bodyPath(race.body),
-      c.base,
-      [-sw, 640, sw, 1040],
-      blur(22, E(0, h.C + 30, nw + 70, 92, c.deep, 0.85)) +
-        blur(
-          14,
-          both(
-            S(
-              `M${nw * 0.5} 802Q${nw + 60} 814 ${sw * 0.6} 852`,
-              c.light,
-              14,
-              0.4,
-            ),
-          ),
-        ) +
-        blur(18, E(0, 965, nw * 0.5, 110, c.deep, 0.35)) +
-        (race.torso?.(c) ?? ""),
-      [nw * 0.4, sw],
-    ) +
-    P(head, lit(c.base, [-h.K, h.T, h.K, h.C])) +
-    clipTo(
-      head,
-      blur(
-        18,
-        both(E(EYE_X, EYE_Y - 2, 62, 34, c.deep, 0.6)) +
-          E(0, 556, 46, 14, c.deep, 0.45) +
-          E(0, MOUTH_Y + 40, 52, 12, c.deep, 0.35) +
-          both(E(h.K - 52, 585, 30, 70, c.deep, 0.4, 14)) +
-          E(h.K + 20, 470, 84, 290, c.deep, 0.65) +
-          E(-h.K - 34, 500, 56, 250, c.deep, 0.3),
-      ) +
-        blur(
-          6,
-          both(
-            P(
-              `M${EYE_X - 58} 420Q${EYE_X} 388 ${EYE_X + 70} 408L${EYE_X + 64} 446Q${EYE_X} 424 ${EYE_X - 52} 446Z`,
-              c.deep,
-              0.5,
-            ) + S("M46 562Q72 592 62 634", c.deep, 7, 0.35),
-          ),
-        ) +
-        blur(
-          14,
-          E(-46, h.T + 92, 96, 54, c.light, 0.75) +
-            E(-116, 506, 42, 19, c.light, 0.75) +
-            E(104, 506, 30, 14, c.light, 0.4) +
-            E(-6, h.C - 30, 32, 13, c.light, 0.4),
-        ) +
-        (race.lips === false
-          ? ""
-          : blur(
-              4,
-              E(0, MOUTH_Y + 2, 46, 15, mix(c.base, "#8a2438", 0.5), 0.5),
-            )) +
-        (race.face?.(c, h) ?? ""),
-    ) +
-    rimLight(head, 20, h.K) +
-    race.front(c, h)
+    (race.back?.(c) ?? "") +
+    cel(bodyPath(race.body), c.base, {
+      shade: c.shade,
+      inner:
+        (race.torso?.(c) ?? "") +
+        fill(oval(0, race.head.C + 2, nw + 96, 60), c.shade),
+    }) +
+    cel(headPath(race.head), c.base, {
+      by: [-30, -22],
+      shade: c.shade,
+      inner:
+        turn(-24, -104, 276, fill(oval(-104, 276, 74, 30), c.light, 0.9)) +
+        (race.face?.(c) ?? ""),
+    }) +
+    race.front(c)
   );
 }
 
 /** Neutral bust behind single-item thumbnails, so small parts stay readable. */
 const silhouette = (color) =>
-  P(bodyPath({ nw: 110, sw: 400 }), color) +
-  P(headPath({ T: 222, W: 178, K: 186, J: 160, C: 680, CW: 70 }), color);
-
-/** Deterministic scatter for embers and sparkles, so reruns are identical. */
-function scatter(seed) {
-  let state = seed;
-  return () => {
-    state = (state * 1664525 + 1013904223) % 4294967296;
-    return state / 4294967296;
-  };
-}
-
-/** Moody backdrop: a glow behind the head, drifting haze, embers, vignette. */
-function background({ deep, mid, glow }, seed) {
-  const next = scatter(seed);
-  let embers = "";
-  for (let ember = 0; ember < 46; ember++) {
-    const x = next() * 1024 - 512;
-    const y = next() * 1024;
-    embers += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(1.5 + next() * 3.5).toFixed(1)}" fill="${mix(glow, "#ffffff", 0.5)}" opacity="${(0.25 + next() * 0.6).toFixed(2)}"/>`;
-  }
-  return (
-    `<rect x="-512" y="0" width="1024" height="1024" fill="${radial(
-      0,
-      400,
-      780,
-      [
-        [0, glow],
-        [0.42, mid],
-        [1, deep],
-      ],
-    )}"/>` +
-    blur(
-      50,
-      E(-270, 300, 230, 150, glow, 0.4) +
-        E(310, 650, 270, 170, mid, 0.7) +
-        E(0, 1000, 540, 170, deep, 0.85),
-    ) +
-    blur(
-      20,
-      P("M-512 0L-250 0L120 1024L-180 1024Z", glow, 0.12) +
-        P("M-120 0L10 0L420 1024L260 1024Z", glow, 0.08),
-    ) +
-    blur(1, embers) +
-    `<rect x="-512" y="0" width="1024" height="1024" fill="${radial(
-      0,
-      470,
-      760,
-      [
-        [0.5, "#000000", 0],
-        [1, "#000000", 0.5],
-      ],
-    )}"/>`
+  fill(bodyPath({ nw: 150, sw: 430 }), color) +
+  fill(
+    headPath({ cheek: 244, J: 250, jawY: 640, CW: 120, CY: 764, C: 782 }),
+    color,
   );
-}
 
-function aura(color) {
-  const next = scatter(channels(color)[0] + 7);
+/** Flat backdrop with a sunburst one shade darker, like a trading card. */
+function background(color) {
+  const dark = mix(color, "#1a0b2e", 0.2);
   let rays = "";
-  for (let ray = 0; ray < 14; ray++) {
-    const angle = (ray / 14) * Math.PI * 2;
-    const point = (offset, reach) =>
-      `${Math.cos(angle + offset) * reach} ${440 + Math.sin(angle + offset) * reach}`;
-    rays += P(`M0 440L${point(-0.07, 720)}L${point(0.07, 720)}Z`, color, 0.3);
+  for (let ray = 0; ray < 10; ray++) {
+    const point = (step) => {
+      const angle = (step / 20) * Math.PI * 2;
+      return `${Math.cos(angle) * 900} ${470 + Math.sin(angle) * 900}`;
+    };
+    rays += `M 0 470 L ${point(ray * 2)} L ${point(ray * 2 + 1)} Z `;
   }
-  let sparks = "";
-  for (let spark = 0; spark < 16; spark++) {
-    const angle = next() * Math.PI * 2;
-    const reach = 250 + next() * 220;
-    const x = Math.cos(angle) * reach;
-    const y = 440 + Math.sin(angle) * reach;
-    const r = 6 + next() * 9;
-    sparks += P(
-      `M${x} ${y - r}L${x + r * 0.25} ${y - r * 0.25}L${x + r} ${y}L${x + r * 0.25} ${y + r * 0.25}L${x} ${y + r}L${x - r * 0.25} ${y + r * 0.25}L${x - r} ${y}L${x - r * 0.25} ${y - r * 0.25}Z`,
-      "#ffffff",
-      0.85,
-    );
+  return box(-600, -80, 1200, 1200, color) + fill(rays, dark, 0.55);
+}
+
+/** Spiky sun behind the head. */
+function aura(color) {
+  let rays = "";
+  for (let ray = 0; ray < 16; ray++) {
+    const angle = (ray / 16) * Math.PI * 2;
+    const point = (offset, reach) =>
+      `${Math.cos(angle + offset) * reach} ${470 + Math.sin(angle + offset) * reach}`;
+    rays += `M ${point(-0.13, 250)} L ${point(0, ray % 2 ? 470 : 420)} L ${point(0.13, 250)} Z `;
   }
   return (
-    blur(8, rays) +
-    `<circle cx="0" cy="440" r="470" fill="${radial(0, 440, 470, [
-      [0, mix(color, "#ffffff", 0.5), 0.95],
-      [0.5, color, 0.5],
-      [1, color, 0],
-    ])}"/>` +
-    blur(1, sparks)
+    ink(rays, 12) +
+    fill(rays, color) +
+    ink(oval(0, 470, 300), 12) +
+    fill(oval(0, 470, 300), lightOf(color, 0.45))
   );
 }
 
+/** Shoulders shared by every armor, wider than the widest body. */
+const ARMOR_SIDES = [
+  [272, 794, 404, 834, 458, 886],
+  [498, 928, 560, 990, 560, 1090],
+  [0, 1090],
+];
 const ARMOR = symmetric(
-  [0, 838],
-  [
-    [70, 838, 130, 812, 172, 772],
-    [260, 790, 400, 830, 446, 880],
-    [486, 920, 496, 980, 496, 1045],
-    [0, 1045],
-  ],
+  [0, 850],
+  [[80, 850, 150, 826, 184, 780], ...ARMOR_SIDES],
 );
 /** Same shoulders with a V opening down to `depth`, showing the chest. */
 const armorNotched = (depth) =>
-  symmetric(
-    [0, depth],
-    [
-      [172, 772],
-      [260, 790, 400, 830, 446, 880],
-      [486, 920, 496, 980, 496, 1045],
-      [0, 1045],
-    ],
-  );
-const ARMOR_BOX = [-460, 770, 480, 1045];
-const folds = (color) =>
-  blur(
-    10,
-    S(
-      "M-300 880Q-250 960 -270 1040M-140 900Q-120 980 -150 1040M180 900Q150 980 190 1040M330 880Q290 960 320 1040",
-      mix(color, SHADOW, 0.7),
-      16,
-      0.5,
-    ),
-  ) +
-  blur(
-    8,
-    S(
-      "M-360 870Q-320 940 -340 1040M-210 880Q-190 950 -210 1030",
-      mix(color, WARM, 0.4),
-      10,
-      0.35,
-    ),
+  symmetric([0, depth], [[184, 780], ...ARMOR_SIDES]);
+const NECKLINE = "M -184 780 C -150 826 -80 850 0 850 C 80 850 150 826 184 780";
+const seams = (color) =>
+  ink(
+    "M -330 900 Q -262 1000 -280 1090 M 330 900 Q 262 1000 280 1090",
+    9,
+    shadeOf(color, 0.5),
   );
 
 const armor = [
-  // Leather vest with a fur collar
-  () => {
-    const vest = armorNotched(950);
-    return (
-      form(
-        vest,
-        "#6b4424",
-        ARMOR_BOX,
-        folds("#6b4424") +
-          S("M-262 852L-222 1040M262 852L222 1040", "#2e1a0c", 7, 0.7) +
-          `<path d="M-262 852L-222 1040M262 852L222 1040" fill="none" stroke="#c9a06a" stroke-width="3" stroke-dasharray="10 14"/>`,
-        [150, 500],
-      ) +
-      S("M172 772L0 950L-172 772", lit("#a9793f", [-172, 770, 172, 950]), 18) +
-      both(
-        blur(
-          2,
-          S(
-            "M176 778Q230 760 300 800M190 800Q250 790 330 830M150 800Q130 850 90 880",
-            "#d8c3a0",
-            16,
-            0.9,
-          ),
-        ) +
-          S(
-            "M186 776Q236 762 296 798M196 802Q250 794 322 830",
-            "#fff4dc",
-            5,
-            0.6,
-          ),
-      )
-    );
-  },
-  // Plate cuirass
+  // Leather vest, open over the chest, with a fur collar
   () =>
-    form(
-      ARMOR,
-      STEEL,
-      ARMOR_BOX,
-      blur(
-        14,
-        E(-240, 880, 120, 40, "#ffffff", 0.5, -18) +
-          E(220, 980, 200, 90, SHADOW, 0.55),
-      ) +
-        S("M0 850L0 1045", mix(STEEL, SHADOW, 0.6), 10, 0.8) +
-        S("M-6 850L-6 1045", "#e6edf5", 4, 0.5) +
-        S(
-          "M-380 900Q-200 960 0 930Q200 960 380 900",
-          mix(STEEL, SHADOW, 0.6),
-          8,
-          0.6,
-        ),
-      [150, 500],
-    ) +
-    form(
-      "M-176 776Q0 884 176 776L162 742Q0 838 -162 742Z",
-      "#b9c4d2",
-      [-176, 740, 176, 880],
-      "",
-      [40, 180],
-    ) +
-    S("M-176 776Q0 884 176 776", lit(GOLD, [-176, 780, 176, 880]), 9) +
-    form(
-      "M0 900L44 950L0 1010L-44 950Z",
-      GOLD,
-      [-44, 900, 44, 1010],
-      "",
-      [0, 44],
-    ) +
-    both(
-      [
-        [300, 950],
-        [215, 892],
-        [390, 930],
-      ]
-        .map(
-          ([x, y]) =>
-            `<circle cx="${x}" cy="${y}" r="10" fill="${radial(
-              x - 3,
-              y - 3,
-              12,
-              [
-                [0, "#fff3c0"],
-                [1, "#8a5c10"],
-              ],
-            )}"/>`,
-        )
-        .join(""),
+    cel(armorNotched(1016), LEATHER, {
+      by: [-20, -14],
+      inner:
+        dash(
+          "M -214 800 L -24 1040 M 214 800 L 24 1040",
+          7,
+          "#f1d9a8",
+          "16 14",
+        ) + seams(LEATHER),
+    }) +
+    cloud(
+      [-1, 1].flatMap((side) => [
+        [side * 172, 806, 36],
+        [side * 224, 798, 40],
+        [side * 280, 810, 38],
+        [side * 334, 830, 34],
+        [side * 380, 856, 28],
+      ]),
+      "#f4ead0",
     ),
-  // Mage robe
+  // Plate cuirass with a gold collar and a ruby
+  () =>
+    cel(ARMOR, STEEL, {
+      by: [-22, -16],
+      inner: ink("M 0 870 L 0 1090", 9, shadeOf(STEEL, 0.5)) + seams(STEEL),
+    }) +
+    cel(
+      symmetric(
+        [0, 850],
+        [
+          [80, 850, 150, 826, 184, 780],
+          [220, 786, 250, 796, 270, 806],
+          [220, 874, 110, 912, 0, 912],
+        ],
+      ),
+      GOLD,
+      { by: [-8, -10], shade: GOLD_DARK },
+    ) +
+    cel("M 0 922 L 34 966 L 0 1012 L -34 966 Z", RED, { by: [-8, -8] }),
+  // Mage robe with a gold trim and stars
   () => {
-    const robe = armorNotched(905);
+    const color = "#3b55cf";
     return (
-      both(
-        form(
-          "M150 800L226 660L262 812Z",
-          "#3a1f78",
-          [150, 660, 262, 812],
-          "",
-          [150, 262],
-        ),
-      ) +
-      form(robe, "#4a2a96", ARMOR_BOX, folds("#4a2a96"), [150, 500]) +
-      S(
-        "M172 772L0 905L-172 772M0 905L0 1045",
-        lit(GOLD, [-172, 770, 172, 1040]),
-        18,
-      ) +
-      S("M172 772L0 905L-172 772M0 905L0 1045", "#fff0b0", 4, 0.6) +
-      both(
-        P(
-          "M250 900L262 928L290 938L262 948L250 976L238 948L210 938L238 928Z",
-          lit(GOLD, [210, 900, 290, 976]),
-        ),
-      ) +
-      blur(10, `<circle cx="0" cy="905" r="34" fill="#7fe9ff" opacity=".7"/>`) +
-      `<circle cx="0" cy="905" r="20" fill="${radial(-5, 899, 22, [
-        [0, "#ffffff"],
-        [0.5, "#7fe9ff"],
-        [1, "#1c6fb0"],
-      ])}" stroke="${GOLD}" stroke-width="5"/>`
+      cel(ARMOR, color, {
+        by: [-22, -16],
+        inner:
+          seams(color) +
+          cord("M -210 790 L 0 1016 L 210 790", 28, GOLD) +
+          fill(
+            star(-306, 960, 34) + star(318, 930, 26) + star(250, 1010, 18),
+            GOLD,
+          ),
+      }) + cel(oval(0, 1016, 26), "#7fe6ff", { by: [-6, -6], width: 10 })
     );
   },
-  // Guild tee
+  // Guild tee with a ringer collar
   () =>
-    form(ARMOR, "#22212b", ARMOR_BOX, folds("#22212b"), [150, 500]) +
-    S("M-172 772Q-70 838 0 838Q70 838 172 772", "#3d3b4a", 16),
+    cel(ARMOR, "#f3eee2", {
+      by: [-22, -16],
+      inner: seams("#f3eee2"),
+    }) +
+    cord(NECKLINE, 20, RED) +
+    cord("M -50 928 L -25 1006 L 0 950 L 25 1006 L 50 928", 14, RED),
+  // Degen hoodie
+  () => {
+    const color = "#7b4be0";
+    return (
+      cel(ARMOR, color, {
+        by: [-22, -16],
+        inner: seams(color) + ink("M 0 860 L 0 1090", 9, shadeOf(color, 0.5)),
+      }) +
+      pair(
+        "M 40 866 C 96 852 170 822 196 770 C 252 782 270 820 246 850 C 190 892 110 906 44 906 Z",
+        (d) =>
+          cel(d, lightOf(color, 0.18), {
+            by: [-8, -10],
+            shade: shadeOf(color),
+          }),
+      ) +
+      pair("M 52 900 L 44 996", (d) => cord(d, 9, SMOKE))
+    );
+  },
 ];
 
 const necklace = [
-  // Gold chain
-  () =>
-    S("M-124 800Q0 996 124 800", "#6e440a", 16) +
-    `<path d="M-124 800Q0 996 124 800" fill="none" stroke="${lit(GOLD, [-124, 800, 124, 990])}" stroke-width="11" stroke-dasharray="17 8" stroke-linecap="round"/>` +
-    `<circle cx="0" cy="902" r="25" fill="${radial(-7, 894, 28, [
-      [0, "#fff3c0"],
-      [0.5, GOLD],
-      [1, "#6e440a"],
-    ])}" stroke="#6e440a" stroke-width="5"/>`,
-  // Spiked pauldrons with a glowing gem
+  // Gold chain with a coin
   () => {
-    const plate =
-      "M178 905C170 800 290 730 440 770C500 800 512 900 500 1045L210 1045Z";
-    return both(
-      [
-        "M196 836L214 728L262 800Z",
-        "M278 778L314 660L352 770Z",
-        "M380 768L436 668L452 790Z",
-      ]
-        .map((spike) =>
-          P(
-            spike,
-            linear(190, 660, 460, 800, [
-              [0, "#f4f7fb"],
-              [1, "#5d6878"],
-            ]),
-          ),
-        )
-        .join("") +
-        form(
-          plate,
-          STEEL,
-          [170, 730, 510, 1045],
-          blur(
-            12,
-            E(280, 800, 90, 26, "#ffffff", 0.55, -18) +
-              E(440, 980, 110, 120, SHADOW, 0.5),
-          ) +
-            S(
-              "M206 950C240 860 340 826 492 860",
-              mix(STEEL, SHADOW, 0.6),
-              9,
-              0.7,
-            ) +
-            S(
-              "M212 1010C250 930 350 900 496 930",
-              mix(STEEL, SHADOW, 0.6),
-              9,
-              0.7,
-            ),
-          [330, 520],
-        ) +
-        S(plate, lit(GOLD, [170, 730, 510, 1045]), 10) +
-        blur(
-          10,
-          `<circle cx="330" cy="880" r="32" fill="#ff5a2a" opacity=".7"/>`,
-        ) +
-        `<circle cx="330" cy="880" r="20" fill="${radial(324, 873, 22, [
-          [0, "#fff0c0"],
-          [0.5, "#ff5a2a"],
-          [1, "#6e1408"],
-        ])}" stroke="${GOLD}" stroke-width="5"/>`,
+    const loop = "M -176 800 C -150 900 -70 946 0 948 C 70 946 150 900 176 800";
+    return (
+      cord(loop, 16, GOLD) +
+      dash(loop, 16, INK, "5 23") +
+      cel(oval(0, 972, 50), GOLD, { by: [-8, -8], shade: GOLD_DARK }) +
+      ink(oval(0, 972, 36), 6, GOLD_DARK) +
+      ink("M -22 954 L -11 992 L 0 966 L 11 992 L 22 954", 9)
     );
   },
-  // Scarf
-  () => {
-    const wrap = "M-178 742Q0 800 178 742L186 838Q0 900 -186 838Z";
-    const tail = "M40 852L132 838L156 1010L122 992L104 1020L78 996L54 1018Z";
-    return (
-      form(
-        tail,
-        "#8e1f1a",
-        [40, 838, 156, 1020],
-        blur(6, S("M80 860L96 1000", SHADOW, 12, 0.4)),
-        [60, 160],
-      ) +
-      form(
-        wrap,
-        "#b3271f",
-        [-186, 742, 186, 900],
-        blur(
-          8,
-          S(
-            "M-120 770Q-90 830 -120 880M20 792Q40 840 20 890M110 772Q130 830 110 870",
-            SHADOW,
-            14,
-            0.45,
+  // Spiked pauldrons
+  () =>
+    pair(
+      "M 214 838 C 262 762 430 752 492 846 C 520 900 560 980 560 1090 L 236 1090 C 204 1000 192 900 214 838 Z",
+      (d, side) =>
+        [
+          "M 262 800 L 286 690 L 326 776 Z",
+          "M 350 772 L 392 664 L 418 780 Z",
+          "M 438 800 L 496 716 L 494 832 Z",
+        ]
+          .map((spike) =>
+            cel(flip(spike, side), IVORY, { by: [-8, -4], shade: BONE }),
+          )
+          .join("") +
+        cel(d, IRON, {
+          by: [-18, -16],
+          inner: ink(
+            flip("M 236 880 C 290 812 420 810 478 884", side),
+            16,
+            GOLD,
           ),
-        ),
-        [40, 190],
-      ) +
-      S("M-182 790Q0 852 182 790", "#e8cf9a", 9, 0.85)
+        }),
+    ),
+  // Striped scarf
+  () => {
+    const wrap =
+      "M -206 776 C -130 836 130 836 206 776 L 222 852 C 130 918 -130 918 -222 852 Z";
+    return (
+      cel("M -172 876 L -70 896 L -92 1070 L -196 1052 Z", RED, {
+        by: [-8, -8],
+        inner: ink("M -190 956 L -76 978 M -196 1016 L -82 1038", 16, CREAM),
+      }) +
+      cel(wrap, RED, {
+        by: [-10, -12],
+        inner: ink("M -216 812 C -130 876 130 876 216 812", 16, CREAM),
+      })
     );
   },
 ];
 
-const mouthLine = (d) =>
-  S(d, "#1a0810", 8, 0.8) + blur(4, E(0, MOUTH_Y + 22, 30, 8, "#ffffff", 0.22));
-
 const mouth = [
-  // Smile
-  () => mouthLine(`M-50 ${MOUTH_Y - 6}Q0 ${MOUTH_Y + 18} 50 ${MOUTH_Y - 6}`),
-  // Shout
+  // Smirk
+  () =>
+    ink(
+      `M -74 ${MOUTH_Y + 2} Q -20 ${MOUTH_Y + 30} 40 ${MOUTH_Y + 8} Q 64 ${MOUTH_Y - 2} 74 ${MOUTH_Y - 26}`,
+    ) + ink(`M 60 ${MOUTH_Y - 36} Q 84 ${MOUTH_Y - 30} 86 ${MOUTH_Y - 10}`, 8),
+  // Grin
   () => {
-    const open = `M-44 ${MOUTH_Y - 10}Q0 ${MOUTH_Y - 24} 44 ${MOUTH_Y - 10}Q32 ${MOUTH_Y + 44} 0 ${MOUTH_Y + 46}Q-32 ${MOUTH_Y + 44} -44 ${MOUTH_Y - 10}Z`;
+    const open = `M -86 ${MOUTH_Y - 18} Q 0 ${MOUTH_Y + 4} 86 ${MOUTH_Y - 18} Q 84 ${MOUTH_Y + 56} 0 ${MOUTH_Y + 60} Q -84 ${MOUTH_Y + 56} -86 ${MOUTH_Y - 18} Z`;
     return (
-      P(open, "#1c0509") +
+      fill(open, "#5b1226") +
       clipTo(
         open,
-        `<rect x="-34" y="${MOUTH_Y - 22}" width="68" height="16" rx="4" fill="#f3ead8"/>` +
-          blur(2, E(0, MOUTH_Y + 36, 26, 16, "#c2434a", 0.95)),
+        fill(oval(8, MOUTH_Y + 62, 46, 26), "#ef6f7c") +
+          fill(
+            `M -90 ${MOUTH_Y - 24} Q 0 ${MOUTH_Y} 90 ${MOUTH_Y - 24} L 84 ${MOUTH_Y + 8} Q 0 ${MOUTH_Y + 30} -84 ${MOUTH_Y + 8} Z`,
+            WHITE,
+          ) +
+          ink(
+            `M -84 ${MOUTH_Y + 8} Q 0 ${MOUTH_Y + 30} 84 ${MOUTH_Y + 8} M -44 ${MOUTH_Y - 14} L -42 ${MOUTH_Y + 22} M 0 ${MOUTH_Y - 6} L 0 ${MOUTH_Y + 28} M 44 ${MOUTH_Y - 14} L 42 ${MOUTH_Y + 22}`,
+            6,
+          ),
       ) +
-      S(open, "#1a0810", 5, 0.8)
+      ink(open, 12)
     );
   },
   // Frown
-  () => mouthLine(`M-46 ${MOUTH_Y + 12}Q0 ${MOUTH_Y - 12} 46 ${MOUTH_Y + 12}`),
+  () =>
+    ink(`M -72 ${MOUTH_Y + 26} Q 0 ${MOUTH_Y - 22} 72 ${MOUTH_Y + 26}`) +
+    ink(`M -30 ${MOUTH_Y + 44} Q 0 ${MOUTH_Y + 54} 30 ${MOUTH_Y + 44}`, 8),
+  // Gritted teeth
+  () => {
+    const open = `M -84 ${MOUTH_Y - 16} L 84 ${MOUTH_Y - 16} Q 92 ${MOUTH_Y + 14} 84 ${MOUTH_Y + 40} L -84 ${MOUTH_Y + 40} Q -92 ${MOUTH_Y + 14} -84 ${MOUTH_Y - 16} Z`;
+    return (
+      fill(open, WHITE) +
+      ink(
+        `M -86 ${MOUTH_Y + 12} L 86 ${MOUTH_Y + 12} M -42 ${MOUTH_Y - 16} L -42 ${MOUTH_Y + 40} M 0 ${MOUTH_Y - 16} L 0 ${MOUTH_Y + 40} M 42 ${MOUTH_Y - 16} L 42 ${MOUTH_Y + 40}`,
+        6,
+      ) +
+      ink(open, 12)
+    );
+  },
 ];
 
-const BEARD_BOX = [-230, 460, 230, 900];
+/** Inner edge shared by the full beards: open around the mouth and the tusks. */
+const BEARD_TOP = [
+  [70, 746, 150, 734, 180, 664],
+  [188, 600, 188, 530, 198, 468],
+  [246, 468],
+  [266, 540, 288, 600, 284, 684],
+];
+const strands = (color, d) => ink(d, 7, shadeOf(color, 0.45));
+
 const beard = [
-  // Braided: a chin curtain that leaves the mouth, mustache and tusks showing.
+  // Braided: full, with two beaded braids
   () => {
-    const curtain = symmetric(
-      [0, 656],
+    const mass = symmetric(
+      [0, 742],
       [
-        [60, 656, 120, 655, 150, 620],
-        [176, 580, 168, 500, 168, 470],
-        [208, 462],
-        [232, 560, 222, 700, 130, 800],
-        [80, 845, 30, 850, 0, 850],
+        ...BEARD_TOP,
+        [280, 790, 204, 868, 124, 892],
+        [84, 904, 42, 912, 0, 912],
       ],
     );
+    const braid = (x) =>
+      [0, 1, 2]
+        .map((step) =>
+          cel(oval(x, 918 + step * 36, 27 - step * 3, 22 - step * 2), AUBURN, {
+            by: [-6, -6],
+          }),
+        )
+        .join("") +
+      cel(oval(x, 1022, 15), GOLD, { by: [-4, -4], shade: GOLD_DARK });
     return (
-      both(
-        [862, 896, 928]
-          .map((y, index) =>
-            E(
-              52,
-              y,
-              26,
-              21,
-              index % 2
-                ? mix(AUBURN, SHADOW, 0.35)
-                : lit(AUBURN, [26, y - 22, 78, y + 22]),
-            ),
-          )
-          .join("") +
-          P("M34 962L70 962L52 1016Z", mix(AUBURN, SHADOW, 0.25)) +
-          `<rect x="29" y="944" width="46" height="20" rx="6" fill="${lit(GOLD, [29, 942, 75, 966])}"/>`,
-      ) +
-      hairMass(
-        curtain,
-        AUBURN,
-        BEARD_BOX,
-        "M-196 500Q-206 640 -130 760M-170 600Q-150 720 -70 800M-60 690Q-30 780 0 830M150 660Q120 760 60 820",
-        "M-150 640Q-110 740 -40 820M40 700Q30 780 10 836M186 520Q200 640 150 740M110 680Q90 760 40 824",
-      )
+      braid(-80) +
+      braid(80) +
+      cel(mass, AUBURN, {
+        by: [-18, -12],
+        inner: strands(
+          AUBURN,
+          "M -232 560 Q -238 700 -150 824 M 232 560 Q 238 700 150 824 M -96 790 Q -64 850 -76 900 M 96 790 Q 64 850 76 900 M 0 780 L 0 900",
+        ),
+      })
     );
   },
   // Mutton chops
   () =>
-    both(
-      hairMass(
-        "M208 462C228 560 216 660 150 700C124 670 140 620 150 590C172 548 170 500 168 470Z",
-        AUBURN,
-        [150, 460, 226, 700],
-        "M196 490Q204 580 166 660",
-        "M182 500Q186 580 156 640",
-        [150, 226],
-      ),
-    ),
-  // Long grey: covers the dwarf's own brows and mustache with grey ones.
-  () => {
-    const long =
-      symmetric(
-        [0, 562],
-        [
-          [70, 564, 150, 556, 168, 470],
-          [208, 462],
-          [244, 610, 200, 830, 0, 985],
-        ],
-      ) + `M-56 ${MOUTH_Y + 6}a56 30 0 1 0 112 0a56 30 0 1 0 -112 0Z`;
-    const grown = (d) =>
-      `<path d="${d}" fill="${GREY}" stroke="${GREY}" stroke-width="10" stroke-linejoin="round"/>`;
-    return (
-      `<path fill-rule="evenodd" d="${long}" fill="${lit(GREY, BEARD_BOX)}"/>` +
-      S(
-        "M-196 500Q-214 660 -110 820M-150 640Q-120 780 -30 900M-40 700Q-20 820 0 960M60 690Q40 820 10 950",
-        "#f4f1ea",
-        5,
-        0.6,
-      ) +
-      S(
-        "M150 640Q130 780 40 900M186 520Q206 660 130 800M100 690Q80 800 30 900",
-        mix(GREY, SHADOW, 0.6),
-        6,
-        0.45,
-      ) +
-      both(grown(BROW)) +
-      brows(GREY) +
-      grown(MUSTACHE) +
-      mustache(GREY)
-    );
-  },
-];
-
-const almond = (top, bottom) =>
-  `M${EYE_X - 40} ${EYE_Y + 5}Q${EYE_X - 4} ${EYE_Y - top} ${EYE_X + 44} ${EYE_Y - 9}Q${EYE_X + 8} ${EYE_Y + bottom} ${EYE_X - 40} ${EYE_Y + 5}Z`;
-
-/**
- * A pair of eyes. `iris` with `pupil: false` fills the whole eye with light,
- * and `glow` adds the halo that magical races wear.
- */
-function eyePair({
-  top = 30,
-  bottom = 24,
-  sclera = "#efe6d8",
-  iris,
-  irisR = 16,
-  pupil = true,
-  glow,
-  extra = "",
-}) {
-  const shape = almond(top, bottom);
-  const right =
-    (glow ? blur(10, E(EYE_X, EYE_Y, 46, 26, glow, 0.6)) : "") +
-    P(almond(top + 7, bottom + 5), INK) +
-    P(shape, sclera) +
-    clipTo(
-      shape,
-      `<circle cx="${EYE_X}" cy="${EYE_Y}" r="${irisR}" fill="${radial(
-        EYE_X - 4,
-        EYE_Y - 6,
-        irisR,
-        [
-          [0, mix(iris, "#ffffff", 0.6)],
-          [0.6, iris],
-          [1, mix(iris, INK, 0.6)],
-        ],
-      )}"/>` +
-        (pupil
-          ? `<circle cx="${EYE_X}" cy="${EYE_Y}" r="${irisR * 0.42}" fill="${INK}"/>`
-          : "") +
-        blur(
-          3,
-          P(
-            `M${EYE_X - 46} ${EYE_Y - 46}H${EYE_X + 50}V${EYE_Y - top * 0.42}H${EYE_X - 46}Z`,
-            INK,
-            glow ? 0.2 : 0.5,
+    pair(
+      "M 198 464 L 246 464 C 274 540 306 624 290 706 C 276 770 204 782 178 728 C 192 664 186 562 198 464 Z",
+      (d, side) =>
+        cel(d, AUBURN, {
+          by: [-10, -10],
+          inner: strands(
+            AUBURN,
+            flip(
+              "M 228 520 Q 262 620 240 730 M 204 600 Q 222 680 204 740",
+              side,
+            ),
           ),
+        }),
+    ),
+  // Long grey, with matching mustache and brows
+  () =>
+    cel(
+      symmetric(
+        [0, 742],
+        [
+          ...BEARD_TOP,
+          [296, 810, 210, 950, 70, 1034],
+          [40, 1050, 16, 1056, 0, 1056],
+        ],
+      ),
+      GREY,
+      {
+        by: [-18, -12],
+        inner: strands(
+          GREY,
+          "M -232 560 Q -244 720 -150 880 M 232 560 Q 244 720 150 880 M -90 790 Q -50 900 -60 1010 M 90 790 Q 50 900 60 1010 M 0 780 L 0 1030",
         ),
+      },
     ) +
-    S(
-      `M${EYE_X - 40} ${EYE_Y + 5}Q${EYE_X - 4} ${EYE_Y - top} ${EYE_X + 44} ${EYE_Y - 9}`,
-      INK,
-      7,
-    ) +
-    extra;
-  const scaled = `<g transform="translate(${EYE_X} ${EYE_Y}) scale(${EYE_SCALE}) translate(${-EYE_X} ${-EYE_Y})">${right}</g>`;
-  return (
-    both(scaled) +
-    [-EYE_X, EYE_X]
-      .map(
-        (x) =>
-          `<circle cx="${x - 8}" cy="${EYE_Y - 9}" r="4.5" fill="#ffffff" opacity=".9"/>`,
-      )
-      .join("")
-  );
-}
+    mustache(GREY) +
+    bushyBrows(GREY),
+];
 
 const eyes = [
-  // Calm
-  () => eyePair({ iris: "#c98a2a" }),
-  // Fierce
+  // Smug: half-lidded side-eye
   () =>
-    eyePair({
-      top: 18,
-      bottom: 22,
-      sclera: "#3a0906",
-      iris: "#ff5a1f",
-      irisR: 15,
-      glow: "#ff3a12",
-      extra: P(
-        `M${EYE_X - 46} ${EYE_Y - 4}L${EYE_X + 52} ${EYE_Y - 36}L${EYE_X + 52} ${EYE_Y - 20}L${EYE_X - 38} ${EYE_Y + 6}Z`,
-        INK,
-        0.85,
-      ),
-    }),
-  // Wide
-  () => eyePair({ top: 42, bottom: 32, iris: "#f2c23a", irisR: 20 }),
-  // Moonlit: pupil-less glowing eyes with trailing light.
+    [-1, 1]
+      .map((side) => {
+        const x = side * EYE_X;
+        const shape = `M ${x - 62} ${EYE_Y - 8} L ${x + 62} ${EYE_Y - 8} Q ${x + 66} ${EYE_Y + 54} ${x} ${EYE_Y + 56} Q ${x - 66} ${EYE_Y + 54} ${x - 62} ${EYE_Y - 8} Z`;
+        return (
+          fill(shape, WHITE) +
+          clipTo(
+            shape,
+            box(x - 70, EYE_Y - 12, 140, 20, "#c8bfdc") +
+              fill(oval(x + 24, EYE_Y + 18, 25), INK) +
+              fill(oval(x + 15, EYE_Y + 10, 8), "#ffffff"),
+          ) +
+          ink(shape, 11) +
+          ink(`M ${x - 72} ${EYE_Y - 8} L ${x + 72} ${EYE_Y - 8}`, 18)
+        );
+      })
+      .join(""),
+  // Fierce: slanted lids over yellow irises
   () =>
-    eyePair({
-      sclera: "#e8fbff",
-      iris: "#8fe9ff",
-      irisR: 44,
-      pupil: false,
-      glow: "#5fd4ff",
-      extra: blur(
-        5,
-        S(`M${EYE_X + 40} ${EYE_Y - 14}q48 -26 74 -86`, "#bff4ff", 9, 0.7),
-      ),
-    }),
+    pair(
+      `M ${EYE_X - 62} ${EYE_Y + 16} L ${EYE_X + 64} ${EYE_Y - 20} Q ${EYE_X + 72} ${EYE_Y + 40} ${EYE_X + 8} ${EYE_Y + 54} Q ${EYE_X - 50} ${EYE_Y + 56} ${EYE_X - 62} ${EYE_Y + 16} Z`,
+      (d, side) => {
+        const x = side * (EYE_X - 2);
+        return (
+          fill(d, WHITE) +
+          clipTo(
+            d,
+            fill(oval(x, EYE_Y + 24, 27), GOLD) +
+              ink(oval(x, EYE_Y + 24, 27), 6) +
+              fill(oval(x, EYE_Y + 24, 12), INK) +
+              fill(oval(x - 9, EYE_Y + 14, 6), "#ffffff"),
+          ) +
+          ink(d, 11) +
+          ink(
+            flip(
+              `M ${EYE_X - 74} ${EYE_Y + 20} L ${EYE_X + 74} ${EYE_Y - 24}`,
+              side,
+            ),
+            18,
+          )
+        );
+      },
+    ),
+  // Wide: bloodshot and sleepless
+  () =>
+    [-1, 1]
+      .map((side) => {
+        const x = side * EYE_X;
+        const y = EYE_Y + 10;
+        const shape = oval(x, y, 56);
+        return (
+          fill(shape, WHITE) +
+          clipTo(
+            shape,
+            ink(
+              `M ${x - 56} ${y - 20} L ${x - 30} ${y - 10} L ${x - 22} ${y - 14} M ${x + 56} ${y + 18} L ${x + 30} ${y + 12} L ${x + 24} ${y + 20} M ${x - 40} ${y + 40} L ${x - 22} ${y + 24}`,
+              4,
+              RED,
+            ),
+          ) +
+          fill(oval(x + 4, y + 2, 15), INK) +
+          fill(oval(x - 1, y - 3, 5), "#ffffff") +
+          ink(shape, 11) +
+          ink(`M ${x - 44} ${y + 74} Q ${x} ${y + 88} ${x + 44} ${y + 74}`, 7)
+        );
+      })
+      .join(""),
+  // Moonlit: glowing, without pupils
+  () =>
+    [-1, 1]
+      .map((side) => {
+        const x = side * EYE_X;
+        const y = EYE_Y + 16;
+        const shape = `M ${x - 64} ${y} Q ${x} ${y - 52} ${x + 64} ${y} Q ${x} ${y + 44} ${x - 64} ${y} Z`;
+        return (
+          glow(18, fill(oval(x, y, 98, 58), "#7fe6ff", 0.85)) +
+          fill(shape, "#f2ffff") +
+          clipTo(shape, fill(oval(x, y + 34, 70, 30), "#a6efff")) +
+          ink(shape, 11)
+        );
+      })
+      .join(""),
+  // Laser: red-hot with a lens flare
+  () =>
+    [-1, 1]
+      .map((side) => {
+        const x = side * EYE_X;
+        const y = EYE_Y + 14;
+        return (
+          glow(22, fill(oval(x, y, 104, 58), "#ff1f1f", 0.85)) +
+          fill(oval(x, y, 60, 30), "#ff2b24") +
+          ink(oval(x, y, 60, 30), 10) +
+          fill(oval(x, y, 38, 15), "#ffd7a8") +
+          fill(oval(x, y, 22, 8), "#ffffff") +
+          fill(
+            `M ${x - 190} ${y} L ${x} ${y - 9} L ${x + 190} ${y} L ${x} ${y + 9} Z`,
+            "#fff3e0",
+            0.95,
+          ) +
+          fill(
+            `M ${x} ${y - 78} L ${x + 6} ${y} L ${x} ${y + 78} L ${x - 6} ${y} Z`,
+            "#fff3e0",
+            0.9,
+          )
+        );
+      })
+      .join(""),
+  // Pixel shades
+  () => {
+    const u = 22;
+    const top = EYE_Y - 50;
+    let art = box(-11 * u, top, 22 * u, u);
+    for (const left of [-10 * u, u]) {
+      art +=
+        box(left, top + u, 9 * u, u) +
+        box(left + u, top + 2 * u, 7 * u, u) +
+        box(left + 2 * u, top + 3 * u, 5 * u, u) +
+        [
+          [1, 1],
+          [2, 2],
+          [3, 1],
+          [4, 2],
+        ]
+          .map(([column, row]) =>
+            box(left + column * u, top + row * u, u, u, "#ffffff"),
+          )
+          .join("");
+    }
+    return art;
+  },
 ];
 
-const HAIR_DARK = "#2e1c12";
-const HAIR_BLONDE = "#d9a82a";
-const HAIR_RED = "#c22a1c";
-const CAP = symmetric(
-  [0, 172],
-  [
-    [130, 172, 215, 250, 208, 440],
-    [190, 400, 196, 330, 150, 292],
-    [100, 262, 50, 300, 0, 268],
-  ],
-);
+const HAIR_BROWN = "#5a3620";
+const HAIR_BLONDE = "#f4cd52";
+const HAIR_BLACK = "#2b2333";
 
 const hair = [
-  // Short
+  // Short, with a jagged fringe
   () =>
-    hairMass(
-      CAP,
-      HAIR_DARK,
-      [-210, 172, 210, 440],
-      "M-170 330Q-150 230 -40 200M-110 280Q-70 220 20 210M-190 400Q-196 320 -160 270",
-      "M40 270Q90 250 150 290M90 210Q170 250 196 380M-20 240Q30 220 90 240",
-    ),
-  // Long
-  () => {
-    const lock =
-      "M150 290C200 300 222 360 226 440C240 600 250 720 232 820C200 850 160 840 150 800C176 680 186 540 182 420C180 360 170 320 150 290Z";
-    return (
-      both(
-        hairMass(
-          lock,
-          mix(HAIR_BLONDE, SHADOW, 0.15),
-          [150, 290, 250, 840],
-          "M196 340Q216 520 206 700M176 400Q200 600 176 800",
-          "M214 420Q236 600 218 800M188 480Q206 640 190 780",
-          [170, 250],
+    cel(
+      "M -226 336 C -236 206 -148 162 0 162 C 148 162 236 206 226 336 L 190 290 L 156 326 L 112 280 L 70 316 L 26 274 L -20 310 L -66 272 L -110 312 L -152 280 L -190 322 Z",
+      HAIR_BROWN,
+      {
+        inner: strands(
+          HAIR_BROWN,
+          "M -120 190 Q -150 230 -150 270 M -30 172 Q -50 220 -44 264 M 60 176 Q 80 220 76 300",
         ),
-      ) +
-      hairMass(
-        CAP,
-        HAIR_BLONDE,
-        [-210, 172, 210, 440],
-        "M-170 330Q-150 230 -40 200M-110 280Q-70 220 20 210M-190 400Q-196 320 -160 270",
-        "M40 270Q90 250 150 290M90 210Q170 250 196 380M-20 240Q30 220 90 240",
-      )
-    );
-  },
+      },
+    ),
+  // Long, parted in the middle
+  () =>
+    cel(
+      symmetric(
+        [0, 162],
+        [
+          [152, 162, 244, 206, 240, 330],
+          [276, 480, 340, 700, 316, 880],
+          [306, 944, 250, 950, 230, 896],
+          [250, 760, 240, 560, 210, 384],
+          [160, 300, 70, 300, 0, 248],
+        ],
+      ),
+      HAIR_BLONDE,
+      {
+        shade: mix(HAIR_BLONDE, "#a8641a", 0.5),
+        inner: ink(
+          "M 0 166 L 0 248 M -252 500 Q -290 700 -276 890 M 252 500 Q 290 700 276 890 M -150 200 Q -190 250 -200 330 M 150 200 Q 190 250 200 330",
+          7,
+          mix(HAIR_BLONDE, "#a8641a", 0.6),
+        ),
+      },
+    ),
   // Mohawk
   () =>
-    hairMass(
-      "M-44 330C-60 240 -50 170 -30 60C-10 120 0 90 12 30C30 110 40 140 52 80C66 180 62 260 44 330Q0 300 -44 330Z",
-      HAIR_RED,
-      [-60, 30, 66, 330],
-      "M-30 300Q-40 200 -26 110M-4 300Q-8 180 10 80M24 300Q30 200 46 130",
-      "M-16 310Q-22 200 -10 130M12 310Q14 200 28 120M38 310Q46 240 52 160",
-      [0, 66],
+    cel(
+      "M -60 214 L -84 108 L -44 148 L -32 24 L 4 124 L 36 40 L 52 148 L 92 100 L 60 214 Q 30 236 0 264 Q -30 236 -60 214 Z",
+      RED,
+      {
+        by: [-12, -6],
+        inner: strands(
+          RED,
+          "M -34 70 L -22 200 M 34 86 L 22 200 M 0 150 L 0 240",
+        ),
+      },
     ),
+  // Topknot
+  () =>
+    cel(
+      "M -34 110 L -58 14 L -14 66 L 4 -6 L 24 66 L 62 20 L 36 112 Z",
+      HAIR_BLACK,
+      {
+        by: [-8, -4],
+        shade: "#120d18",
+      },
+    ) +
+    cel(oval(0, 128, 54, 46), HAIR_BLACK, { by: [-10, -8], shade: "#120d18" }) +
+    cel(
+      "M -220 318 C -228 212 -142 168 0 168 C 142 168 228 212 220 318 Q 110 262 0 284 Q -110 262 -220 318 Z",
+      HAIR_BLACK,
+      {
+        shade: "#120d18",
+        inner: ink(
+          "M -120 200 Q -80 180 -40 178 M -150 240 Q -100 206 -30 204",
+          7,
+          "#5a4d6b",
+        ),
+      },
+    ) +
+    cel("M -44 160 L 44 160 L 40 186 L -40 186 Z", RED, { by: [-4, -6] }),
 ];
+
+const stud = (x, y, r = 9) => fill(oval(x, y, r), GOLD) + ink(oval(x, y, r), 6);
 
 const headgear = [
   // Iron helm with horns and a nose guard
-  () => {
-    const dome = symmetric(
-      [0, 150],
-      [
-        [140, 150, 232, 220, 226, 386],
-        [20, 380],
-        [15, 500],
-        [15, 520, 6, 528, 0, 528],
-      ],
-    );
-    const horn = "M196 300C300 300 350 220 338 90C300 190 250 226 190 232Z";
-    return (
-      both(
-        form(
-          horn,
-          IVORY,
-          [190, 90, 350, 300],
-          S(
-            "M214 250Q270 250 300 200M236 286Q300 270 330 200",
-            "#8a7748",
-            6,
-            0.5,
+  () =>
+    pair(
+      "M 178 262 C 262 262 318 196 322 56 C 388 180 352 330 214 342 Z",
+      (d, side) =>
+        cel(d, IVORY, {
+          by: [-12, -8],
+          shade: BONE,
+          inner: ink(
+            flip(
+              "M 250 252 Q 262 290 248 326 M 296 206 Q 316 250 306 300",
+              side,
+            ),
+            7,
+            BONE,
           ),
-          [250, 350],
+        }),
+    ) +
+    cel(
+      "M -240 380 C -250 206 -152 160 0 160 C 152 160 250 206 240 380 L 66 350 L 36 356 L 28 512 L -28 512 L -36 356 L -66 350 Z",
+      STEEL,
+      {
+        by: [-22, -16],
+        inner: ink(
+          "M 0 164 L 0 356 M -236 330 L -66 304 L -36 310 M 236 330 L 66 304 L 36 310",
+          10,
+          shadeOf(STEEL, 0.5),
         ),
-      ) +
-      form(
-        dome,
-        STEEL,
-        [-230, 150, 230, 520],
-        blur(
-          16,
-          E(-120, 230, 70, 34, "#ffffff", 0.6, -28) +
-            E(170, 300, 70, 130, SHADOW, 0.55),
-        ) +
-          S("M0 152L0 380", mix(STEEL, SHADOW, 0.6), 22, 0.7) +
-          S("M-5 152L-5 380", "#e6edf5", 5, 0.6),
-      ) +
-      form(
-        "M-228 346Q0 328 228 346L226 388Q0 370 -226 388Z",
-        GOLD,
-        [-228, 330, 228, 390],
-        "",
-        [40, 230],
-      ) +
-      both(
-        [70, 150]
-          .map(
-            (x) =>
-              `<circle cx="${x}" cy="${362 - x * 0.03}" r="8" fill="${radial(
-                x - 2,
-                359,
-                9,
-                [
-                  [0, "#fff3c0"],
-                  [1, "#6e440a"],
-                ],
-              )}"/>`,
-          )
-          .join(""),
-      )
-    );
-  },
-  // Wool cap
-  () => {
-    const cap = symmetric(
-      [0, 140],
+      },
+    ) +
+    [-190, -120, 120, 190].map((x) => stud(x, 340)).join(""),
+  // Wool cap with a pom-pom
+  () =>
+    cloud(
       [
-        [130, 140, 225, 200, 214, 332],
-        [0, 332],
+        [-24, 122, 30],
+        [24, 118, 32],
+        [0, 92, 30],
       ],
-    );
-    return (
-      `<circle cx="0" cy="134" r="40" fill="${radial(-12, 120, 48, [
-        [0, "#fffaf0"],
-        [0.6, "#e6dcc8"],
-        [1, "#8f8672"],
-      ])}"/>` +
-      form(
-        cap,
-        "#96261c",
-        [-216, 140, 216, 332],
-        S(
-          "M-150 190Q-170 260 -168 330M-80 160Q-96 240 -92 330M0 150L0 330M80 160Q96 240 92 330M150 190Q170 260 168 330",
-          SHADOW,
-          7,
-          0.3,
+      WHITE,
+    ) +
+    cel(
+      "M -236 330 C -246 196 -152 140 0 140 C 152 140 246 196 236 330 Z",
+      "#d6453d",
+      {
+        inner: ink(
+          "M -124 160 Q -146 240 -140 300 M -42 146 Q -52 230 -50 290 M 42 146 Q 52 230 50 290 M 124 160 Q 146 240 140 300",
+          8,
+          shadeOf("#d6453d", 0.4),
         ),
-      ) +
-      form(
-        "M-228 290Q0 268 228 290L226 364Q0 342 -226 364Z",
-        "#b83a2c",
-        [-228, 270, 228, 364],
-        S(
-          "M-180 290L-180 358M-120 284L-120 352M-60 280L-60 348M0 278L0 346M60 280L60 348M120 284L120 352M180 290L180 358",
-          SHADOW,
-          7,
-          0.35,
-        ),
-        [40, 230],
-      )
-    );
-  },
+      },
+    ) +
+    cel("M -250 300 Q 0 262 250 300 L 246 372 Q 0 338 -246 372 Z", CREAM, {
+      by: [-10, -10],
+      inner: ink(
+        [-200, -150, -100, -50, 0, 50, 100, 150, 200]
+          .map((x) => `M ${x} 270 L ${x} 372`)
+          .join(" "),
+        7,
+        shadeOf(CREAM, 0.35),
+      ),
+    }),
   // Crown
-  () => {
-    const crown =
-      "M-150 262L-168 120L-96 196L-50 92L0 190L50 92L96 196L168 120L150 262Q0 240 -150 262Z";
-    const gem = (x, y, r, color) =>
-      blur(
-        6,
-        `<circle cx="${x}" cy="${y}" r="${r + 8}" fill="${color}" opacity=".6"/>`,
-      ) +
-      `<circle cx="${x}" cy="${y}" r="${r}" fill="${radial(
-        x - r * 0.3,
-        y - r * 0.3,
-        r,
-        [
-          [0, "#ffffff"],
-          [0.5, color],
-          [1, mix(color, INK, 0.6)],
-        ],
-      )}"/>`;
-    return (
-      form(
-        crown,
-        GOLD,
-        [-168, 92, 168, 262],
-        blur(8, E(-90, 180, 50, 16, "#fff6c8", 0.7, -30)),
-        [0, 170],
-      ) +
-      form(
-        "M-152 226Q0 204 152 226L150 266Q0 244 -150 266Z",
-        "#b8801a",
-        [-152, 204, 152, 266],
-        "",
-        [40, 152],
-      ) +
-      gem(0, 236, 13, "#e02a2a") +
-      gem(-84, 242, 10, "#2f7dff") +
-      gem(84, 242, 10, "#2f7dff")
-    );
-  },
-];
-
-const puff = (x, y) =>
-  blur(
-    6,
-    S(
-      `M${x} ${y}q28 -32 0 -66q-28 -34 8 -74q30 -30 4 -64`,
-      "#efece4",
-      16,
-      0.55,
+  () =>
+    cel(
+      "M -180 270 L -198 122 L -142 206 L -98 94 L -48 206 L 0 62 L 48 206 L 98 94 L 142 206 L 198 122 L 180 270 Q 0 308 -180 270 Z",
+      GOLD,
+      {
+        by: [-14, -10],
+        shade: GOLD_DARK,
+        inner: ink("M -188 224 Q 0 262 188 224", 8, GOLD_DARK),
+      },
+    ) +
+    [
+      [-198, 118],
+      [-98, 90],
+      [0, 58],
+      [98, 90],
+      [198, 118],
+    ]
+      .map(([x, y]) =>
+        cel(oval(x, y, 15), GOLD, { by: [-4, -4], shade: GOLD_DARK, width: 9 }),
+      )
+      .join("") +
+    cel(oval(0, 266, 17), RED, { by: [-4, -4], width: 9 }) +
+    pair(oval(98, 256, 13), (d) =>
+      cel(d, "#3f8bff", { by: [-4, -4], width: 9 }),
     ),
-  ) + blur(3, S(`M${x} ${y}q28 -32 0 -66q-28 -34 8 -74`, "#ffffff", 6, 0.4));
-const ember = (x, y) =>
-  blur(8, `<circle cx="${x}" cy="${y}" r="18" fill="#ff7a2a" opacity=".8"/>`) +
-  `<circle cx="${x}" cy="${y}" r="8" fill="#ffd27a"/>`;
-const MOUTH_CORNER = MOUTH_Y + 4;
+];
 
 const smoke = [
   // Cigar
   () =>
-    `<g transform="rotate(8 34 ${MOUTH_CORNER})"><rect x="34" y="${MOUTH_CORNER - 13}" width="150" height="26" rx="11" fill="${linear(
-      0,
-      MOUTH_CORNER - 13,
-      0,
-      MOUTH_CORNER + 13,
+    turn(
+      17,
+      66,
+      MOUTH_Y + 8,
+      cel(
+        `M 62 ${MOUTH_Y - 10} L 216 ${MOUTH_Y - 10} L 216 ${MOUTH_Y + 26} L 62 ${MOUTH_Y + 26} Q 50 ${MOUTH_Y + 8} 62 ${MOUTH_Y - 10} Z`,
+        "#8a5a2b",
+        { by: [-2, -10], width: 11 },
+      ) +
+        cel(
+          `M 216 ${MOUTH_Y - 10} L 244 ${MOUTH_Y - 8} Q 256 ${MOUTH_Y + 8} 244 ${MOUTH_Y + 24} L 216 ${MOUTH_Y + 26} Z`,
+          "#e9e4dc",
+          { by: [-2, -8], width: 11 },
+        ) +
+        box(220, MOUTH_Y - 4, 12, 24, "#ff7a1f") +
+        box(100, MOUTH_Y - 10, 22, 36, GOLD) +
+        ink(
+          `M 100 ${MOUTH_Y - 10} L 100 ${MOUTH_Y + 26} M 122 ${MOUTH_Y - 10} L 122 ${MOUTH_Y + 26}`,
+          6,
+        ),
+    ) +
+    cloud(
       [
-        [0, "#a06a36"],
-        [1, "#3e2210"],
+        [330, 640, 34],
+        [366, 618, 30],
+        [352, 660, 26],
       ],
-    )}"/>` +
-    `<rect x="78" y="${MOUTH_CORNER - 13}" width="16" height="26" fill="${GOLD}"/>` +
-    `<rect x="170" y="${MOUTH_CORNER - 13}" width="14" height="26" rx="5" fill="#9a9488"/></g>` +
-    ember(186, MOUTH_CORNER + 21) +
-    puff(198, MOUTH_CORNER + 2),
-  // Pipe
+      SMOKE,
+    ) +
+    cloud(
+      [
+        [388, 548, 26],
+        [416, 532, 22],
+      ],
+      SMOKE,
+    ) +
+    cloud([[404, 470, 18]], SMOKE),
+  // Bent briar pipe
   () =>
-    S(
-      `M34 ${MOUTH_CORNER}Q110 ${MOUTH_CORNER + 6} 150 ${MOUTH_CORNER + 46}`,
-      "#24140a",
-      15,
+    cord(
+      `M 58 ${MOUTH_Y + 8} Q 140 ${MOUTH_Y + 90} 232 ${MOUTH_Y + 62}`,
+      16,
+      "#3a2a22",
     ) +
-    form(
-      `M132 ${MOUTH_CORNER + 2}L208 ${MOUTH_CORNER + 2}L200 ${MOUTH_CORNER + 74}Q170 ${MOUTH_CORNER + 94} 140 ${MOUTH_CORNER + 74}Z`,
-      "#5a3418",
-      [132, MOUTH_CORNER, 208, MOUTH_CORNER + 94],
-      "",
-      [150, 210],
+    cel(
+      `M 194 ${MOUTH_Y + 4} L 280 ${MOUTH_Y + 4} L 272 ${MOUTH_Y + 84} Q 237 ${MOUTH_Y + 112} 202 ${MOUTH_Y + 84} Z`,
+      WOOD,
+      { by: [-8, -8] },
     ) +
-    `<rect x="126" y="${MOUTH_CORNER - 8}" width="88" height="18" rx="9" fill="${lit("#8a5a36", [126, MOUTH_CORNER - 8, 214, MOUTH_CORNER + 10])}"/>` +
-    ember(170, MOUTH_CORNER - 6) +
-    puff(170, MOUTH_CORNER - 24),
-  // Clay pipe
+    cel(oval(237, MOUTH_Y + 4, 46, 13), "#ff7a1f", { by: [0, 0], width: 10 }) +
+    cloud(
+      [
+        [262, 600, 30],
+        [296, 582, 26],
+        [282, 622, 22],
+      ],
+      SMOKE,
+    ) +
+    cloud(
+      [
+        [318, 512, 22],
+        [342, 498, 18],
+      ],
+      SMOKE,
+    ) +
+    cloud([[330, 440, 15]], SMOKE),
+  // Long clay pipe
   () =>
-    S(`M34 ${MOUTH_CORNER}L206 ${MOUTH_CORNER + 18}`, "#d9cba6", 10) +
-    form(
-      `M196 ${MOUTH_CORNER - 34}L236 ${MOUTH_CORNER - 34}L232 ${MOUTH_CORNER + 28}Q216 ${MOUTH_CORNER + 38} 200 ${MOUTH_CORNER + 28}Z`,
-      "#e6d9b6",
-      [196, MOUTH_CORNER - 34, 236, MOUTH_CORNER + 38],
-      "",
-      [200, 238],
+    cord(`M 58 ${MOUTH_Y + 8} L 312 ${MOUTH_Y + 44}`, 12, "#f1ece0") +
+    cel(
+      `M 290 ${MOUTH_Y - 16} L 346 ${MOUTH_Y - 16} L 340 ${MOUTH_Y + 50} Q 318 ${MOUTH_Y + 66} 296 ${MOUTH_Y + 50} Z`,
+      "#f1ece0",
+      { by: [-6, -6] },
     ) +
-    ember(216, MOUTH_CORNER - 36) +
-    puff(216, MOUTH_CORNER - 54),
+    cloud(
+      [
+        [336, 588, 26],
+        [364, 572, 22],
+      ],
+      SMOKE,
+    ) +
+    cloud([[376, 506, 18]], SMOKE) +
+    cloud([[366, 446, 13]], SMOKE),
 ];
 
 const held = [
-  // Tankard
-  () => {
-    const body = "M266 770L424 770L416 978Q345 992 274 978Z";
-    return (
-      S(
-        "M420 806Q494 806 494 868Q494 930 418 934",
-        lit("#7d8794", [420, 800, 500, 940]),
-        24,
-      ) +
-      form(
-        body,
-        WOOD,
-        [266, 770, 424, 990],
-        S("M306 772L310 984M346 772L346 988M386 772L382 984", SHADOW, 6, 0.4),
-        [330, 430],
-      ) +
-      S(
-        "M268 812Q345 826 422 812M272 934Q345 948 418 934",
-        lit("#aab4c0", [266, 800, 424, 950]),
-        18,
-      ) +
-      blur(
-        2,
-        [
-          [290, 766, 30],
-          [338, 748, 38],
-          [388, 764, 33],
-          [422, 778, 22],
-        ]
-          .map(
-            ([x, y, r]) =>
-              `<circle cx="${x}" cy="${y}" r="${r}" fill="${radial(
-                x - 8,
-                y - 10,
-                r * 1.2,
-                [
-                  [0, "#ffffff"],
-                  [1, "#d9c9a0"],
-                ],
-              )}"/>`,
-          )
-          .join("") +
-          `<rect x="372" y="772" width="26" height="60" rx="13" fill="#f3e9d0"/>`,
-      )
-    );
-  },
+  // Foaming mug
+  () =>
+    cel(
+      "M 404 806 C 506 792 524 954 410 958 L 410 918 C 462 912 454 846 404 848 Z",
+      WOOD,
+      { by: [-6, -6] },
+    ) +
+    cel("M 236 770 L 420 770 L 410 1000 L 246 1000 Z", WOOD, {
+      by: [-16, -10],
+      inner: ink(
+        "M 296 770 L 300 1000 M 356 770 L 352 1000",
+        7,
+        shadeOf(WOOD, 0.5),
+      ),
+    }) +
+    cel("M 232 822 L 424 822 L 422 856 L 234 856 Z", STEEL, {
+      by: [-6, -6],
+      width: 9,
+    }) +
+    cel("M 240 930 L 418 930 L 416 962 L 242 962 Z", STEEL, {
+      by: [-6, -6],
+      width: 9,
+    }) +
+    cloud(
+      [
+        [258, 760, 34],
+        [314, 742, 42],
+        [374, 756, 36],
+        [414, 784, 24],
+        [238, 802, 22],
+      ],
+      "#fff8e6",
+    ),
   // Torch
   () =>
-    blur(
-      40,
-      `<circle cx="348" cy="560" r="170" fill="#ff7a1f" opacity=".55"/>`,
+    cord("M 390 660 L 380 1120", 26, WOOD) +
+    cel(
+      "M 392 352 C 474 446 490 560 454 624 C 432 660 348 660 328 624 C 298 560 330 510 352 468 C 364 510 380 500 392 352 Z",
+      "#ff8a1f",
+      {
+        by: [-10, -6],
+        shade: RED,
+        inner: fill(
+          "M 392 474 C 432 534 438 584 422 616 C 410 636 372 636 362 616 C 350 584 372 562 380 538 C 386 558 390 542 392 474 Z",
+          "#ffe14a",
+        ),
+      },
     ) +
-    form(
-      "M328 700L368 700L364 1045L332 1045Z",
-      WOOD,
-      [328, 700, 368, 1045],
-      "",
-      [340, 370],
-    ) +
-    form(
-      "M310 640L386 640L380 720L316 720Z",
-      "#3a2a22",
-      [310, 640, 386, 720],
-      S("M312 664L384 664M314 692L382 692", "#9a8a6a", 5, 0.6),
-      [350, 388],
-    ) +
-    blur(
-      3,
-      P(
-        "M348 440C426 546 430 606 404 652Q348 694 292 652C268 606 296 574 316 540C328 580 340 560 348 440Z",
-        linear(0, 440, 0, 690, [
-          [0, "#ffd23f"],
-          [0.5, "#ff7a1f"],
-          [1, "#c22a0c"],
-        ]),
-      ),
-    ) +
-    blur(
-      2,
-      P(
-        "M348 548C388 606 384 640 370 658Q348 676 326 658C312 636 328 606 348 548Z",
-        linear(0, 548, 0, 676, [
-          [0, "#ffffff"],
-          [1, "#ffd23f"],
-        ]),
-      ),
-    ),
-  // Axe
+    cel("M 336 636 L 444 636 L 430 708 L 350 708 Z", IRON, { by: [-8, -8] }),
+  // Double-bladed axe
   () => {
-    const blade = "M370 556C470 532 512 626 498 736C456 690 414 676 370 680Z";
-    return (
-      form(
-        "M336 540L370 540L368 1045L338 1045Z",
-        WOOD,
-        [336, 540, 370, 1045],
-        "",
-        [346, 372],
-      ) +
-      form(
-        "M336 578L274 614L336 656Z",
-        STEEL,
-        [274, 578, 336, 656],
-        "",
-        false,
-      ) +
-      form(
-        blade,
-        STEEL,
-        [370, 540, 510, 740],
-        blur(8, E(410, 600, 50, 16, "#ffffff", 0.7, 30)) +
-          S("M470 560C506 620 504 690 496 730", "#f4f8fc", 8, 0.8),
-        [420, 512],
-      ) +
-      blur(5, S("M400 606L430 640L404 662", "#7fe9ff", 7, 0.9)) +
-      `<rect x="330" y="600" width="46" height="22" fill="${lit(GOLD, [330, 600, 376, 622])}"/>`
+    const blade =
+      "M 10 -30 C 50 -40 78 -84 84 -128 C 150 -70 150 70 84 128 C 78 84 50 40 10 30 Z";
+    const edge = "M 84 -128 C 150 -70 150 70 84 128 C 116 60 116 -60 84 -128 Z";
+    return turn(
+      8,
+      396,
+      596,
+      cord("M 396 452 L 396 1140", 26, WOOD) +
+        `<g transform="translate(396 596)">` +
+        pair(blade, (d, side) =>
+          cel(d, STEEL, {
+            by: [-10, -10],
+            inner: fill(flip(edge, side), lightOf(STEEL, 0.6)),
+          }),
+        ) +
+        cel("M -24 -44 L 24 -44 L 24 44 L -24 44 Z", IRON, { by: [-6, -6] }) +
+        `</g>`,
     );
   },
 ];
 
-/** Rarity ring: a beveled metal band in the rarity color with four studs. */
+/** Rarity ring with gold studs. */
 function frame(color) {
-  const metal = linear(-360, 150, 360, 880, [
-    [0, mix(color, "#ffffff", 0.6)],
-    [0.45, color],
-    [1, mix(color, INK, 0.65)],
-  ]);
-  const studs = [
-    [0, 18],
-    [494, 512],
-    [0, 1006],
-    [-494, 512],
-  ]
-    .map(([x, y]) =>
-      P(
-        `M${x} ${y - 30}L${x + 22} ${y}L${x} ${y + 30}L${x - 22} ${y}Z`,
-        radial(x - 5, y - 8, 30, [
-          [0, "#ffffff"],
-          [0.5, color],
-          [1, mix(color, INK, 0.6)],
-        ]),
-      ),
-    )
-    .join("");
+  const ring = oval(0, 512, 486);
+  let studs = "";
+  for (let index = 0; index < 8; index++) {
+    const angle = (index / 8) * Math.PI * 2 + Math.PI / 8;
+    studs += cel(
+      oval(Math.cos(angle) * 486, 512 + Math.sin(angle) * 486, 20),
+      GOLD,
+      { by: [-5, -5], shade: GOLD_DARK, width: 9 },
+    );
+  }
   return (
-    blur(
-      14,
-      `<circle cx="0" cy="512" r="494" fill="none" stroke="${color}" stroke-width="30" opacity=".6"/>`,
-    ) +
-    `<circle cx="0" cy="512" r="494" fill="none" stroke="${metal}" stroke-width="30"/>` +
-    `<circle cx="0" cy="512" r="508" fill="none" stroke="${INK}" stroke-width="4" opacity=".7"/>` +
-    `<circle cx="0" cy="512" r="478" fill="none" stroke="${mix(color, "#ffffff", 0.7)}" stroke-width="4" opacity=".8"/>` +
+    cord(ring, 38, color) +
+    ink(oval(0, 512, 494), 7, lightOf(color, 0.6)) +
     studs
   );
 }
-
-const BACKDROPS = [
-  { deep: "#1a0d06", mid: "#5a3214", glow: "#c8782a" },
-  { deep: "#050a1f", mid: "#14285e", glow: "#3f7fd6" },
-  { deep: "#1c0504", mid: "#6e130c", glow: "#e0531f" },
-  { deep: "#04140a", mid: "#145222", glow: "#7fe03a" },
-  { deep: "#0d0520", mid: "#3a1a70", glow: "#a05cf0" },
-  { deep: "#1f1203", mid: "#7a5210", glow: "#f7cf5a" },
-];
 
 /**
  * Artwork per category; counts and order must match `avatar.config.ts`.
  * Skin entries take the race because the tone follows its body.
  */
 const layers = {
-  background: BACKDROPS.map(
-    (palette, index) => () => background(palette, index + 3),
-  ),
-  aura: ["#ffc93a", "#b574ff", "#6fc3ff"].map((color) => () => aura(color)),
+  background: [
+    "#b9713d",
+    "#3f7fe0",
+    "#e8553d",
+    "#3fae6a",
+    "#8a56e2",
+    "#f2b233",
+  ].map((color) => () => background(color)),
+  aura: ["#ffd23a", "#c084ff", "#7fd0ff"].map((color) => () => aura(color)),
   race: RACES.map((race) => () => figure(race, 1)),
   skin: [0, 1, 2].map((tone) => ({ perRace: (race) => figure(race, tone) })),
   armor,
@@ -1543,77 +1261,85 @@ const layers = {
 };
 
 const SKIN_SWATCHES = ["#eadbc8", "#b08a66", "#5c4130"];
-const FULL = "0 0 1024 1024";
-const FACE = "152 130 720 720";
-const TORSO = "152 304 720 720";
+const FULL = [0, 0, 1024, 1024];
+const FACE = [132, 110, 760, 760];
+const BUST = [32, 40, 960, 960];
+const HEAD = [112, 0, 800, 800];
+const TORSO = [172, 344, 680, 680];
 /** How each category's thumbnail is cropped so its artwork fills the tile. */
 const thumbViews = {
-  race: FACE,
+  race: BUST,
   skin: FACE,
-  mouth: FACE,
-  beard: "152 260 720 720",
-  eyes: FACE,
-  hair: "152 100 720 720",
-  headgear: "152 40 720 720",
-  smoke: FACE,
+  mouth: [312, 472, 400, 400],
+  beard: [162, 400, 700, 700],
+  eyes: [232, 222, 560, 560],
+  hair: HEAD,
+  headgear: HEAD,
+  smoke: [372, 380, 600, 600],
   armor: TORSO,
-  necklace: TORSO,
-  held: "304 304 720 720",
+  necklace: [82, 164, 860, 860],
+  held: [404, 404, 620, 620],
 };
 
 /**
- * The brush: `paint` wobbles edges and lays streaky light and dark grain over
- * whatever is drawn; `grain` keeps edges straight for full-bleed backdrops.
- * Both are pinned to canvas coordinates, so stacked layers distort alike.
+ * The hand-drawn line: every outline is nudged by the same low-frequency
+ * noise. It is pinned to canvas coordinates, so stacked layers bend alike.
  */
-const grainSteps = (source) =>
-  `<feTurbulence type="fractalNoise" baseFrequency="0.05 0.02" numOctaves="3" seed="11" result="noise"/>` +
-  `<feColorMatrix in="noise" type="matrix" values="0 0 0 0 0.05  0 0 0 0 0.02  0 0 0 0 0.1  0.5 0 0 0 -0.23" result="dark"/>` +
-  `<feComposite in="dark" in2="${source}" operator="in" result="darkIn"/>` +
-  `<feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 0.95  0 0 0 0 0.85  0 0.34 0 0 -0.165" result="light"/>` +
-  `<feComposite in="light" in2="${source}" operator="in" result="lightIn"/>` +
-  `<feMerge><feMergeNode in="${source}"/><feMergeNode in="darkIn"/><feMergeNode in="lightIn"/></feMerge>`;
-const region = `filterUnits="userSpaceOnUse" x="-20" y="-20" width="1064" height="1064" color-interpolation-filters="sRGB"`;
-const BRUSHES =
-  `<filter id="paint" ${region}><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="warp"/>` +
-  `<feDisplacementMap in="SourceGraphic" in2="warp" scale="6" xChannelSelector="R" yChannelSelector="G" result="shape"/>${grainSteps("shape")}</filter>` +
-  `<filter id="grain" ${region}>${grainSteps("SourceGraphic")}</filter>`;
+const WOBBLE = `<filter id="wobble" filterUnits="userSpaceOnUse" x="-60" y="-60" width="1144" height="1144"><feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="2" seed="7" result="warp"/><feDisplacementMap in="SourceGraphic" in2="warp" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter>`;
 
-/** Runs one recipe with fresh definitions and wraps it into an SVG document. */
-function render(draw, size, view = FULL, brush = "paint") {
+/** Rendered margin, as a fraction of the image, that `write` crops away. */
+const MARGIN = 1 / 32;
+
+/**
+ * Stacks recipes into one SVG document. Wobbled parts are filtered one by one
+ * so they bend exactly as they do when drawn as separate layers. The extra
+ * margin gives pixels at the canvas edge real neighbours to bend with.
+ */
+function render(parts, size, [x, y, width, height] = FULL) {
   defs = [];
-  blurIds.clear();
-  const inner = draw();
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="${view}"><defs>${BRUSHES}${defs.join("")}</defs><g filter="url(#${brush})"><g transform="translate(512 0)">${inner}</g></g></svg>`;
+  const body = parts
+    .map(([draw, wobble = true]) => {
+      const content = `<g transform="translate(512 0)">${draw()}</g>`;
+      return wobble ? `<g filter="url(#wobble)">${content}</g>` : content;
+    })
+    .join("");
+  const pad = width * MARGIN;
+  const pixels = size * (1 + 2 * MARGIN);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${pixels}" height="${pixels}" viewBox="${x - pad} ${y - pad} ${width + 2 * pad} ${height + 2 * pad}"><defs>${WOBBLE}${defs.join("")}</defs>${body}</svg>`;
 }
 
-async function write(file, svg) {
+async function write(file, svg, size) {
   mkdirSync(dirname(file), { recursive: true });
-  await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(file);
+  const edge = size * MARGIN;
+  await sharp(Buffer.from(svg))
+    .extract({ left: edge, top: edge, width: size, height: size })
+    .png({ compressionLevel: 9 })
+    .toFile(file);
 }
 
-const backdrop = () =>
-  `<rect x="-512" y="0" width="1024" height="1024" fill="#1a120b"/>`;
+const backdrop = () => box(-600, -80, 1200, 1200, "#3d2f22");
+const bust = (color) => () => silhouette(color);
 
 function thumbnail(category, index, draw) {
-  if (category === "background") return draw;
-  if (category === "race") return () => backdrop() + draw();
+  if (category === "background") return [[draw, false]];
+  if (category === "race") return [[backdrop, false], [draw]];
   if (category === "skin")
-    return () => backdrop() + silhouette(SKIN_SWATCHES[index]);
+    return [[backdrop, false], [bust(SKIN_SWATCHES[index])]];
   if (category === "aura")
-    return () => backdrop() + draw() + silhouette("#4a3a2a");
-  return () => backdrop() + silhouette("#4a3a2a") + draw();
+    return [[backdrop, false], [draw], [bust("#857059")]];
+  return [[backdrop, false], [bust("#857059")], [draw]];
 }
 
 let count = 0;
 for (const [category, recipes] of Object.entries(layers)) {
-  const brush = category === "background" ? "grain" : "paint";
+  const wobble = category !== "background";
   for (const [index, recipe] of recipes.entries()) {
     const number = String(index + 1).padStart(2, "0");
     if (typeof recipe === "function") {
       await write(
         join(root, "layers", category, `${number}.png`),
-        render(recipe, 1024, FULL, brush),
+        render([[recipe, wobble]], 1024),
+        1024,
       );
       count += 1;
     } else {
@@ -1621,19 +1347,16 @@ for (const [category, recipes] of Object.entries(layers)) {
         const raceId = `race_${String(raceIndex + 1).padStart(2, "0")}`;
         await write(
           join(root, "layers", category, `${number}-${raceId}.png`),
-          render(() => recipe.perRace(race), 1024),
+          render([[() => recipe.perRace(race)]], 1024),
+          1024,
         );
         count += 1;
       }
     }
     await write(
       join(root, "thumbs", category, `${number}.png`),
-      render(
-        thumbnail(category, index, recipe),
-        128,
-        thumbViews[category],
-        "grain",
-      ),
+      render(thumbnail(category, index, recipe), 128, thumbViews[category]),
+      128,
     );
     count += 1;
   }
