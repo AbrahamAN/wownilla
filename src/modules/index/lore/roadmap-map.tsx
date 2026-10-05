@@ -114,7 +114,18 @@ export function RoadmapMap({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const onStageMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+  // Replacing the no-JavaScript quest details on mount shortens the page, so a
+  // direct anchor to a section below the map is restored once.
+  useEffect(() => {
+    const stage = stageRef.current;
+    const target = document.getElementById(location.hash.slice(1));
+    if (!mounted || !stage || !target || stage.contains(target)) return;
+    const position = stage.compareDocumentPosition(target);
+    if (position & Node.DOCUMENT_POSITION_FOLLOWING)
+      target.scrollIntoView({ behavior: "instant" });
+  }, [mounted]);
+
+  const onStageMove =(event: ReactPointerEvent<HTMLDivElement>) => {
     if (reduced || event.pointerType !== "mouse") return;
     const bounds = event.currentTarget.getBoundingClientRect();
     leanY.set(((event.clientX - bounds.left) / bounds.width - 0.5) * LEAN_Y);

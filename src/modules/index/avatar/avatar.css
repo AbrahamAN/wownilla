@@ -1,0 +1,309 @@
+/* The forge keeps the amber hearth glow of the closing invitation above it. */
+.avatar-section {
+  position: relative;
+  padding: clamp(4rem, 8vw, 7rem) 1.5rem;
+  background:
+    radial-gradient(
+      ellipse 70% 60% at 50% 0%,
+      rgb(168 91 31 / 0.1),
+      transparent 75%
+    ),
+    var(--ink);
+}
+.avatar-content {
+  max-width: 76rem;
+  margin-inline: auto;
+  text-align: center;
+}
+.avatar-content h2 {
+  margin-top: 1rem;
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.avatar-description {
+  max-width: 34rem;
+  margin: 1.25rem auto 0;
+  font-size: clamp(1rem, 1.6vw, 1.125rem);
+  line-height: 1.7;
+}
+.avatar-studio {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  text-align: left;
+}
+/* The generator is the primary action, so it leads on small screens. */
+.avatar-generator {
+  order: -1;
+}
+@media (min-width: 1024px) {
+  .avatar-studio {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+  .avatar-generator {
+    order: 0;
+    position: sticky;
+    top: 88px;
+  }
+}
+
+/* Retro program window drawn with the site's bronze and leather tokens. */
+.avatar-window {
+  min-width: 0;
+  border: 1px solid var(--bronze);
+  background: linear-gradient(180deg, rgb(26 18 11 / 0.96), var(--ink));
+  box-shadow:
+    inset 0 1px 0 rgb(212 175 55 / 0.12),
+    0 18px 40px -20px rgb(0 0 0 / 0.9);
+}
+.avatar-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--bronze);
+  background: linear-gradient(180deg, var(--leather), var(--ink2));
+  color: var(--goldhi);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.avatar-titlebar-dots {
+  display: flex;
+  gap: 0.3rem;
+}
+.avatar-titlebar-dots i {
+  width: 0.6rem;
+  height: 0.6rem;
+  border: 1px solid var(--gold);
+}
+.avatar-code {
+  overflow: hidden;
+  color: var(--parch2);
+  font-weight: 400;
+  text-overflow: ellipsis;
+}
+.avatar-window-body {
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+.avatar-label {
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.avatar-gallery h3 {
+  margin-top: 0.5rem;
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.avatar-copy {
+  margin-top: 0.75rem;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.avatar-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--leather);
+  background: var(--ink2);
+  transition: border-color 0.3s;
+}
+.avatar-card canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.avatar-card-caption {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0.35rem 0.4rem;
+  background: rgb(11 10 8 / 0.82);
+  color: var(--parch2);
+  font-size: 11px;
+  line-height: 1.3;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.avatar-card-caption strong {
+  color: var(--parch);
+  font-weight: 700;
+}
+.avatar-card:hover,
+.avatar-card:focus-visible {
+  border-color: var(--gold);
+}
+.avatar-card:hover .avatar-card-caption,
+.avatar-card:focus-visible .avatar-card-caption {
+  opacity: 1;
+}
+.avatar-more {
+  margin-top: 1.25rem;
+  padding: 0.75rem 1.25rem;
+  border-color: var(--gold);
+  font-size: 12px;
+}
+
+.avatar-stage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1rem;
+}
+.avatar-canvas {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 22rem;
+  height: auto;
+  aspect-ratio: 1;
+  border: 1px solid var(--bronze);
+  background: var(--ink2);
+}
+.avatar-mirror {
+  flex: none;
+  width: 5rem;
+  text-align: center;
+}
+.avatar-mirror canvas {
+  width: 5rem;
+  height: 5rem;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  background: var(--ink2);
+}
+.avatar-mirror figcaption {
+  margin-top: 0.4rem;
+  font-size: 10px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.avatar-tools,
+.avatar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.avatar-tools {
+  justify-content: center;
+}
+.avatar-tools .btn,
+.avatar-actions .btn {
+  min-height: 44px;
+  padding: 0.7rem 1rem;
+  font-size: 11px;
+}
+.avatar-actions .btn {
+  flex: 1 1 8rem;
+}
+.avatar-tools .btn-dark,
+.avatar-actions .btn-dark {
+  border-color: var(--bronze);
+}
+.avatar-tools .btn:disabled {
+  opacity: 0.45;
+}
+
+.avatar-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 1.25rem;
+  padding-bottom: 0.4rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bronze) transparent;
+}
+.avatar-tab {
+  flex: none;
+  min-height: 40px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--leather);
+  background: var(--ink2);
+  color: var(--parch2);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.avatar-tab[data-set] {
+  color: var(--parch);
+}
+.avatar-tab[aria-selected="true"] {
+  border-color: var(--gold);
+  background: var(--leather);
+  color: var(--goldhi);
+}
+.avatar-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.25rem, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.avatar-option {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--leather);
+  background: var(--ink2);
+  color: var(--parch2);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: border-color 0.2s;
+}
+.avatar-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.avatar-option:hover:not(:disabled) {
+  border-color: var(--bronze);
+}
+.avatar-option[aria-pressed="true"] {
+  border-color: var(--goldhi);
+  box-shadow: inset 0 0 0 1px var(--goldhi);
+}
+.avatar-option:disabled {
+  opacity: 0.3;
+}
+.avatar-note,
+.avatar-status {
+  margin-top: 0.75rem;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.avatar-status {
+  min-height: 1.5em;
+}
+
+@media (max-width: 479px) {
+  .avatar-section {
+    padding-inline: 1rem;
+  }
+  .avatar-grid {
+    gap: 0.35rem;
+  }
+  /* Touch has no hover, so the caption would only cover the small portrait. */
+  .avatar-card-caption {
+    display: none;
+  }
+}

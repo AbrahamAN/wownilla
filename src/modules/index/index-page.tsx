@@ -12,6 +12,7 @@ import "./common/bars.css";
 import "./hero/achievement.css";
 import "./lore/lore.css";
 import "./community/community.css";
+import "./avatar/avatar.css";
 import "./intro/intro.css";
 import "./token/token.css";
 import "./token/vault.css";
@@ -27,6 +28,7 @@ import { TokenSection } from "@/modules/index/token/token-section";
 import { GuildVault } from "@/modules/index/token/guild-vault";
 import { LoreSection } from "@/modules/index/lore/lore-section";
 import { CommunitySection } from "@/modules/index/community/community-section";
+import { AvatarSection } from "@/modules/index/avatar/avatar-section";
 import { Footer } from "@/modules/index/common/footer";
 import { ScrollProgress } from "@/modules/index/common/navigation";
 
@@ -45,6 +47,7 @@ export function IndexPage() {
           <GuildVault />
           <LoreSection />
           <CommunitySection />
+          <AvatarSection />
           <Footer />
           <ScrollProgress />
         </Experience>
