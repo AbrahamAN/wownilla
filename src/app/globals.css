@@ -1,5 +1,5 @@
 @import "tailwindcss";
-/* Native 32px cursors: original local art, with the fingertip at (7, 2).
+/* Native 32px arrow and gauntlet: original local art, with both tips at (7, 2).
    Base-layer rules let explicit resize/grab/loading cursors keep precedence.
    Third-party chart iframes own their document and may retain their own cursors. */
 @layer base {
@@ -10,7 +10,7 @@
     }
     body {
       cursor:
-        url("/assets/cursor-gauntlet.png") 7 2,
+        url("/assets/cursor-arrow.png") 7 2,
         auto;
     }
     :where(
