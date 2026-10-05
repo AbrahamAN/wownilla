@@ -66,10 +66,10 @@ export function AboutSection() {
         </div>
         <div className="tavern-scene" aria-hidden="true">
           <Image
-            src="/assets/tavern-scene.webp"
+            src="/assets/tavern-innkeepers.png"
             alt=""
-            width={1536}
-            height={1024}
+            width={1122}
+            height={1402}
             sizes="(min-width: 1024px) 760px, 100vw"
             className="tavern-artwork"
           />
