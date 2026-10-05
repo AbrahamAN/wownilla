@@ -1,5 +1,6 @@
 import { projectDestinations } from "@/modules/index/common/site-config";
 import { WhyAtmosphere } from "./why-atmosphere";
+import { WhyMemories } from "./why-memories";
 
 /** Gives the reunion story a readable server-rendered home before the Tavern invitation. */
 export function WhySection() {
@@ -7,6 +8,7 @@ export function WhySection() {
 
   return (
     <section id="why" className="why-section" aria-labelledby="why-title">
+      <WhyMemories />
       <WhyAtmosphere />
       <div className="why-reading-column">
         <h2 id="why-title" className="why-title font-friz">

@@ -18,6 +18,103 @@
   max-width: 45rem;
   margin-inline: auto;
 }
+/* Portrait clips fill the backdrop; the central veil protects the original reading column. */
+.why-memories {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  pointer-events: none;
+  opacity: 0.7475;
+  mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent);
+}
+.why-memories::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    /* An extra 10% black veil darkens the existing video treatment. */
+    linear-gradient(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.1)),
+    radial-gradient(
+      ellipse 60% 90% at 50% 50%,
+      rgb(11 10 8 / 0.9),
+      rgb(11 10 8 / 0.35)
+    ),
+    linear-gradient(90deg, rgb(11 10 8 / 0.2), rgb(11 10 8 / 0.25));
+}
+.why-memory {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  filter: saturate(0.65);
+}
+.why-memory video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+}
+.why-memory video[data-ready="true"] {
+  opacity: 1;
+}
+.why-memory video[hidden] {
+  display: none;
+}
+.why-memories[data-beating="true"] .why-memory {
+  opacity: 0.06;
+}
+.why-memories[data-beating="true"] .why-memory[data-active="true"] {
+  animation: whyHeartbeat 2.4s ease-in-out infinite;
+  animation-play-state: paused;
+}
+.why-memories[data-running="true"] .why-memory[data-active="true"] {
+  animation-play-state: running;
+}
+/* A restrained double beat reveals footage without moving the reading column. */
+@keyframes whyHeartbeat {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  6% {
+    opacity: 0.95;
+  }
+  13% {
+    opacity: 0.2;
+  }
+  21% {
+    opacity: 0.8;
+  }
+  35%,
+  85% {
+    opacity: 0.15;
+  }
+}
+.why-memories-control {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgb(107 74 37 / 0.55);
+  background: rgb(11 10 8 / 0.8);
+  color: var(--parch2);
+  font-size: 12px;
+}
+.why-memories-control:hover {
+  color: var(--goldhi);
+  border-color: var(--gold);
+}
+.why-memories-control[hidden] {
+  display: none;
+}
 .why-atmosphere {
   position: absolute;
   inset: 0;
@@ -111,6 +208,11 @@
   font-size: 13px;
 }
 @media (max-width: 639px) {
+  .why-memories {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    opacity: 0.575;
+  }
   .why-story {
     gap: 1.5rem;
   }
@@ -119,6 +221,11 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .why-memories[data-beating="true"] .why-memory,
+  .why-memories[data-beating="true"] .why-memory[data-active="true"] {
+    opacity: 1;
+    animation: none;
+  }
   .why-atmosphere {
     display: none;
   }

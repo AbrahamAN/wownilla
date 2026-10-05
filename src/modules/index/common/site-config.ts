@@ -43,6 +43,7 @@ export interface ProjectConfig {
   feeMechanics: string;
   announcement: string;
   heroVideo: string;
+  whyMemories: { id: string; src: string; poster: string }[];
   heroMusic: string;
   musicVolume: number;
   memes: MemeAsset[];
@@ -120,6 +121,28 @@ export const siteConfig: ProjectConfig = {
   feeMechanics: "",
   announcement: "",
   heroVideo: "",
+  whyMemories: [
+    {
+      id: "boss",
+      src: "/assets/memory-boss.mp4",
+      poster: "/assets/memory-boss.webp",
+    },
+    {
+      id: "shredder",
+      src: "/assets/memory-shredder.mp4",
+      poster: "/assets/memory-shredder.webp",
+    },
+    {
+      id: "dungeon",
+      src: "/assets/memory-dungeon.mp4",
+      poster: "/assets/memory-dungeon.webp",
+    },
+    {
+      id: "loot",
+      src: "/assets/memory-loot.mp4",
+      poster: "/assets/memory-loot.webp",
+    },
+  ],
   heroMusic: "/assets/hero-theme.webm",
   musicVolume: 0.35,
   memes: [
