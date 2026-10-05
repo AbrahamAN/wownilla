@@ -23,13 +23,13 @@ test("closing keeps approved copy, disabled destinations and the legacy chat anc
     section.getByRole("button", { name: "Buy $NILLA" }),
   ).toBeDisabled();
   await expect(
-    section.getByRole("button", { name: "Join the Tavern" }),
-  ).toBeDisabled();
+    section.getByRole("link", { name: "Join Telegram" }),
+  ).toHaveAttribute("href", "https://t.me/+oLbd05GY5Sc0MDQx");
   await expect(section.locator("#chat p")).toHaveCount(0);
   await expect(section).not.toContainText("312 online");
   await expect(section).not.toContainText("Guild members");
   const boxes = await section
-    .locator(".closing-actions button")
+    .locator(".closing-actions > :is(button, a)")
     .evaluateAll((buttons) =>
       buttons.map((button) => {
         const rect = button.getBoundingClientRect();
@@ -58,8 +58,8 @@ test("footer links reach real sections and keeps legal text with no placeholder 
     footer.getByRole("button", { name: "Copy $NILLA contract" }),
   ).toBeDisabled();
   await expect(
-    footer.getByRole("button", { name: "X Community unavailable" }),
-  ).toBeDisabled();
+    footer.getByRole("link", { name: "Join Telegram" }),
+  ).toHaveAttribute("href", "https://t.me/+oLbd05GY5Sc0MDQx");
   for (const link of await footer
     .getByRole("navigation", { name: "Footer" })
     .getByRole("link")

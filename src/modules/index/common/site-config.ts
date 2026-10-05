@@ -32,7 +32,6 @@ export interface ProjectConfig {
   };
   links: {
     x: string;
-    community: string;
     telegram: string;
     discord: string;
     buy: string;
@@ -97,8 +96,7 @@ export const siteConfig: ProjectConfig = {
   },
   links: {
     x: "https://x.com/Wownillaa",
-    community: "",
-    telegram: "",
+    telegram: "https://t.me/+oLbd05GY5Sc0MDQx",
     discord: "",
     buy: "",
   },
@@ -218,11 +216,7 @@ export function projectDestinations(config: ProjectConfig = siteConfig) {
       isUsableAddress(config.token)
         ? safeProjectUrl(config.links.buy, ["app.long.xyz"])
         : undefined,
-    community: /^https:\/\/x\.com\/i\/communities\/\d+\/?$/.test(
-      config.links.community,
-    )
-      ? safeProjectUrl(config.links.community, ["x.com"])
-      : undefined,
+    community: safeProjectUrl(config.links.telegram, ["t.me"]),
     x: safeProjectUrl(config.links.x, ["x.com"]),
     discord: safeProjectUrl(config.links.discord, [
       "discord.gg",

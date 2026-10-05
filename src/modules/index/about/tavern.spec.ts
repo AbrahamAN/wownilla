@@ -17,9 +17,9 @@ test("Tavern preserves legacy entry and keeps the Community invitation honest", 
   }
   const tavern = page.locator("#tavern");
   await expect(
-    tavern.getByRole("button", { name: "Join the Tavern" }),
-  ).toBeDisabled();
-  await expect(tavern).toContainText("X Community link unavailable.");
+    tavern.getByRole("link", { name: "Join Telegram" }),
+  ).toHaveAttribute("href", "https://t.me/+oLbd05GY5Sc0MDQx");
+  await expect(tavern).not.toContainText("Community link unavailable.");
   await expect(tavern.locator(".tooltip-card")).toHaveCount(0);
   const artwork = tavern.locator("img");
   await expect(artwork).toHaveAttribute("alt", "");

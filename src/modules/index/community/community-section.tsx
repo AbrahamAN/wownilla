@@ -45,7 +45,7 @@ export function CommunitySection() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Join the Tavern
+              Join Telegram
             </a>
           ) : (
             <button
@@ -53,7 +53,7 @@ export function CommunitySection() {
               disabled
               aria-describedby="closing-availability"
             >
-              Join the Tavern
+              Join Telegram
             </button>
           )}
         </div>
@@ -67,7 +67,7 @@ export function CommunitySection() {
           >
             {!destinations.buy && "Purchase link unavailable."}
             {!destinations.buy && !destinations.community && " "}
-            {!destinations.community && "X Community link unavailable."}
+            {!destinations.community && "Telegram community link unavailable."}
           </p>
         )}
       </div>

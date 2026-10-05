@@ -11,6 +11,7 @@ import type {
   ReactNode,
   CSSProperties,
   PointerEvent as ReactPointerEvent,
+  MouseEvent as ReactMouseEvent,
 } from "react";
 import {
   CloudBand,
@@ -24,6 +25,8 @@ import {
 } from "@/modules/index/lore/roadmap-art";
 import { ROADMAP_PHASES } from "@/modules/index/lore/roadmap-data";
 import type { RoadmapPhase } from "@/modules/index/lore/roadmap-data";
+
+import { RoadmapQuestOverlay } from "./roadmap-quest-overlay";
 
 const subscribe = () => () => {};
 
@@ -42,11 +45,12 @@ const SPARKS = [
   [-12, 2.8],
 ] as const;
 
-/** Selects persistent quest details while preserving the original world artwork and motion. */
+/** Previews quests beside the cursor and opens accessible dialogs without growing the map. */
 export function RoadmapMap({ children }: { children: ReactNode }) {
-  const detailsRef = useRef<HTMLDivElement>(null);
-  const [selected, setSelected] = useState(ROADMAP_PHASES[0].id);
-  const [mobile, setMobile] = useState(false);
+  const [modal, setModal] = useState(false);
+  const cursorX = useMotionValue(0);
+  const cursorY = useMotionValue(0);
+  const [selected, setSelected] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
@@ -82,25 +86,13 @@ export function RoadmapMap({ children }: { children: ReactNode }) {
   const rotateY = useSpring(leanY, { stiffness: 60, damping: 16 });
 
   useEffect(() => {
-    const query = window.matchMedia("(max-width: 767px)");
-    const updateMobile = () => setMobile(query.matches);
     const updateHidden = () => setHidden(document.hidden);
-    updateMobile();
     updateHidden();
-    query.addEventListener("change", updateMobile);
     document.addEventListener("visibilitychange", updateHidden);
     return () => {
-      query.removeEventListener("change", updateMobile);
       document.removeEventListener("visibilitychange", updateHidden);
     };
   }, []);
-
-  useEffect(() => {
-    if (mobile) return;
-    detailsRef.current?.querySelectorAll("details").forEach((element) => {
-      element.open = element.dataset.quest === selected;
-    });
-  }, [selected, mobile]);
 
   useEffect(() => {
     let frame = 0;
@@ -109,13 +101,10 @@ export function RoadmapMap({ children }: { children: ReactNode }) {
         (item) => location.hash === `#roadmap-${item.id}`,
       );
       if (!quest) return;
+      setModal(true);
       setSelected(quest.id);
-      const element = document.getElementById(`roadmap-${quest.id}`);
-      if (element instanceof HTMLDetailsElement) {
-        element.open = true;
-        cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() => element.scrollIntoView());
-      }
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => stageRef.current?.scrollIntoView());
     };
     followAnchor();
     window.addEventListener("hashchange", followAnchor);
@@ -141,7 +130,7 @@ export function RoadmapMap({ children }: { children: ReactNode }) {
   return (
     <div
       className="roadmap-quests"
-      data-enhanced={mounted && !mobile}
+      data-enhanced={mounted}
       data-selected={selected}
     >
       <div
@@ -150,11 +139,7 @@ export function RoadmapMap({ children }: { children: ReactNode }) {
         onPointerMove={onStageMove}
         onPointerLeave={onStageLeave}
       >
-        <motion.div
-          className="rm-tilt"
-          style={{ rotateX, rotateY }}
-          aria-hidden={mobile || undefined}
-        >
+        <motion.div className="rm-tilt" style={{ rotateX, rotateY }}>
           <div className="rm-float">
             <div className="rm-world">
               <span className="rm-ground" aria-hidden="true" />
@@ -188,8 +173,19 @@ export function RoadmapMap({ children }: { children: ReactNode }) {
                   index={index}
                   final={index === ROADMAP_PHASES.length - 1}
                   selected={selected === phase.id}
-                  mobile={mobile}
-                  onSelect={() => setSelected(phase.id)}
+                  onPreview={(event) => {
+                    if (modal || event.pointerType !== "mouse") return;
+                    cursorX.set(event.clientX);
+                    cursorY.set(event.clientY);
+                    setSelected(phase.id);
+                  }}
+                  onLeave={() => {
+                    if (!modal) setSelected(null);
+                  }}
+                  onSelect={() => {
+                    setModal(true);
+                    setSelected(phase.id);
+                  }}
                 />
               ))}
               <div className="rm-layer rm-clouds-front" aria-hidden="true">
@@ -201,9 +197,26 @@ export function RoadmapMap({ children }: { children: ReactNode }) {
         <span className="rm-fog" aria-hidden="true" />
         <CloudVeil />
       </div>
-      <div ref={detailsRef} className="quest-details">
-        {children}
-      </div>
+      {mounted ? (
+        <p className="quest-prompt font-narrow text-parch2">
+          Hover or select a checkpoint to view its quest.
+        </p>
+      ) : null}
+      {!mounted ? <div className="quest-details">{children}</div> : null}
+      {mounted && selected ? (
+        <RoadmapQuestOverlay
+          questId={selected}
+          modal={modal}
+          cursorX={cursorX}
+          cursorY={cursorY}
+          onDismiss={() => {
+            setSelected(null);
+            setModal(false);
+          }}
+        >
+          {children}
+        </RoadmapQuestOverlay>
+      ) : null}
     </div>
   );
 }
@@ -214,15 +227,17 @@ function Marker({
   index,
   final,
   selected,
-  mobile,
   onSelect,
+  onPreview,
+  onLeave,
 }: {
   phase: RoadmapPhase;
   index: number;
   final: boolean;
   selected: boolean;
-  mobile: boolean;
-  onSelect: () => void;
+  onSelect: (event: ReactMouseEvent<HTMLButtonElement>) => void;
+  onPreview: (event: ReactPointerEvent<HTMLButtonElement>) => void;
+  onLeave: () => void;
 }) {
   const style: CSSProperties & { "--x": string; "--y": string; "--i": number } =
     {
@@ -251,7 +266,11 @@ function Marker({
         aria-label={`${phase.numeral} — ${phase.title}`}
         aria-controls={`roadmap-${phase.id}`}
         aria-pressed={selected}
-        tabIndex={mobile ? -1 : 0}
+        aria-haspopup="dialog"
+        aria-expanded={selected}
+        onPointerEnter={onPreview}
+        onPointerMove={onPreview}
+        onPointerLeave={onLeave}
         onClick={onSelect}
       >
         <span className="rm-marker-tag">{phase.mark}</span>

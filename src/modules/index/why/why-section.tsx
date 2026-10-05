@@ -43,7 +43,7 @@ export function WhySection() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Find Your Party
+              Join Telegram
             </a>
           ) : (
             <>
@@ -52,13 +52,13 @@ export function WhySection() {
                 disabled
                 aria-describedby="why-community-status"
               >
-                Find Your Party
+                Join Telegram
               </button>
               <p
                 id="why-community-status"
                 className="why-availability font-narrow text-parch2"
               >
-                X Community link unavailable.
+                Telegram community link unavailable.
               </p>
             </>
           )}

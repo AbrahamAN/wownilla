@@ -85,7 +85,7 @@ export function HeroSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Join the Tavern
+                    Join Telegram
                   </a>
                 ) : (
                   <button
@@ -93,7 +93,7 @@ export function HeroSection() {
                     disabled
                     aria-describedby="hero-destination-status"
                   >
-                    Join the Tavern
+                    Join Telegram
                   </button>
                 )}
               </div>
@@ -104,7 +104,7 @@ export function HeroSection() {
                 >
                   {!destinations.buy ? "Purchase link unavailable." : ""}{" "}
                   {!destinations.community
-                    ? "X Community link unavailable."
+                    ? "Telegram community link unavailable."
                     : ""}
                 </p>
               ) : null}

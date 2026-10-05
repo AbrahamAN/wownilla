@@ -51,15 +51,15 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                X Community
+                Join Telegram
               </a>
             ) : (
               <button
                 className="btn btn-dark"
                 disabled
-                title="X Community link unavailable"
+                title="Telegram community link unavailable"
               >
-                X Community unavailable
+                Telegram community unavailable
               </button>
             )}
           </div>

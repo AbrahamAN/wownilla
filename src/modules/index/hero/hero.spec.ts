@@ -1,30 +1,25 @@
 import { expect, test } from "@playwright/test";
 import { projectDestinations, siteConfig } from "../common/site-config";
 
-test("community action accepts only an X Community destination", () => {
-  expect(projectDestinations().community).toBeUndefined();
-  for (const community of [
-    "https://x.com/example",
-    "https://x.com/",
-    "http://x.com/i/communities/123",
-    "https://x.com/i/communities/123?redirect=other",
+test("community action uses the Telegram invite and rejects other hosts", () => {
+  expect(projectDestinations().community).toBe(
+    "https://t.me/+oLbd05GY5Sc0MDQx",
+  );
+  expect(projectDestinations().community).toBe(projectDestinations().telegram);
+  for (const telegram of [
+    "https://x.com/i/communities/123",
+    "https://t.me/",
+    "http://t.me/+oLbd05GY5Sc0MDQx",
+    "https://t.me.example.com/+oLbd05GY5Sc0MDQx",
+    "https://user:password@t.me/+oLbd05GY5Sc0MDQx",
   ]) {
     expect(
       projectDestinations({
         ...siteConfig,
-        links: { ...siteConfig.links, community },
+        links: { ...siteConfig.links, telegram },
       }).community,
     ).toBeUndefined();
   }
-  expect(
-    projectDestinations({
-      ...siteConfig,
-      links: {
-        ...siteConfig.links,
-        community: "https://x.com/i/communities/123",
-      },
-    }).community,
-  ).toBe("https://x.com/i/communities/123");
 });
 
 test("Hero preserves layout order, readable controls and a valid scroll destination", async ({

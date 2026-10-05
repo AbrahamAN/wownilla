@@ -511,7 +511,7 @@
 @media (max-width: 639px) {
   .rm-stage {
     --rm-tilt: 22deg;
-    --rm-pin: 0.72;
+    --rm-pin: 1;
     perspective: 900px;
     padding: 9% 0 5%;
   }
@@ -636,28 +636,27 @@
   font-size: 14px;
   line-height: 1.8;
 }
-@media (min-width: 768px) {
-  .roadmap-quests[data-enhanced="true"] .quest-panel {
-    display: none;
-  }
-  .roadmap-quests[data-selected="awakening"][data-enhanced="true"]
-    [data-quest="awakening"],
-  .roadmap-quests[data-selected="expansion"][data-enhanced="true"]
-    [data-quest="expansion"],
-  .roadmap-quests[data-selected="ascension"][data-enhanced="true"]
-    [data-quest="ascension"],
-  .roadmap-quests[data-selected="eternal-realm"][data-enhanced="true"]
-    [data-quest="eternal-realm"] {
-    display: block;
-  }
-  .roadmap-quests[data-enhanced="true"] summary {
-    display: none;
-  }
+.quest-prompt {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+.roadmap-quests[data-enhanced="true"] .quest-panel {
+  display: none;
+}
+.roadmap-quests[data-selected="awakening"][data-enhanced="true"]
+  [data-quest="awakening"],
+.roadmap-quests[data-selected="expansion"][data-enhanced="true"]
+  [data-quest="expansion"],
+.roadmap-quests[data-selected="ascension"][data-enhanced="true"]
+  [data-quest="ascension"],
+.roadmap-quests[data-selected="eternal-realm"][data-enhanced="true"]
+  [data-quest="eternal-realm"] {
+  display: block;
+}
+.roadmap-quests[data-enhanced="true"] summary {
+  display: none;
 }
 @media (max-width: 767px) {
-  .rm-marker {
-    pointer-events: none;
-  }
   .quest-body h3 {
     display: none;
   }
@@ -667,4 +666,81 @@
   .quest-description {
     margin-top: 0;
   }
+  .roadmap-quests[data-enhanced="true"] .quest-body {
+    padding-top: 1.5rem;
+  }
+  .roadmap-quests[data-enhanced="true"] .quest-body h3 {
+    display: block;
+  }
+  .roadmap-quests[data-enhanced="true"] .quest-description {
+    margin-top: 1rem;
+  }
+}
+
+/* Top-layer previews escape the map's 3D transforms and section clipping. */
+.quest-overlay {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 0;
+  width: min(25rem, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  color: var(--parch);
+  background: var(--ink);
+  border: 1px solid var(--gold);
+  box-shadow:
+    0 12px 48px rgb(0 0 0 / 0.65),
+    0 0 20px rgb(212 175 55 / 0.12);
+}
+.quest-overlay:popover-open {
+  display: block;
+}
+.quest-overlay[data-mode="tooltip"] {
+  pointer-events: none;
+}
+.quest-overlay[data-mode="modal"] {
+  inset: 0;
+  margin: auto;
+  width: min(34rem, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  overscroll-behavior: contain;
+}
+.quest-overlay:modal::backdrop {
+  background: rgb(5 4 3 / 0.72);
+}
+.quest-overlay .quest-panel {
+  border: 0;
+}
+.quest-overlay .quest-body {
+  padding: 1.25rem;
+}
+.quest-overlay .quest-body h3 {
+  font-size: 1.125rem;
+}
+.quest-overlay[data-mode="tooltip"] .quest-body {
+  font-size: 0.875rem;
+}
+.quest-overlay[data-mode="tooltip"] .quest-checklist {
+  gap: 0.5rem;
+  margin-top: 0.875rem;
+}
+.quest-overlay[data-mode="tooltip"] .quest-qualification {
+  font-size: 0.75rem;
+  margin-top: 1rem;
+}
+.quest-close {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  color: var(--goldhi);
+  border-bottom: 1px solid var(--bronze);
+  cursor: var(--cursor-interactive, pointer);
+}
+.quest-close span {
+  font-size: 1.5rem;
 }

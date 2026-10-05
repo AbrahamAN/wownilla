@@ -59,8 +59,8 @@ test("Hero keeps missing destinations and contract unavailable without redirecti
   ).toBeDisabled();
   await expect(hero.getByRole("button", { name: "Buy $NILLA" })).toBeDisabled();
   await expect(
-    hero.getByRole("button", { name: "Join the Tavern" }),
-  ).toBeDisabled();
+    hero.getByRole("link", { name: "Join Telegram" }),
+  ).toHaveAttribute("href", "https://t.me/+oLbd05GY5Sc0MDQx");
   await expect(hero).toContainText("Contract unavailable");
   await expect(hero).not.toContainText("NILLA-CONTRACT-COMING-SOON");
   await expect(hero).not.toContainText("MSFT");
@@ -79,4 +79,29 @@ test("Hero keeps missing destinations and contract unavailable without redirecti
     hero.getByRole("link", { name: "Robinhood Chain" }),
   ).toHaveAttribute("href", "https://robinhood.com/us/en/crypto/chain/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+});
+
+test("every community invitation references the same Telegram group", async ({
+  page,
+}) => {
+  await page.goto("/#token");
+  const invitations = page.getByRole("link", {
+    name: "Join Telegram",
+    exact: true,
+  });
+  await expect(invitations).toHaveCount(5);
+  for (const invitation of await invitations.all()) {
+    await expect(invitation).toHaveAttribute(
+      "href",
+      "https://t.me/+oLbd05GY5Sc0MDQx",
+    );
+    await expect(invitation).toHaveAttribute("target", "_blank");
+    await expect(invitation).toHaveAttribute("rel", "noopener noreferrer");
+  }
+  await expect(page.locator("body")).not.toContainText("X Community");
+  await expect(
+    page
+      .getByRole("link", { name: "Follow on X", includeHidden: true })
+      .first(),
+  ).toHaveAttribute("href", "https://x.com/Wownillaa");
 });

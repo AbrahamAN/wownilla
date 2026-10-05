@@ -13,7 +13,7 @@ export function AboutSection() {
       fill="currentColor"
       aria-hidden="true"
     >
-      <path d="M18.9 2h3.3l-7.2 8.3L23.5 22h-6.7l-5.2-6.8L5.6 22H2.3l7.7-8.9L.5 2h6.9l4.7 6.2L18.9 2Zm-1.2 18h1.8L6.4 3.9H4.5L17.7 20Z" />
+      <path d="M21.44 3.34 2.77 10.54c-1.27.5-1.26 1.2-.23 1.51l4.79 1.49 1.84 5.65c.23.63.12.88.79.88.52 0 .75-.24 1.04-.52l2.33-2.26 4.85 3.58c.89.49 1.53.24 1.75-.83l3.16-14.89c.32-1.3-.49-1.89-1.65-1.81ZM8.08 13.2l10.79-6.81c.54-.33 1.04-.15.63.21l-8.69 7.84-.34 3.66-2.39-4.9Z" />
     </svg>
   );
 
@@ -43,7 +43,7 @@ export function AboutSection() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {communityIcon} Join the Tavern
+                {communityIcon} Join Telegram
               </a>
             ) : (
               <>
@@ -52,13 +52,13 @@ export function AboutSection() {
                   disabled
                   aria-describedby="tavern-community-status"
                 >
-                  {communityIcon} Join the Tavern
+                  {communityIcon} Join Telegram
                 </button>
                 <p
                   id="tavern-community-status"
                   className="tavern-availability font-narrow text-parch2"
                 >
-                  X Community link unavailable.
+                  Telegram community link unavailable.
                 </p>
               </>
             )}

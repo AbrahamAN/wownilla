@@ -22,11 +22,11 @@ export const ROADMAP_PHASES: readonly RoadmapPhase[] = [
     numeral: "QUEST 01",
     title: "GET THE GUILD TOGETHER",
     description:
-      "Launch $NILLA, open the tavern on X, and give the community its first home.",
+      "Launch $NILLA, open the tavern on Telegram, and give the community its first home.",
     items: [
       { text: "Launch on LONG." },
       { text: "Publish the token details and fee breakdown." },
-      { text: "Open the X Community." },
+      { text: "Open the Telegram community." },
       { text: "Release a starter pack of memes and artwork." },
     ],
     position: { x: 25.5, y: 63.2 },

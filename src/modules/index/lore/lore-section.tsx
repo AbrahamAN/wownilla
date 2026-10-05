@@ -1,7 +1,7 @@
 import { ROADMAP_PHASES } from "./roadmap-data";
 import { RoadmapMap } from "./roadmap-map";
 
-/** Keeps every approved quest server rendered while the map selects desktop details. */
+/** Keeps every quest server rendered for checkpoint selection and native disclosure fallback. */
 export function LoreSection() {
   return (
     <section
@@ -29,7 +29,10 @@ export function LoreSection() {
                 {quest.numeral} — {quest.title}
               </summary>
               <div className="quest-body">
-                <h3 className="font-friz text-goldhi">
+                <h3
+                  id={`roadmap-${quest.id}-title`}
+                  className="font-friz text-goldhi"
+                >
                   {quest.numeral} — {quest.title}
                 </h3>
                 <p className="quest-description text-parch">
