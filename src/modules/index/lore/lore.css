@@ -288,7 +288,7 @@
   height: 58px;
   margin: -56px 0 0 -22px;
   padding: 0;
-  cursor: pointer;
+  cursor: var(--cursor-interactive, pointer);
   pointer-events: auto;
   transform-origin: 50% 96%;
   /* Counter-rotating the tilt stands each pin upright on the map plane. */
@@ -590,7 +590,7 @@
   scroll-margin-top: 100px;
 }
 .quest-panel summary {
-  cursor: pointer;
+  cursor: var(--cursor-interactive, pointer);
   padding: 1.25rem;
   font-size: 1rem;
   line-height: 1.5;

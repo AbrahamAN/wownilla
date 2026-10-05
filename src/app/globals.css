@@ -1,4 +1,58 @@
 @import "tailwindcss";
+/* Native 32px cursors: original local art, with the fingertip at (7, 2).
+   Base-layer rules let explicit resize/grab/loading cursors keep precedence.
+   Third-party chart iframes own their document and may retain their own cursors. */
+@layer base {
+  @media (hover: hover) and (pointer: fine) {
+    :root {
+      --cursor-interactive:
+        url("/assets/cursor-gauntlet-interactive.png") 7 2, pointer;
+    }
+    body {
+      cursor:
+        url("/assets/cursor-gauntlet.png") 7 2,
+        auto;
+    }
+    :where(
+        a[href],
+        button,
+        summary,
+        select,
+        label[for],
+        [role="button"],
+        [role="link"],
+        input[type="button"],
+        input[type="submit"],
+        input[type="reset"],
+        input[type="checkbox"],
+        input[type="radio"],
+        input[type="range"],
+        input[type="file"],
+        input[type="color"]
+      ):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):not(
+        [inert] *
+      ) {
+      cursor: var(--cursor-interactive);
+    }
+    :where(
+      input,
+      textarea,
+      [contenteditable]:not([contenteditable="false"]),
+      .contract-value,
+      .copy-full-value,
+      .select-text,
+      .select-all
+    ) {
+      cursor: text;
+    }
+    :where(:disabled, [aria-disabled="true"]) {
+      cursor: not-allowed;
+    }
+    :where([aria-busy="true"]) {
+      cursor: progress;
+    }
+  }
+}
 /* Tailwind v3 responsive font utilities won over unprefixed line heights. */
 @layer utilities {
   @media (min-width: 640px) {

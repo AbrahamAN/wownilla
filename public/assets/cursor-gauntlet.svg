@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- Original Wownilla artwork. Both states share a 32px canvas and hotspot (7, 2). -->
+  <path fill="#151617" d="M7 2h3v1h2v9h3v-1h4v2h4v2h3v3h1v6h-2v6H10v-4H8v-2H6v-3H4v-3H3v-3h2v-1h2z"/>
+  <path fill="#777e7e" d="M7 3h3v1h1v11h3v-3h4v3h4v1h3v3h1v4h-2v3H10v-2H8v-3H6v-3H4v-2h2v1h2V4H7z"/>
+  <path fill="#adb3ad" d="M8 4h2v4H8zm0 6h2v4H8zm5 3h3v2h-3zm6 2h2v2h-2zm4 3h2v2h-2zM5 16h1v2H5zm4 3h2v4H9z"/>
+  <path fill="#454d50" d="M10 5h1v10h-1zm3 11h4v2h-4zm5 2h4v2h-4zm5 3h2v2h-2zM12 20h2v4h8v2H12zM7 18h2v3H7z"/>
+  <path fill="#282e31" d="M8 8h3v1H8zm0 4h3v1H8zm5 3h5v1h-5zm5 2h4v1h-4zm4 3h4v1h-4zM10 26h14v3H10z"/>
+  <path fill="#89744c" d="M11 25h12v2H11zM11 28h12v1H11z"/>
+  <path fill="#b2a078" d="M12 25h2v1h-2zm8 0h2v1h-2z"/>
+</svg>
